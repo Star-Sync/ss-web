@@ -2,6 +2,7 @@ import React from 'react';
 
 const Dashboard: React.FC = () => {
     return (
+        <section className="w-full h-full flex flex-col bg-gray-700">
             <div className="p-6 bg-gray-700 shadow-md rounded-lg">
                 <h2 className="text-2xl font-bold mb-4 text-white">Overview</h2>
                 <div className="grid grid-cols-1 md:grid-cols-3 gap-4">
@@ -20,6 +21,8 @@ const Dashboard: React.FC = () => {
                     </div>
                 </div>
             </div>
+        </section>
+
     );
 };
 
