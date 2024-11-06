@@ -1,18 +1,8 @@
 import {
-    BookOpen,
-    Bot,
-    ChevronRight,
-    ChevronsUpDown, CogIcon,
-    Folder,
-    Forward,
-    Frame,
+    ChevronsUpDown,
+    CogIcon,
+    LayoutDashboard,
     LogOut,
-    Map,
-    MoreHorizontal,
-    PieChart,
-    Settings2,
-    SquareTerminal,
-    Trash2,
 } from "lucide-react"
 
 import {
@@ -20,11 +10,6 @@ import {
     AvatarFallback,
     AvatarImage,
 } from "@/components/ui/avatar"
-import {
-    Collapsible,
-    CollapsibleContent,
-    CollapsibleTrigger,
-} from "@/components/ui/collapsible"
 import {
     DropdownMenu,
     DropdownMenuContent,
@@ -39,20 +24,15 @@ import {
     SidebarContent,
     SidebarFooter,
     SidebarGroup,
-    SidebarGroupLabel,
     SidebarHeader,
     SidebarMenu,
-    SidebarMenuAction,
     SidebarMenuButton,
     SidebarMenuItem,
-    SidebarMenuSub,
-    SidebarMenuSubButton,
-    SidebarMenuSubItem,
-    SidebarRail,
     useSidebar,
 } from "@/components/ui/sidebar"
 import Image from "next/image";
 import {FaQuestionCircle} from "react-icons/fa";
+import {useIsMobile} from "@/hooks/use-mobile";
 
 const data = {
     user: {
@@ -62,106 +42,9 @@ const data = {
     },
     navMain: [
         {
-            title: "Playground",
-            url: "#",
-            icon: SquareTerminal,
+            title: "Dashboard",
+            url: "/dashboard",
             isActive: true,
-            items: [
-                {
-                    title: "History",
-                    url: "#",
-                },
-                {
-                    title: "Starred",
-                    url: "#",
-                },
-                {
-                    title: "Settings",
-                    url: "#",
-                },
-            ],
-        },
-        {
-            title: "Models",
-            url: "#",
-            icon: Bot,
-            items: [
-                {
-                    title: "Genesis",
-                    url: "#",
-                },
-                {
-                    title: "Explorer",
-                    url: "#",
-                },
-                {
-                    title: "Quantum",
-                    url: "#",
-                },
-            ],
-        },
-        {
-            title: "Documentation",
-            url: "#",
-            icon: BookOpen,
-            items: [
-                {
-                    title: "Introduction",
-                    url: "#",
-                },
-                {
-                    title: "Get Started",
-                    url: "#",
-                },
-                {
-                    title: "Tutorials",
-                    url: "#",
-                },
-                {
-                    title: "Changelog",
-                    url: "#",
-                },
-            ],
-        },
-        {
-            title: "Settings",
-            url: "#",
-            icon: Settings2,
-            items: [
-                {
-                    title: "General",
-                    url: "#",
-                },
-                {
-                    title: "Team",
-                    url: "#",
-                },
-                {
-                    title: "Billing",
-                    url: "#",
-                },
-                {
-                    title: "Limits",
-                    url: "#",
-                },
-            ],
-        },
-    ],
-    projects: [
-        {
-            name: "Design Engineering",
-            url: "#",
-            icon: Frame,
-        },
-        {
-            name: "Sales & Marketing",
-            url: "#",
-            icon: PieChart,
-        },
-        {
-            name: "Travel",
-            url: "#",
-            icon: Map,
         },
     ],
 }
@@ -170,120 +53,49 @@ export function AppSidebar() {
 
     const {state} = useSidebar()
     const isCollapsed = state === "collapsed"
+    const isMobile = useIsMobile()
     return (
 
         <div>
             <Sidebar collapsible="icon">
-                <SidebarHeader>
-                    <div
-                        className={`flex items-center justify-center h-full transition-all duration-300 ${isCollapsed ? 'w-16' : 'w-64'}`}>
-                        {!isCollapsed ? (
+                <SidebarHeader className="mt-3 ml-1 flex items-center justify-center transition-all duration-300">
+                        {!isCollapsed || isMobile ? (
                             <Image
                                 src="/ss-logo-full.png"
                                 alt="Wide Logo"
                                 width={128}
                                 height={64}
-                                className="transition-all duration-300 mt-4 -ml-5"
+                                className="transition-all duration-300 mt-4"
                             />
                         ) : (
                             <Image
                                 src="/favicon.png"
                                 alt="Square Logo"
-                                width={24}
-                                height={24}
-                                className="transition-all duration-300 -ml-8"
+                                width={30}
+                                height={30}
+                                className="transition-all duration-300"
                             />
                         )}
-                    </div>
                 </SidebarHeader>
-                <SidebarContent>
+                <SidebarContent  className="ml-1">
                     <SidebarGroup>
-                        <SidebarGroupLabel>Dashboard</SidebarGroupLabel>
                         <SidebarMenu>
                             {data.navMain.map((item) => (
-                                <Collapsible
-                                    key={item.title}
-                                    asChild
-                                    defaultOpen={item.isActive}
-                                    className="group/collapsible"
-                                >
-                                    <SidebarMenuItem>
-                                        <CollapsibleTrigger asChild>
-                                            <SidebarMenuButton tooltip={item.title}>
-                                                {item.icon && <item.icon/>}
-                                                <span>{item.title}</span>
-                                                <ChevronRight
-                                                    className="ml-auto transition-transform duration-200 group-data-[state=open]/collapsible:rotate-90"/>
-                                            </SidebarMenuButton>
-                                        </CollapsibleTrigger>
-                                        <CollapsibleContent>
-                                            <SidebarMenuSub>
-                                                {item.items?.map((subItem) => (
-                                                    <SidebarMenuSubItem key={subItem.title}>
-                                                        <SidebarMenuSubButton asChild>
-                                                            <a href={subItem.url}>
-                                                                <span>{subItem.title}</span>
-                                                            </a>
-                                                        </SidebarMenuSubButton>
-                                                    </SidebarMenuSubItem>
-                                                ))}
-                                            </SidebarMenuSub>
-                                        </CollapsibleContent>
-                                    </SidebarMenuItem>
-                                </Collapsible>
-                            ))}
-                        </SidebarMenu>
-                    </SidebarGroup>
-                    <SidebarGroup className="group-data-[collapsible=icon]:hidden">
-                        <SidebarGroupLabel>Projects</SidebarGroupLabel>
-                        <SidebarMenu>
-                            {data.projects.map((item) => (
-                                <SidebarMenuItem key={item.name}>
-                                    <SidebarMenuButton asChild>
-                                        <a href={item.url}>
-                                            <item.icon/>
-                                            <span>{item.name}</span>
-                                        </a>
+                                <SidebarMenuItem key={item.title} asChild>
+                                    <SidebarMenuButton href={item.url} active={item.isActive}>
+                                        {item.title === "Dashboard" ? (
+                                            <span className="icon"><LayoutDashboard /></span>
+                                        ) : item.title === "Settings" ? (
+                                            <span className="icon"><CogIcon /></span>
+                                        ) : null}
+                                        <span className="">{item.title}</span>
                                     </SidebarMenuButton>
-                                    <DropdownMenu>
-                                        <DropdownMenuTrigger asChild>
-                                            <SidebarMenuAction showOnHover>
-                                                <MoreHorizontal/>
-                                                <span className="sr-only">More</span>
-                                            </SidebarMenuAction>
-                                        </DropdownMenuTrigger>
-                                        <DropdownMenuContent
-                                            className="w-48 rounded-lg"
-                                            side="bottom"
-                                            align="end"
-                                        >
-                                            <DropdownMenuItem>
-                                                <Folder className="text-muted-foreground"/>
-                                                <span>View Project</span>
-                                            </DropdownMenuItem>
-                                            <DropdownMenuItem>
-                                                <Forward className="text-muted-foreground"/>
-                                                <span>Share Project</span>
-                                            </DropdownMenuItem>
-                                            <DropdownMenuSeparator/>
-                                            <DropdownMenuItem>
-                                                <Trash2 className="text-muted-foreground"/>
-                                                <span>Delete Project</span>
-                                            </DropdownMenuItem>
-                                        </DropdownMenuContent>
-                                    </DropdownMenu>
                                 </SidebarMenuItem>
                             ))}
-                            <SidebarMenuItem>
-                                <SidebarMenuButton className="text-sidebar-foreground/70">
-                                    <MoreHorizontal className="text-sidebar-foreground/70"/>
-                                    <span>More</span>
-                                </SidebarMenuButton>
-                            </SidebarMenuItem>
                         </SidebarMenu>
                     </SidebarGroup>
                 </SidebarContent>
-                <SidebarFooter>
+                <SidebarFooter className={`flex items-center justify-center ${isMobile || isCollapsed ? 'ml-2' : ''}`}>
                     <SidebarMenu>
                         <SidebarMenuItem>
                             <DropdownMenu>
@@ -361,7 +173,6 @@ export function AppSidebar() {
                         </SidebarMenuItem>
                     </SidebarMenu>
                 </SidebarFooter>
-                <SidebarRail/>
             </Sidebar>
         </div>
     )
