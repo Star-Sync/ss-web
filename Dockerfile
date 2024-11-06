@@ -1,6 +1,6 @@
 # Adjust NODE_VERSION as desired
 ARG NODE_VERSION=22.4.0
-FROM node:${NODE_VERSION}-slim as base
+FROM node:${NODE_VERSION}-slim AS base
 
 LABEL fly_launch_runtime="Next.js"
 ENV NEXT_PRIVATE_STANDALONE true
@@ -10,7 +10,7 @@ WORKDIR /app
 ENV NODE_ENV="production"
 
 # Throw-away build stage to reduce size of final image
-FROM base as build
+FROM base AS build
 
 # Install node modules
 COPY package-lock.json package.json ./
