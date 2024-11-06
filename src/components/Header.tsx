@@ -18,6 +18,30 @@ const Header: React.FC = () => {
     const [time, setTime] = useState<string>("");
     const [timezone, setTimezone] = useState<string>("UTC");
     const [open, setOpen] = useState<boolean>(false);
+    const [opacity, setOpacity] = useState<number>(1);
+    const [hover, setHover] = useState<boolean>(false);
+
+    const adjustOpacity = () => {
+        if (open || hover) {
+            setOpacity(1);
+        } else {
+            const scrollY = window.scrollY;
+            const newOpacity = Math.max(1 - scrollY / 300, 0.5);
+            setOpacity(newOpacity);
+        }
+    };
+
+    useEffect(() => {
+        adjustOpacity();
+    }, [open, hover]);
+
+    useEffect(() => {
+        const handleScroll = () => {
+            adjustOpacity();
+        };
+        window.addEventListener('scroll', handleScroll);
+        return () => window.removeEventListener('scroll', handleScroll);
+    }, [open, hover]);
 
     useEffect(() => {
         const timer = setInterval(() => {
@@ -27,7 +51,7 @@ const Header: React.FC = () => {
                 hour: "2-digit",
                 minute: "2-digit",
                 second: "2-digit",
-                hour12: false, // Ensure 24-hour format
+                hour12: false,
             });
             const formattedTime = formatter.format(now);
             const locationName = timezones.find((tz) => tz.value === timezone)?.name || "";
@@ -38,12 +62,17 @@ const Header: React.FC = () => {
     }, [timezone]);
 
     return (
-        <header className="bg-white p-4 text-black">
-            <div className="relative flex items-center w-full">
+        <header
+            className="bg-white p-4 text-black sticky top-0 z-10"
+            style={{ opacity }}
+            onMouseEnter={() => setHover(true)}
+            onMouseLeave={() => setHover(false)}
+        >
+            <div className="relative flex items-center w-full header-content">
                 {/* Left Side */}
                 <div className="absolute left-0 flex items-center">
                     <SidebarTrigger />
-                    <Separator orientation="vertical" className="h-6 ml-1" />
+                    <Separator orientation="vertical" className="h-6 ml-3" />
                 </div>
 
                 {/* Centered Combo Box with Clock */}
