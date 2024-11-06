@@ -6,6 +6,7 @@ on:
         # Push events to `release/*` branches will trigger the workflow
         # for example, `release/1.0.0`, `release/1.0.1`, `release/2.0.0`
         branches: ["release/*"]
+    workflow_dispatch:
 
 env:
     REGISTRY: ghcr.io
