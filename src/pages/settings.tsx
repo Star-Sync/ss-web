@@ -1,25 +1,58 @@
-import React from 'react';
+import React, {useEffect, useState} from 'react';
+import SettingsGeneral from "@/components/settings/settings-general";
+
+// Tab data and dynamic import of components for each tab content
+const tabs = [
+    { name: "General", key: "general", Component: SettingsGeneral },
+    { name: "Users", key: "users", Component: () => <div>User management settings content goes here.</div> },
+    { name: "Analytics", key: "analytics", Component: () => <div>Analytics settings content goes here.</div> },
+    { name: "Apps", key: "apps", Component: () => <div>Apps settings content goes here.</div> },
+    { name: "Security", key: "security", Component: () => <div>Security settings content goes here.</div> },
+    { name: "Billing", key: "billing", Component: () => <div>Billing settings content goes here.</div> },
+    { name: "API", key: "api", Component: () => <div>API settings content goes here.</div> },
+];
 
 const Settings: React.FC = () => {
-    return (
-            <div className="p-6 bg-white shadow-md rounded-lg">
-                <h2 className="text-2xl font-bold mb-4 text-black">Settings</h2>
-                <div className="grid grid-cols-1 md:grid-cols-3 gap-4">
-                    <div className="bg-blue-500 text-white p-4 rounded-lg shadow-md">
-                        <h3 className="text-lg font-semibold">User Profile</h3>
-                        <p>Update your profile details</p>
-                    </div>
-                    <div className="bg-green-500 text-white p-4 rounded-lg shadow-md">
-                        <h3 className="text-lg font-semibold">Account Settings</h3>
+    const [activeTab, setActiveTab] = useState("general");
+    // Find the active tab object
+    const activeTabData = tabs.find((tab) => tab.key === activeTab);
+    const [isLoaded, setIsLoaded] = useState(false);
 
-                        <p>Update your account settings</p>
-                    </div>
-                    <div className="bg-yellow-500 text-white p-4 rounded-lg shadow-md">
-                        <h3 className="text-lg font-semibold">Notification Preferences</h3>
-                        <p>Update your notification preferences</p>
-                    </div>
+    useEffect(() => {
+        setIsLoaded(true);
+    }, []);
+
+    return (
+        <section className="w-full h-full bg-gray-50 p-4 space-y-4">
+            {/* Heading Section */}
+            <div className={`bg-white rounded-xl p-6 shadow-md ${isLoaded ? 'fade-in' : ''}`}>
+                <h1 className="text-2xl font-bold text-black">Settings</h1>
+                <h2 className="text-md text-gray-500 mb-3">Manage your plan and billing history here.</h2>
+
+                {/* Tab Navigation */}
+                <div className="flex space-x-2 overflow-x-auto">
+                    {tabs.map((tab) => (
+                        <button
+                            key={tab.key}
+                            onClick={() => setActiveTab(tab.key)}
+                            className={`px-4 py-2 rounded-full border text-sm font-medium ${
+                                activeTab === tab.key
+                                    ? "bg-black text-white"
+                                    : "bg-gray-100 text-gray-800 hover:bg-gray-200"
+                            }`}
+                        >
+                            {tab.name}
+                        </button>
+                    ))}
                 </div>
+
             </div>
+
+            {/* Content Section for Active Tab */}
+            <div className={`bg-white rounded-xl p-6 shadow-md ${isLoaded ? 'fade-in' : ''}`}>
+                {activeTabData?.Component && <activeTabData.Component/>}
+            </div>
+        </section>
     );
 };
 
