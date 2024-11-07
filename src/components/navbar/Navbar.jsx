@@ -1,5 +1,6 @@
 import React, {useState} from 'react'
 import { RiMenu3Line, RiCloseLine } from 'react-icons/ri';
+import Image from 'next/image';
 import logo from '../../assets/logo.png';
 import './navbar.css';
 const Navbar = () => {
@@ -9,7 +10,7 @@ const [toggleMenu, setToggleMenu] = useState(false);
     <div className='scheduler_navbar'>
       <div className='scheduler_navbar-links'>
       <div className='scheduler_navbar-links_logo'>
-        <img src={logo} alt='logo' />
+        <Image src={logo} alt='logo' />
         </div>
         <div className='scheduler_navbar-links_container'>
           <p><a href='#home'>Home</a></p>
