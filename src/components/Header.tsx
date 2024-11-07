@@ -44,6 +44,14 @@ const Header: React.FC = () => {
     }, [open, hover]);
 
     useEffect(() => {
+        // Only access localStorage on the client side
+        const savedTimezone = typeof window !== "undefined" ? localStorage.getItem("timezone") : "UTC";
+        if (savedTimezone) {
+            setTimezone(savedTimezone);
+        }
+    }, []);
+
+    useEffect(() => {
         const timer = setInterval(() => {
             const now = new Date();
             const formatter = new Intl.DateTimeFormat("en-US", {
@@ -60,6 +68,14 @@ const Header: React.FC = () => {
 
         return () => clearInterval(timer);
     }, [timezone]);
+
+    const handleTimezoneChange = (newTimezone: string) => {
+        setTimezone(newTimezone);
+        if (typeof window !== "undefined") {
+            localStorage.setItem("timezone", newTimezone);
+        }
+        setOpen(false);
+    };
 
     return (
         <header
@@ -100,10 +116,7 @@ const Header: React.FC = () => {
                                             <CommandItem
                                                 key={tz.value}
                                                 value={tz.value}
-                                                onSelect={() => {
-                                                    setTimezone(tz.value);
-                                                    setOpen(false);
-                                                }}
+                                                onSelect={() => handleTimezoneChange(tz.value)}
                                             >
                                                 {tz.label}
                                                 <Check

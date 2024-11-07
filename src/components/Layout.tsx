@@ -4,6 +4,7 @@ import { SidebarProvider } from '@/components/ui/sidebar';
 import { AppSidebar } from '@/components/AppSidebar';
 import Header from '@/components/Header';
 
+
 type LayoutProps = {
     children: React.ReactNode;
 };
@@ -15,7 +16,7 @@ const Layout: React.FC<LayoutProps> = ({ children }) => {
     return (
         <SidebarProvider>
             {!isHomepage && <AppSidebar />}
-            <main className="w-screen h-screen">
+            <main className="w-screen h-screen bg-white">
                 {!isHomepage && <Header />}
                 {children}
             </main>

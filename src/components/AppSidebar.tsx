@@ -1,19 +1,16 @@
-"use client"
+"use client";
 
 // External Libraries
-import React from "react";
+import React, { useEffect, useState } from "react";
 import Image from "next/image";
 import { FaQuestionCircle } from "react-icons/fa";
-import { useIsMobile } from "@/hooks/use-mobile";
-import { useRouter } from "next/navigation";
+import { useRouter } from "next/router";
 
 // Icons
-import {
-    ChevronsUpDown,
-    CogIcon,
-    LayoutDashboard,
-    LogOut,
-} from "lucide-react";
+import { ChevronsUpDown, CogIcon, LayoutDashboard, LogOut } from "lucide-react";
+
+// Custom Hooks
+import { useIsMobile } from "@/hooks/use-mobile";
 
 // UI Components
 import {
@@ -42,8 +39,28 @@ import {
     useSidebar,
 } from "@/components/ui/sidebar";
 
+// Types
+interface User {
+    name: string;
+    email: string;
+    avatar: string;
+    role: string;
+}
+
+interface NavItem {
+    title: string;
+    url: string;
+    isActive: boolean;
+    icon: React.ComponentType<React.SVGProps<SVGSVGElement>>;
+}
+
+interface Data {
+    user: User;
+    navMain: NavItem[];
+}
+
 // Data
-const data = {
+const data: Data = {
     user: {
         name: "Sathira Williams",
         email: "sathira.williams@gmail.com",
@@ -67,16 +84,21 @@ const data = {
 };
 
 // Logo Component
-function Logo({ isCollapsed, isMobile }) {
+interface LogoProps {
+    isCollapsed: boolean;
+    isMobile: boolean;
+}
+
+const Logo: React.FC<LogoProps> = ({ isCollapsed, isMobile }) => {
     return (
-        <SidebarHeader className="mt-3 ml-1 flex items-center justify-center transition-all duration-300">
+        <SidebarHeader className="mt-3 -ml-1 flex items-center justify-center transition-all duration-300">
             {!isCollapsed || isMobile ? (
                 <Image
                     src="/ss-logo-full.png"
                     alt="Wide Logo"
                     width={128}
                     height={64}
-                    className="transition-all duration-300 mt-4"
+                    className="mt-4 transition-all duration-300"
                 />
             ) : (
                 <Image
@@ -89,25 +111,50 @@ function Logo({ isCollapsed, isMobile }) {
             )}
         </SidebarHeader>
     );
-}
+};
 
 // Navigation Menu Component
-function NavigationMenu({ navMain }) {
+interface NavigationMenuProps {
+    navMain: NavItem[];
+}
+
+const NavigationMenu: React.FC<NavigationMenuProps> = ({ navMain }) => {
     const router = useRouter();
+    const { state } = useSidebar();
+    const isCollapsed = state === "collapsed";
+    const isMobile = useIsMobile();
+    const { asPath } = useRouter();
+    const [activeNav, setActiveNav] = useState(navMain);
+
+    useEffect(() => {
+        // Update the active state based on the current path
+        setActiveNav(
+            navMain.map((item) => ({
+                ...item,
+                isActive: asPath === item.url,
+            }))
+        );
+    }, [asPath, navMain]);
+
     return (
         <SidebarGroup>
             <SidebarMenu>
-                {navMain.map((item) => {
+                {activeNav.map((item) => {
                     const IconComponent = item.icon;
                     return (
-                        <SidebarMenuItem key={item.title} asChild onClick={() => router.push(item.url)}>
-                            <SidebarMenuButton href={item.url} active={item.isActive}>
+                        <SidebarMenuItem key={item.title}>
+                            <SidebarMenuButton
+                                onClick={() => router.push(item.url)}
+                                isActive={item.isActive}
+                                tooltip={isCollapsed && !isMobile ? item.title : undefined}
+                                className={`flex items-center gap-2 ${
+                                    item.isActive ? "bg-blue-500 text-white" : ""
+                                } transition-colors duration-200`}
+                            >
                                 {IconComponent && (
-                                    <span className="icon">
-                                        <IconComponent />
-                                    </span>
+                                    <IconComponent className="w-10 h-10" />
                                 )}
-                                <span>{item.title}</span>
+                                {(!isCollapsed || isMobile) && <span>{item.title}</span>}
                             </SidebarMenuButton>
                         </SidebarMenuItem>
                     );
@@ -115,10 +162,14 @@ function NavigationMenu({ navMain }) {
             </SidebarMenu>
         </SidebarGroup>
     );
-}
+};
 
 // User Dropdown Menu Component
-function UserDropdownMenu({ user }) {
+interface UserDropdownMenuProps {
+    user: User;
+}
+
+const UserDropdownMenu: React.FC<UserDropdownMenuProps> = ({ user }) => {
     return (
         <DropdownMenu>
             <DropdownMenuTrigger asChild>
@@ -128,13 +179,15 @@ function UserDropdownMenu({ user }) {
                 >
                     <Avatar className="h-8 w-8 rounded-lg">
                         <AvatarImage src={user.avatar} alt={user.name} />
-                        <AvatarFallback className="rounded-lg">CN</AvatarFallback>
+                        <AvatarFallback className="rounded-lg">
+                            {user.name.charAt(0)}
+                        </AvatarFallback>
                     </Avatar>
                     <div className="grid flex-1 text-left text-sm leading-tight">
                         <span className="truncate font-semibold">{user.name}</span>
                         <span className="truncate text-xs">{user.email}</span>
                     </div>
-                    <ChevronsUpDown className="ml-auto size-4" />
+                    <ChevronsUpDown className="ml-auto h-4 w-4" />
                 </SidebarMenuButton>
             </DropdownMenuTrigger>
             <DropdownMenuContent
@@ -147,7 +200,9 @@ function UserDropdownMenu({ user }) {
                     <div className="flex items-center gap-2 px-1 py-1.5 text-left text-sm">
                         <Avatar className="h-8 w-8 rounded-lg">
                             <AvatarImage src={user.avatar} alt={user.name} />
-                            <AvatarFallback className="rounded-lg">CN</AvatarFallback>
+                            <AvatarFallback className="rounded-lg">
+                                {user.name.charAt(0)}
+                            </AvatarFallback>
                         </Avatar>
                         <div className="grid flex-1 text-left text-sm leading-tight">
                             <span className="truncate font-semibold">{user.name}</span>
@@ -158,29 +213,29 @@ function UserDropdownMenu({ user }) {
                 <DropdownMenuSeparator />
                 <DropdownMenuGroup>
                     <DropdownMenuItem>
-                        <FaQuestionCircle />
+                        <FaQuestionCircle className="mr-2 h-4 w-4" />
                         Help
                     </DropdownMenuItem>
                 </DropdownMenuGroup>
                 <DropdownMenuItem>
-                    <LogOut />
+                    <LogOut className="mr-2 h-4 w-4" />
                     Log out
                 </DropdownMenuItem>
             </DropdownMenuContent>
         </DropdownMenu>
     );
-}
+};
 
 // Main AppSidebar Component
-export function AppSidebar() {
+export const AppSidebar: React.FC = () => {
     const { state } = useSidebar();
     const isCollapsed = state === "collapsed";
     const isMobile = useIsMobile();
 
     return (
-        <Sidebar collapsible="icon">
+        <Sidebar collapsible="icon" className="flex flex-col overflow-hidden">
             <Logo isCollapsed={isCollapsed} isMobile={isMobile} />
-            <SidebarContent className="ml-1">
+            <SidebarContent className="ml-1 flex-1 overflow-y-auto">
                 <NavigationMenu navMain={data.navMain} />
             </SidebarContent>
             <SidebarFooter
@@ -196,4 +251,4 @@ export function AppSidebar() {
             </SidebarFooter>
         </Sidebar>
     );
-}
+};
