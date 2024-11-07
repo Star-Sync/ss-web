@@ -1,5 +1,4 @@
 import React, {useEffect, useState} from 'react';
-import { Separator } from "@/components/ui/separator";
 import SettingsGeneral from "@/components/settings/settings-general";
 
 // Tab data and dynamic import of components for each tab content

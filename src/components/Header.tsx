@@ -1,4 +1,4 @@
-import React, { useState, useEffect } from 'react';
+import React, { useState, useEffect, useCallback } from 'react';
 import { SidebarTrigger } from "@/components/ui/sidebar";
 import { Separator } from "@/components/ui/separator";
 import { Button } from "@/components/ui/button";
@@ -21,7 +21,7 @@ const Header: React.FC = () => {
     const [opacity, setOpacity] = useState<number>(1);
     const [hover, setHover] = useState<boolean>(false);
 
-    const adjustOpacity = () => {
+    const adjustOpacity = useCallback(() => {
         if (open || hover) {
             setOpacity(1);
         } else {
@@ -29,11 +29,11 @@ const Header: React.FC = () => {
             const newOpacity = Math.max(1 - scrollY / 300, 0.5);
             setOpacity(newOpacity);
         }
-    };
+    }, [open, hover]);
 
     useEffect(() => {
         adjustOpacity();
-    }, [open, hover]);
+    }, [open, hover, adjustOpacity]);
 
     useEffect(() => {
         const handleScroll = () => {
@@ -41,7 +41,7 @@ const Header: React.FC = () => {
         };
         window.addEventListener('scroll', handleScroll);
         return () => window.removeEventListener('scroll', handleScroll);
-    }, [open, hover]);
+    }, [open, hover, adjustOpacity]);
 
     useEffect(() => {
         // Only access localStorage on the client side
