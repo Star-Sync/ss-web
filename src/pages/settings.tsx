@@ -1,5 +1,5 @@
 import React, {useEffect, useState} from 'react';
-import SettingsGeneral from "@/components/settings/settings-general";
+import SettingsGeneral from "@/components/app/settings/settings-general";
 
 // Tab data and dynamic import of components for each tab content
 const tabs = [

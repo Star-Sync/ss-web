@@ -1,13 +1,13 @@
 import React from 'react';
 import { AppProps } from 'next/app';
-import Layout from '../components/Layout';
+import AppLayout from '../components/app/AppLayout';
 import '../styles/globals.css';
 
 function MyApp({ Component, pageProps }: AppProps) {
     return (
-        <Layout>
+        <AppLayout>
             <Component {...pageProps} />
-        </Layout>
+        </AppLayout>
 );
 }
 

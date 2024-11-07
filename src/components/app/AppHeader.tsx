@@ -1,8 +1,8 @@
 import React, { useState, useEffect, useCallback } from 'react';
-import { SidebarTrigger } from "@/components/ui/sidebar";
-import { Separator } from "@/components/ui/separator";
-import { Button } from "@/components/ui/button";
-import { Popover, PopoverTrigger, PopoverContent } from "@/components/ui/popover";
+import { SidebarTrigger } from "@/components/app/ui/sidebar";
+import { Separator } from "@/components/app/ui/separator";
+import { Button } from "@/components/app/ui/button";
+import { Popover, PopoverTrigger, PopoverContent } from "@/components/app/ui/popover";
 import {
     Command,
     CommandInput,
@@ -10,11 +10,11 @@ import {
     CommandEmpty,
     CommandGroup,
     CommandItem,
-} from "@/components/ui/command";
+} from "@/components/app/ui/command";
 import { ChevronsUpDown, Check } from "lucide-react";
 import { timezones } from "@/data/timezones";
 
-const Header: React.FC = () => {
+const AppHeader: React.FC = () => {
     const [time, setTime] = useState<string>("");
     const [timezone, setTimezone] = useState<string>("UTC");
     const [open, setOpen] = useState<boolean>(false);
@@ -137,4 +137,4 @@ const Header: React.FC = () => {
     );
 };
 
-export default Header;
+export default AppHeader;
