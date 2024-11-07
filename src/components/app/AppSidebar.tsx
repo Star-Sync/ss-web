@@ -64,7 +64,7 @@ const data: Data = {
     user: {
         name: "Sathira Williams",
         email: "sathira.williams@gmail.com",
-        avatar: "/ss-logo-favicon.png",
+        avatar: "/logo/ss-logo-favicon.png",
         role: "CSA Admin",
     },
     navMain: [

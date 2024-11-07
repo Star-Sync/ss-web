@@ -2,21 +2,22 @@ import React, { useState, useEffect, useCallback } from 'react';
 import { SidebarTrigger } from "@/components/app/ui/sidebar";
 import { Separator } from "@/components/app/ui/separator";
 import TimezoneClock from "@/components/app/ui/timezoneclock";
+import { motion, useAnimation } from 'framer-motion';
 
 const AppHeader: React.FC = () => {
-    const [opacity, setOpacity] = useState<number>(1);
     const [hover, setHover] = useState<boolean>(false);
-    const [clockOpen, setClockOpen] = useState<boolean>(false); // Add this state
+    const [clockOpen, setClockOpen] = useState<boolean>(false);
+    const controls = useAnimation();
 
     const adjustOpacity = useCallback(() => {
         if (clockOpen || hover) {
-            setOpacity(1);
+            controls.start({ opacity: 1 });
         } else {
             const scrollY = window.scrollY;
             const newOpacity = Math.max(1 - scrollY / 300, 0.5);
-            setOpacity(newOpacity);
+            controls.start({ opacity: newOpacity });
         }
-    }, [clockOpen, hover]);
+    }, [clockOpen, hover, controls]);
 
     useEffect(() => {
         adjustOpacity();
@@ -28,14 +29,15 @@ const AppHeader: React.FC = () => {
         };
         window.addEventListener('scroll', handleScroll);
         return () => window.removeEventListener('scroll', handleScroll);
-    }, [clockOpen, hover, adjustOpacity]);
+    }, [adjustOpacity]);
 
     return (
-        <header
+        <motion.header
             className="bg-white p-4 text-black sticky top-0 z-10"
-            style={{ opacity }}
+            animate={controls}
             onMouseEnter={() => setHover(true)}
             onMouseLeave={() => setHover(false)}
+            initial={{ opacity: 1 }}
         >
             <div className="relative flex items-center w-full header-content">
                 {/* Left Side */}
@@ -52,7 +54,7 @@ const AppHeader: React.FC = () => {
                     />
                 </div>
             </div>
-        </header>
+        </motion.header>
     );
 };
 
