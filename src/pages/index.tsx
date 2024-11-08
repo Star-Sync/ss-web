@@ -1,13 +1,22 @@
 import React from 'react';
+import WebNavbar from "@/components/web/WebNavbar";
+import WebHeader from "@/components/web/WebHeader";
+import WebFooter from "@/components/web/WebFooter";
+import { Article, Brand, CTA, Feature } from "@/components/web/WebPageExports";
 
 const Home: React.FC = () => {
     return (
-        <section className="w-full h-full flex flex-col bg-gray-700">
-            <div>
-                <h1 className="text-2xl font-bold mb-4 text-white text-center mt-72">This is intentionally blank</h1>
+        <div className="App">
+            <div className="gradient__bg">
+                <WebNavbar />
+                <WebHeader />
             </div>
-        </section>
-
+            <Article />
+            <Brand />
+            <CTA />
+            <Feature />
+            <WebFooter />
+        </div>
     );
 };
 
