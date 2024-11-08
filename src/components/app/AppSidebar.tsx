@@ -94,7 +94,7 @@ const Logo: React.FC<LogoProps> = ({ isCollapsed, isMobile }) => {
         <SidebarHeader className="mt-3 -ml-1 flex items-center justify-center transition-all duration-300">
             {!isCollapsed || isMobile ? (
                 <Image
-                    src="/ss-logo-full.png"
+                    src="/logo/ss-logo-full.png"
                     alt="Wide Logo"
                     width={128}
                     height={64}
@@ -102,7 +102,7 @@ const Logo: React.FC<LogoProps> = ({ isCollapsed, isMobile }) => {
                 />
             ) : (
                 <Image
-                    src="/favicon.png"
+                    src="/logo/favicon.png"
                     alt="Square Logo"
                     width={30}
                     height={30}
