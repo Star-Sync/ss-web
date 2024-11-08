@@ -1,4 +1,5 @@
 import React, { useEffect, useState } from 'react';
+import { motion, AnimatePresence } from 'framer-motion';
 
 const Dashboard: React.FC = () => {
     const [isLoaded, setIsLoaded] = useState(false);
@@ -8,26 +9,43 @@ const Dashboard: React.FC = () => {
     }, []);
 
     return (
-        <section className="w-full h-full bg-gray-50 p-4 space-y-4">
-            <div className={`bg-white rounded-xl p-6 shadow-md ${isLoaded ? 'fade-in' : ''}`}>
+        <motion.section
+            className="w-full h-full bg-gray-50 p-4 space-y-4"
+            initial={{ opacity: 0, y: 10 }}
+            animate={{ opacity: 1, y: 0 }}
+            transition={{ duration: 0.5 }}
+        >
+            <motion.div
+                className="bg-white rounded-xl p-6 shadow-md"
+                initial={{ opacity: 0 }}
+                animate={{ opacity: isLoaded ? 1 : 0 }}
+                transition={{ duration: 0.5 }}
+            >
                 <h2 className="text-2xl font-bold text-black">Overview</h2>
                 <h2 className="text-md text-gray-500 mb-4">Manage your plan and billing history here.</h2>
+
                 <div className="grid grid-cols-1 md:grid-cols-3 gap-4">
-                    <div className="bg-blue-500 text-white p-4 rounded-lg shadow-md">
-                        <h3 className="text-lg font-semibold">Scheduled Tasks</h3>
-                        <p>Number of tasks scheduled today: 10</p>
-                    </div>
-                    <div className="bg-green-500 text-white p-4 rounded-lg shadow-md">
-                        <h3 className="text-lg font-semibold">Active Satellites</h3>
-                        <p>Satellites in operation: 5</p>
-                    </div>
-                    <div className="bg-yellow-500 text-white p-4 rounded-lg shadow-md">
-                        <h3 className="text-lg font-semibold">Pending Requests</h3>
-                        <p>Number of pending requests: 3</p>
-                    </div>
+                    <AnimatePresence>
+                        {[
+                            { color: 'bg-blue-500', title: 'Scheduled Tasks', text: 'Number of tasks scheduled today: 10' },
+                            { color: 'bg-green-500', title: 'Active Satellites', text: 'Satellites in operation: 5' },
+                            { color: 'bg-yellow-500', title: 'Pending Requests', text: 'Number of pending requests: 3' }
+                        ].map((card, index) => (
+                            <motion.div
+                                key={card.title}
+                                className={`${card.color} text-white p-4 rounded-lg shadow-md`}
+                                initial={{ opacity: 0, y: 10 }}
+                                animate={{ opacity: 1, y: 0 }}
+                                transition={{ delay: 0.3 * index, duration: 0.5 }}
+                            >
+                                <h3 className="text-lg font-semibold">{card.title}</h3>
+                                <p>{card.text}</p>
+                            </motion.div>
+                        ))}
+                    </AnimatePresence>
                 </div>
-            </div>
-        </section>
+            </motion.div>
+        </motion.section>
     );
 };
 

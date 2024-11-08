@@ -2,7 +2,7 @@ import React from 'react'
 
 import Image from 'next/image';
 import satellite from '../../assets/satellite.png';
-const Header = () => {
+const WebHeader = () => {
   return (
     <div className="scheduler_header section__padding" id="home">
     <div className="scheduler_header-content">
@@ -22,4 +22,4 @@ const Header = () => {
   )
 }
 
-export default Header
+export default WebHeader

@@ -3,7 +3,8 @@ import { RiMenu3Line, RiCloseLine } from 'react-icons/ri';
 import Image from 'next/image';
 import logo from '../../assets/logo.png';
 
-const Navbar = () => {
+
+const WebNavbar = () => {
 const [toggleMenu, setToggleMenu] = useState(false);
 
   return (
@@ -45,4 +46,4 @@ const [toggleMenu, setToggleMenu] = useState(false);
   )
 }
 
-export default Navbar
+export default WebNavbar

@@ -1,28 +1,27 @@
 import React from 'react';
 import { AppProps } from 'next/app';
-import Layout from '../components/Layout';
-import './App.css';
-import './index.css';
-import '../styles/globals.css';
-import '../components/article/article.css';  // Add this import here for global styles like article.css
-import '../components/brand/brand.css';
-import '../components/cta/cta.css';
-import '../components/feature/feature.css';
-import '../components/navbar/navbar.css';
+import AppLayout from '../components/app/AppLayout';
 
-import '../containers/blog/blog.css';
-import '../containers/features/features.css';
-import '../containers/footer/footer.css';
-import '../containers/header/header.css';
-import '../containers/possibility/possibility.css';
-import '../containers/whatScheduler/whatScheduler.css';
+// Styles
+import '../styles/globals.css';
+import '../styles/web/navbar.css';
+import '../styles/web/brand.css';
+import '../styles/web/cta.css';
+import '../styles/web/footer.css';
+import '../styles/web/header.css';
+import '../styles/web/possibility.css';
+import '../styles/web/feature.css';
+import '../styles/web/blog.css';
+import '../styles/web/whatscheduler.css';
+import '../styles/web/app.css';
+import '../styles/web/index.css';
+
 
 function MyApp({ Component, pageProps }: AppProps) {
     return (
-        <Layout>
+        <AppLayout>
             <Component {...pageProps} />
-        </Layout>
+        </AppLayout>
 );
 }
-
 export default MyApp;

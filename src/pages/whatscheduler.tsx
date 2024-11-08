@@ -1,6 +1,6 @@
 import React from 'react'
 
-const WhatScheduler = () => {
+const Whatscheduler = () => {
   return (
     <div>
      WhatScheduler
@@ -8,4 +8,4 @@ const WhatScheduler = () => {
   )
 }
 
-export default WhatScheduler
+export default Whatscheduler
