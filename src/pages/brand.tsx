@@ -1,7 +1,7 @@
 import React from 'react'
 import Image from 'next/image';
-import york from '../../assets/york.png';
-import csa from '../../assets/csa.png';
+import york from '../assets/york.png';
+import csa from '../assets/csa.png';
 
 const Brand = () => {
   return (

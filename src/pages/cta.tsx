@@ -1,11 +1,10 @@
 import React from 'react'
-
-const Footer = () => {
+const Cta = () => {
   return (
     <div>
-     Footer
+     CTA
     </div>
   )
 }
 
-export default Footer
+export default Cta
