@@ -25,9 +25,9 @@ const DashboardUpcoming: React.FC<DashboardUpcomingProps> = ({ className }) => {
     const [activeMission, setActiveMission] = useState(missions[0]);
 
     return (
-        <div className={`flex flex-col h-full ${className}`}>
+        <div className={`${className}`}>
             {/* Scrollable List */}
-            <ScrollArea className="flex-grow rounded-xl border p-4 bg-white">
+            <ScrollArea className="rounded-xl border p-4 bg-white h-96">
                 <h2 className="text-xl font-bold text-gray-900 ml-3">
                     Upcoming Missions
                 </h2>
@@ -57,7 +57,7 @@ const DashboardUpcoming: React.FC<DashboardUpcomingProps> = ({ className }) => {
                             </div>
 
                             {/* Date */}
-                            <div className="ml-auto mt-auto flex flex-col items-center text-gray-900">
+                            <div className="ml-auto -mt-2 flex flex-col items-center text-gray-900">
                                 <span className="text-xs font-semibold">
                                     {mission.date.split(" ")[0]}
                                 </span>

@@ -2,6 +2,7 @@ import React, { useState } from "react";
 import TabNavigation from "@/components/app/settings/TabNavigation";
 import TabContent from "@/components/app/settings/TabContent";
 import SettingsGeneral from "@/components/app/settings/settings-general";
+import MotionWrapper from "@/components/app/dashboard/MotionWrapper";
 
 const tabs = [
     { name: "General", key: "general", Component: SettingsGeneral },
@@ -19,7 +20,7 @@ const Settings = () => {
     const activeTabData = tabs.find((tab) => tab.key === activeTab);
 
     return (
-        <section className="w-full h-full bg-gray-50 p-4 space-y-4">
+        <MotionWrapper className="w-full h-full bg-gray-50 p-4 space-y-4">
             {/* Header Section */}
             <div className="bg-white rounded-xl p-6 shadow-md">
                 <h1 className="text-2xl font-bold text-black">Settings</h1>
@@ -38,7 +39,7 @@ const Settings = () => {
             {activeTabData && (
                 <TabContent activeKey={activeTabData.key} Component={activeTabData.Component} />
             )}
-        </section>
+        </MotionWrapper>
     );
 };
 

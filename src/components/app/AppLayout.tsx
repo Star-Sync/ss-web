@@ -16,7 +16,7 @@ const AppLayout: React.FC<LayoutProps> = ({ children }) => {
     return (
         <SidebarProvider>
             {!isHomepage && <AppSidebar />}
-            <main className="w-screen h-screen bg-white">
+            <main className="mx-auto w-full bg-white">
                 {!isHomepage && <AppHeader />}
                 {children}
             </main>
