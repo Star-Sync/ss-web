@@ -1,6 +1,6 @@
 import React from 'react'
 
-import Image, {StaticImageData} from "next/image";
+import Image from "next/image";
 import satellite from '../../assets/web/satellite.png';
 const WebHeader = () => {
   return (
@@ -15,7 +15,7 @@ const WebHeader = () => {
       </div>
       </div>
     <div className='scheduler_header-image'>
-      <Image src={satellite as StaticImageData} alt="satellite" />
+      <Image src={satellite as string} alt="satellite" />
      </div>
 
     </div>
