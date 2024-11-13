@@ -1,7 +1,7 @@
 import React from 'react'
 
-import Image from 'next/image';
-import satellite from '../../assets/satellite.png';
+import Image, {StaticImageData} from "next/image";
+import satellite from '../../assets/web/satellite.png';
 const WebHeader = () => {
   return (
     <div className="scheduler_header section__padding" id="home">
@@ -15,9 +15,9 @@ const WebHeader = () => {
       </div>
       </div>
     <div className='scheduler_header-image'>
-      <Image src={satellite} alt="satellite" />
+      <Image src={satellite as StaticImageData} alt="satellite" />
      </div>
-    
+
     </div>
   )
 }

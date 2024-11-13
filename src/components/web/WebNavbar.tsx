@@ -1,7 +1,7 @@
 import React, {useState} from 'react'
 import { RiMenu3Line, RiCloseLine } from 'react-icons/ri';
 import Image from 'next/image';
-import logo from '../../assets/logo.png';
+import logo from '../../assets/web/logo.png';
 
 
 const WebNavbar = () => {

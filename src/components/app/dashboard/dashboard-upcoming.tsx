@@ -1,6 +1,6 @@
 import React, { useState } from "react";
 import { motion, AnimatePresence } from "framer-motion";
-import { ScrollArea } from "@/components/app/ui/scroll-area";
+import { ScrollArea } from "@/components/ui/scroll-area";
 import { missions } from "@/api/mission-overview";
 import { Satellite } from "lucide-react";
 

@@ -1,6 +1,6 @@
 import React, { useState, useEffect } from 'react';
-import { Button } from "@/components/app/ui/button";
-import { Popover, PopoverTrigger, PopoverContent } from "@/components/app/ui/popover";
+import { Button } from "@/components/ui/button";
+import { Popover, PopoverTrigger, PopoverContent } from "@/components/ui/popover";
 import {
     Command,
     CommandInput,
@@ -8,7 +8,7 @@ import {
     CommandEmpty,
     CommandGroup,
     CommandItem,
-} from "@/components/app/ui/command";
+} from "@/components/ui/command";
 import { ChevronsUpDown, Check } from "lucide-react";
 import { timezones } from "@/data/timezones";
 
