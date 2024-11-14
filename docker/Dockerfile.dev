@@ -1,0 +1,14 @@
+ARG NODE_VERSION=22.4.0
+FROM node:${NODE_VERSION}-slim AS base
+
+WORKDIR /app
+
+COPY package*.json /app
+
+RUN npm i
+
+COPY . /app
+
+EXPOSE 3000
+
+CMD ["npm", "run", "dev"]
