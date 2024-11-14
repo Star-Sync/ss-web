@@ -17,7 +17,7 @@ import {
     Avatar,
     AvatarFallback,
     AvatarImage,
-} from "@/components/app/ui/avatar";
+} from "@/components/ui/avatar";
 import {
     DropdownMenu,
     DropdownMenuContent,
@@ -26,7 +26,7 @@ import {
     DropdownMenuLabel,
     DropdownMenuSeparator,
     DropdownMenuTrigger,
-} from "@/components/app/ui/dropdown-menu";
+} from "@/components/ui/dropdown-menu";
 import {
     Sidebar,
     SidebarContent,
@@ -37,7 +37,7 @@ import {
     SidebarMenuButton,
     SidebarMenuItem,
     useSidebar,
-} from "@/components/app/ui/sidebar";
+} from "@/components/ui/sidebar";
 
 // Types
 interface User {

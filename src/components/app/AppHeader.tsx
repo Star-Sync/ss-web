@@ -1,7 +1,7 @@
 import React, { useState, useEffect, useCallback } from 'react';
-import { SidebarTrigger } from "@/components/app/ui/sidebar";
-import { Separator } from "@/components/app/ui/separator";
-import TimezoneClock from "@/components/app/ui/timezoneclock";
+import { SidebarTrigger } from "@/components/ui/sidebar";
+import { Separator } from "@/components/ui/separator";
+import TimezoneClock from "@/components/ui/timezoneclock";
 import { motion, useAnimation } from 'framer-motion';
 
 const AppHeader: React.FC = () => {
