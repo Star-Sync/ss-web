@@ -7,6 +7,7 @@ app = 'ss-web'
 primary_region = 'yyz'
 
 [build]
+  dockerfile = 'docker/Dockerfile'
 
 [http_service]
   internal_port = 3000
