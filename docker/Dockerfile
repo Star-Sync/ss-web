@@ -31,6 +31,7 @@ FROM base
 # Copy built application
 COPY --from=build /app/.next/standalone /app
 COPY --from=build /app/.next/static /app/.next/static
+COPY --from=build /app/public /app/public
 
 # Start the server
 EXPOSE 3000

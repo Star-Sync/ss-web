@@ -1,13 +1,23 @@
 import type { Config } from "tailwindcss";
 
+import tailwindcss_animate from "tailwindcss-animate";
+
 const config: Config = {
     darkMode: ["class"],
     content: [
     "./src/pages/**/*.{js,ts,jsx,tsx,mdx}",
     "./src/components/**/*.{js,ts,jsx,tsx,mdx}",
     "./src/app/**/*.{js,ts,jsx,tsx,mdx}",
-
   ],
+	safelist: [
+		"bg-green-200",
+		"bg-blue-200",
+		"bg-red-200",
+		"bg-yellow-200",
+		"bg-purple-200",
+		"bg-orange-200",
+		"bg-teal-200",
+		],
   theme: {
   	extend: {
   		colors: {
@@ -69,6 +79,6 @@ const config: Config = {
   		}
   	}
   },
-  plugins: [require("tailwindcss-animate")],
+  plugins: [tailwindcss_animate],
 };
 export default config;
