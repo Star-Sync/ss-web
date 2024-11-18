@@ -7,7 +7,7 @@ import { FaQuestionCircle } from "react-icons/fa";
 import { useRouter } from "next/router";
 
 // Icons
-import { ChevronsUpDown, CogIcon, LayoutDashboard, LogOut } from "lucide-react";
+import { ChevronsUpDown, CogIcon, LayoutDashboard, LogOut, Antenna} from "lucide-react";
 
 // Custom Hooks
 import { useIsMobile } from "@/hooks/use-mobile";
@@ -73,6 +73,12 @@ const data: Data = {
             url: "/dashboard",
             isActive: true,
             icon: LayoutDashboard,
+        },
+        {
+            title: "GS-Calendar",
+            url: "/gs-calendar",
+            isActive: false,
+            icon:  Antenna,
         },
         {
             title: "Settings",
