@@ -42,12 +42,12 @@ const Dashboard: React.FC = () => {
             {/* Row 2: DashboardUpcoming and DashboardGS */}
             <div className="flex flex-grow gap-4 mt-4">
                 {/* DashboardUpcoming */}
-                <MotionWrapper className="w-1/2 h-fit bg-white rounded-xl p-6 shadow-md">
+                <MotionWrapper className="w-1/2 min-h-[58vh] max-h-64 bg-white rounded-xl p-6 shadow-md">
                     <DashboardUpcoming />
                 </MotionWrapper>
 
                 {/* DashboardGS */}
-                <MotionWrapper className="w-1/2 h-fit bg-white rounded-xl p-6 shadow-md">
+                <MotionWrapper className="w-1/2 min-h-[58vh] max-h-64 bg-white rounded-xl p-6 shadow-md">
                     <DashboardGS />
                 </MotionWrapper>
             </div>

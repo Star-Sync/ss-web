@@ -86,6 +86,12 @@ const data: Data = {
             isActive: false,
             icon: CogIcon,
         },
+        {
+            title: "gs-scheduler-test",
+            url: "/scheduleTest",
+            isActive: false,
+            icon: CogIcon,
+        }
     ],
 };
 
