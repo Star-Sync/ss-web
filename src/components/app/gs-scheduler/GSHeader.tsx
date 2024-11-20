@@ -1,75 +1,88 @@
-import React, { useState } from "react";
+import React, { FC, useState, useRef } from "react";
+import { motion } from "framer-motion";
 import Combobox from "@/components/ui/combobox";
 import { MapPin, Plus } from "lucide-react";
 import { locations } from "@/api/gs-locations";
+import { Location } from "@/api/gs-locations";
 import MotionWrapper from "../MotionWrapper";
 import RequestForm from "./RequestForm";
 import Scheduler from "@/components/app/gs-scheduler/Scheduler";
 
+
 interface Tab {
     id: string;
     name: string;
-    content: React.ReactNode;
+    content: (location: Location) => React.ReactElement;
     isPinned?: boolean;
 }
 
-const GSHeader: React.FC = () => {
-    const [selectedLocation, setSelectedLocation] = useState(locations[0]);
+interface ComboboxItem {
+    value: string;
+    label: string;
+    icon?: React.ReactNode;
+}
+
+const GSHeader: FC = () => {
+    const [selectedLocation, setSelectedLocation] = useState<Location>(locations[0]);
+
     const [tabs, setTabs] = useState<Tab[]>([
         {
             id: "scheduler",
             name: "Scheduler",
-            content: <Scheduler></Scheduler>,
+            content: (location) => <Scheduler location={location} />,
             isPinned: true,
         },
     ]);
     const [activeTabId, setActiveTabId] = useState("scheduler");
 
-    const renderLocationPin = () => <MapPin className="h-4 w-4 text-gray-500" />;
-    const augmentedLocations = locations.map(location => ({
-        ...location,
+    const tabCounter = useRef(0);
+
+    const renderLocationPin = () => (
+        <MapPin className="h-4 w-4 text-gray-500" />
+    );
+
+    const augmentedLocations: ComboboxItem[] = locations.map((location) => ({
+        value: location.station_id,
+        label: location.label,
         icon: renderLocationPin(),
     }));
 
     const addNewTab = () => {
-        const newTabId = `contact-req-${tabs.length}`;
+        tabCounter.current += 1;
+        const newTabId = `contact-req-${tabCounter.current}`;
         const newTab: Tab = {
             id: newTabId,
-            name: `Contact Req. ${tabs.length}`,
-            content: <RequestForm location={selectedLocation} />,
+            name: `Contact Req. ${tabCounter.current}`,
+            content: (location) => <RequestForm key={newTabId} location={location} />,
         };
-        setTabs([...tabs, newTab]);
+        setTabs((prevTabs) => [...prevTabs, newTab]);
         setActiveTabId(newTabId);
     };
 
     const closeTab = (tabId: string) => {
-        if (tabs.find(tab => tab.id === tabId)?.isPinned) return;
-        const updatedTabs = tabs.filter(tab => tab.id !== tabId);
+        const tabToClose = tabs.find((tab) => tab.id === tabId);
+        if (tabToClose?.isPinned) return;
+
+        const updatedTabs = tabs.filter((tab) => tab.id !== tabId);
         setTabs(updatedTabs);
+
         if (activeTabId === tabId) {
             setActiveTabId(updatedTabs[0]?.id || "");
         }
     };
 
-    const handleLocationChange = (newLocation: typeof locations[0]) => {
-        setSelectedLocation(newLocation);
-        // Update all tabs with the new location
-        setTabs(tabs.map(tab => ({
-            ...tab,
-            content:
-                tab.id === "scheduler"
-                    ? tab.content // Scheduler content remains unchanged
-                    : <RequestForm location={newLocation} />,
-        })));
+    const handleLocationChange = (value: string) => {
+        const newLocation = locations.find((loc) => loc.station_id === value);
+        if (newLocation) {
+            setSelectedLocation(newLocation);
+        }
     };
 
     return (
         <MotionWrapper className="w-full h-full flex flex-col bg-gray-50 p-6">
-            {/* Unified White Box */}
-            <div className="bg-white rounded-xl p-6 shadow-lg flex flex-col h-full">
-                {/* Header Section */}
+            <div className="bg-white rounded-xl p-6 shadow-lg flex flex-col h-full overflow-hidden">
+                {/* Header */}
                 <div className="flex justify-between items-center mb-4">
-                    {/* Left Section: Title and Location */}
                     <div>
                         <h1 className="text-xl font-semibold text-black">
                             Ground-Station Scheduling
@@ -77,13 +90,8 @@ const GSHeader: React.FC = () => {
                         <div className="flex items-center text-sm text-gray-500 mt-2">
                             <Combobox
                                 items={augmentedLocations}
-                                value={selectedLocation.value} // Pass the `value` field as the selected value
-                                onChange={(value: string) => {
-                                    const newLocation = locations.find(loc => loc.value === value); // Find the location by value
-                                    if (newLocation) {
-                                        handleLocationChange(newLocation); // Update with the full location object
-                                    }
-                                }}
+                                value={selectedLocation.station_id}
+                                onChange={handleLocationChange}
                                 placeholder="Select a location"
                                 className="w-56"
                             />
@@ -91,9 +99,9 @@ const GSHeader: React.FC = () => {
                     </div>
                 </div>
 
-                {/* Tab Navigation */}
+                {/* Tabs */}
                 <div className="flex items-center space-x-4 border-b border-gray-200 mb-4">
-                    {tabs.map(tab => (
+                    {tabs.map((tab) => (
                         <div
                             key={tab.id}
                             className={`px-4 py-2 cursor-pointer ${
@@ -106,7 +114,7 @@ const GSHeader: React.FC = () => {
                             {tab.name}
                             {!tab.isPinned && (
                                 <button
-                                    onClick={e => {
+                                    onClick={(e) => {
                                         e.stopPropagation();
                                         closeTab(tab.id);
                                     }}
@@ -117,7 +125,6 @@ const GSHeader: React.FC = () => {
                             )}
                         </div>
                     ))}
-                    {/* New Tab Button */}
                     <button
                         onClick={addNewTab}
                         className="flex items-center px-4 py-2 text-gray-500 hover:text-blue-500 border-b-2 border-transparent"
@@ -126,9 +133,23 @@ const GSHeader: React.FC = () => {
                     </button>
                 </div>
 
-                {/* Content Section */}
-                <div className="flex-grow">
-                    {tabs.find(tab => tab.id === activeTabId)?.content || <div>No content available</div>}
+                {/* Tab Content with Framer Motion Transitions */}
+                <div className="flex-grow relative">
+                    {tabs.map((tab) => (
+                        <motion.div
+                            key={tab.id}
+                            initial={false}
+                            animate={tab.id === activeTabId ? "active" : "inactive"}
+                            variants={{
+                                active: { opacity: 1, x: 0, position: "relative" },
+                                inactive: { opacity: 0, x: -20, position: "absolute" },
+                            }}
+                            transition={{ duration: 0.3 }}
+                            style={{ width: "100%", height: "100%" }}
+                        >
+                            {tab.content(selectedLocation)}
+                        </motion.div>
+                    ))}
                 </div>
             </div>
         </MotionWrapper>
