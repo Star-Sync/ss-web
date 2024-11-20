@@ -1,5 +1,6 @@
-import React, { useState } from "react";
-import { motion, AnimatePresence } from "framer-motion";
+import React from "react";
+import { Tabs, TabsList, TabsTrigger, TabsContent } from "@/components/ui/tabs";
+import { motion } from "framer-motion";
 import { locations } from "@/api/gs-locations";
 import RFRequestForm from "./RFRequestForm";
 import ContactRequestForm from "./ContactRequestForm";
@@ -18,67 +19,41 @@ const formVariants = {
 const transition = { duration: 0.4, ease: "easeInOut" };
 
 const RequestForm: React.FC<RequestFormProps> = ({ location }) => {
-    const [formType, setFormType] = useState<"contact" | "rf">("contact");
-
     return (
         <MotionWrapper>
-            {/* Toggle buttons */}
-            <div className="flex space-x-4 mb-4">
-                <button
-                    className={`px-4 py-2 rounded ${
-                        formType === "contact"
-                            ? "bg-blue-500 text-white"
-                            : "bg-gray-200 text-gray-700"
-                    }`}
-                    aria-pressed={formType === "contact"}
-                    onClick={() => setFormType("contact")}
-                >
-                    Contact Request
-                </button>
-                <button
-                    className={`px-4 py-2 rounded ${
-                        formType === "rf"
-                            ? "bg-blue-500 text-white"
-                            : "bg-gray-200 text-gray-700"
-                    }`}
-                    aria-pressed={formType === "rf"}
-                    onClick={() => setFormType("rf")}
-                >
-                    RF Request
-                </button>
-            </div>
+            <Tabs defaultValue="contact" className="w-full">
+                {/* Tabs List */}
+                <TabsList className="mb-4">
+                    <TabsTrigger value="contact">Contact Request</TabsTrigger>
+                    <TabsTrigger value="rf">RF Request</TabsTrigger>
+                </TabsList>
 
-            {/* Form Content with Animated Transitions */}
-            <div className="relative">
-                <AnimatePresence mode="wait">
-                    {formType === "contact" && (
-                        <motion.div
-                            key="contact"
-                            className="absolute w-full"
-                            variants={formVariants}
-                            initial="initial"
-                            animate="animate"
-                            exit="exit"
-                            transition={transition}
-                        >
-                            <ContactRequestForm location={location} />
-                        </motion.div>
-                    )}
-                    {formType === "rf" && (
-                        <motion.div
-                            key="rf"
-                            className="absolute w-full"
-                            variants={formVariants}
-                            initial="initial"
-                            animate="animate"
-                            exit="exit"
-                            transition={transition}
-                        >
-                            <RFRequestForm location={location} />
-                        </motion.div>
-                    )}
-                </AnimatePresence>
-            </div>
+                {/* Tabs Content */}
+                <TabsContent value="contact">
+                    <motion.div
+                        className="w-full"
+                        variants={formVariants}
+                        initial="initial"
+                        animate="animate"
+                        exit="exit"
+                        transition={transition}
+                    >
+                        <ContactRequestForm location={location} />
+                    </motion.div>
+                </TabsContent>
+                <TabsContent value="rf">
+                    <motion.div
+                        className="w-full"
+                        variants={formVariants}
+                        initial="initial"
+                        animate="animate"
+                        exit="exit"
+                        transition={transition}
+                    >
+                        <RFRequestForm location={location} />
+                    </motion.div>
+                </TabsContent>
+            </Tabs>
         </MotionWrapper>
     );
 };
