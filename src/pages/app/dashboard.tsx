@@ -1,7 +1,7 @@
 import React, { useEffect, useState } from "react";
 import DashboardUpcoming from "@/components/app/dashboard/dashboard-upcoming";
 import MotionWrapper from "@/components/app/MotionWrapper";
-import MotionCardList from "@/components/app/MotionCardList";
+import MotionCardList from "@/components/app/dashboard/MotionCardList";
 import DashboardGS from "@/components/app/dashboard/dashboard-gs";
 
 type Card = {

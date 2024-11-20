@@ -1,6 +1,6 @@
 import React, { useState } from "react";
-import TabNavigation from "@/components/app/TabNavigation";
-import TabContent from "@/components/app/TabContent";
+import TabNavigation from "@/components/app/settings/TabNavigation";
+import TabContent from "@/components/app/settings/TabContent";
 import SettingsGeneral from "@/components/app/settings/settings-general";
 import MotionWrapper from "@/components/app/MotionWrapper";
 
