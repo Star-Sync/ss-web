@@ -19,6 +19,8 @@ const RFRequestForm: React.FC<RFRequestFormProps> = ({ location }) => {
                     className="mt-1 block w-full border-gray-300 rounded-md"
                     placeholder="Enter frequency"
                 />
+            {/*    Display location label*/}
+                <p className="text-gray-500">Location: {location.label}</p>
             </div>
             <div className="mb-4">
                 <label className="block text-gray-700">Bandwidth</label>

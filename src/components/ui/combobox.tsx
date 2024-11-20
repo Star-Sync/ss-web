@@ -19,13 +19,13 @@ import {
     PopoverTrigger,
 } from "@/components/ui/popover";
 
-interface ComboboxItem {
+export interface ComboboxItem {
     value: string;
     label: string;
-    icon?: React.ReactNode; // Icon for the item
+    icon?: React.ReactNode;
 }
 
-interface ComboboxProps {
+export interface ComboboxProps {
     items: ComboboxItem[];
     value: string;
     onChange: (value: string) => void;

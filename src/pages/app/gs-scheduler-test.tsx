@@ -1,11 +1,11 @@
 // File: src/components/app/gs-scheduler/GSScheduler.tsx
 import React from "react";
-import GSHeader from "@/components/app/gs-scheduler/GSHeader";
+import GSContainer from "@/components/app/gs-scheduler/GSContainer";
 
 const GSScheduler: React.FC = () => {
     return (
-        <GSHeader>
-        </GSHeader>
+        <GSContainer>
+        </GSContainer>
     );
 };
 

@@ -3,7 +3,7 @@ export interface Location {
     label: string;
 }
 
-export const locations = [
+export const locations: Location[] = [
     { station_id: "1", label: "Gatineau, Quebec" },
     { station_id: "2", label: "Toronto, Ontario" },
     { station_id: "3", label: "Vancouver, British Columbia" },
