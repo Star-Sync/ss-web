@@ -25,9 +25,9 @@ const DashboardUpcoming: React.FC<DashboardUpcomingProps> = ({ className }) => {
     const [activeMission, setActiveMission] = useState(missions[0]);
 
     return (
-        <div className={`${className}`}>
+        <div className={`${className} flex flex-col h-full`}>
             {/* Scrollable List */}
-            <ScrollArea className="rounded-xl border p-4 bg-white h-96">
+            <ScrollArea className="rounded-xl border p-4 bg-white max-h-[36vh]">
                 <h2 className="text-xl font-bold text-gray-900 ml-3">
                     Upcoming Missions
                 </h2>
@@ -73,31 +73,33 @@ const DashboardUpcoming: React.FC<DashboardUpcomingProps> = ({ className }) => {
             </ScrollArea>
 
             {/* Mission Details */}
-            <AnimatePresence mode="wait">
-                {activeMission && (
-                    <motion.div
-                        key={activeMission.id}
-                        className="bg-gray-50 rounded-lg p-4 shadow-md mt-4"
-                        variants={containerVariants}
-                        initial="initial"
-                        animate="animate"
-                        exit="exit"
-                    >
-                        <motion.div variants={itemVariants}>
-                            <h3 className="font-bold text-lg mb-2 text-gray-900">
-                                {activeMission.title}
-                            </h3>
-                            <p className="text-sm text-gray-900">
-                                Location: {activeMission.location}
-                            </p>
-                            <p className="text-sm text-gray-900">
-                                Duration: {activeMission.duration}
-                            </p>
-                            <p className="text-sm text-gray-900">Date: {activeMission.date}</p>
+            <div className="flex-grow mb-4 mt-4">
+                <AnimatePresence mode="wait">
+                    {activeMission && (
+                        <motion.div
+                            key={activeMission.id}
+                            className="bg-gray-50 rounded-lg p-4 shadow-md h-full"
+                            variants={containerVariants}
+                            initial="initial"
+                            animate="animate"
+                            exit="exit"
+                        >
+                            <motion.div variants={itemVariants} className="h-full">
+                                <h3 className="font-bold text-lg mb-2 text-gray-900">
+                                    {activeMission.title}
+                                </h3>
+                                <p className="text-sm text-gray-900">
+                                    Location: {activeMission.location}
+                                </p>
+                                <p className="text-sm text-gray-900">
+                                    Duration: {activeMission.duration}
+                                </p>
+                                <p className="text-sm text-gray-900">Date: {activeMission.date}</p>
+                            </motion.div>
                         </motion.div>
-                    </motion.div>
-                )}
-            </AnimatePresence>
+                    )}
+                </AnimatePresence>
+            </div>
         </div>
     );
 };
