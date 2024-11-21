@@ -1,13 +1,14 @@
     import React, {useEffect} from "react";
     import {locations} from "@/api/gs-locations";
-    import {Controller, useForm} from "react-hook-form";
-    import {Form, FormControl, FormField, FormItem, FormLabel, FormMessage,} from "@/components/ui/form";
-    import {Input} from "@/components/ui/input";
+    import {useForm} from "react-hook-form";
+    import {Form, } from "@/components/ui/form";
     import {Button} from "@/components/ui/button";
     import {z} from "zod";
     import {zodResolver} from "@hookform/resolvers/zod";
-    import DatePicker from "react-datepicker";
     import "react-datepicker/dist/react-datepicker.css";
+    import { Separator } from "@/components/ui/separator"
+    import {TimePickerField} from "@/components/ui/timepickerfield";
+    import FormFieldWrapper from "@/components/ui/formfieldwrapper";
 
     interface RFRequestFormProps {
         location: typeof locations[0];
@@ -81,181 +82,69 @@
             <Form {...form}>
                 <form onSubmit={form.handleSubmit(onSubmit)} className="space-y-6">
                     {/* Start and End Time at the top */}
-                    <div className="grid grid-cols-1 md:grid-cols-2 gap-6 items-center">
+                    <div className="grid grid-cols-1 md:grid-cols-2 gap-5 items-center max-w-[28vw]">
                         {/* Start Time */}
-                        <div className="flex flex-col">
-                            <FormLabel className="text-sm font-medium text-gray-700 mb-1">
-                                Start Time
-                            </FormLabel>
-                            <FormControl>
-                                <Controller
-                                    control={form.control}
-                                    name="startTime"
-                                    render={({field}) => (
-                                        <DatePicker
-                                            selected={field.value}
-                                            onChange={(date) => field.onChange(date)}
-                                            showTimeSelect
-                                            timeFormat="HH:mm"
-                                            timeIntervals={15}
-                                            dateFormat="yyyy-MM-dd HH:mm 'UTC'"
-                                            className="w-full border border-gray-300 rounded-md p-2 text-gray-900"
-                                        />
-                                    )}
-                                />
-                            </FormControl>
-                            <FormMessage/>
-                        </div>
+                            <TimePickerField
+                                name="startTime"
+                                label="Start Time"
+                                control={form.control}
+                            />
                         {/* End Time */}
-                        <div className="flex flex-col">
-                            <FormLabel className="text-sm font-medium text-gray-700 mb-1">
-                                End Time
-                            </FormLabel>
-                            <FormControl>
-                                <Controller
-                                    control={form.control}
-                                    name="endTime"
-                                    render={({field}) => (
-                                        <DatePicker
-                                            selected={field.value}
-                                            onChange={(date) => field.onChange(date)}
-                                            showTimeSelect
-                                            timeFormat="HH:mm"
-                                            timeIntervals={15}
-                                            dateFormat="yyyy-MM-dd HH:mm 'UTC'"
-                                            className="w-full border border-gray-300 rounded-md p-2 text-gray-900"
-                                        />
-                                    )}
-                                />
-                            </FormControl>
-                            <FormMessage/>
-                        </div>
+                            <TimePickerField
+                                name="endTime"
+                                label="End Time"
+                                control={form.control}
+                            />
                     </div>
+                    <Separator className="max-w-[50vw]"/>
                     {/* Other fields */}
-                    <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
-                        <FormField
+                    <div className="grid grid-cols-1 md:grid-cols-2 gap-4 max-w-[50vw]">
+                        <FormFieldWrapper
                             control={form.control}
                             name="missionName"
-                            render={({field}) => (
-                                <FormItem>
-                                    <FormLabel className="text-sm font-medium text-gray-700">
-                                        Mission Name
-                                    </FormLabel>
-                                    <FormControl>
-                                        <Input
-                                            placeholder="Enter mission name"
-                                            {...field}
-                                            className="text-gray-900"
-                                        />
-                                    </FormControl>
-                                    <FormMessage/>
-                                </FormItem>
-                            )}
+                            label="Mission Name"
+                            placeholder="Enter mission name"
                         />
-                        <FormField
+                        <FormFieldWrapper
                             control={form.control}
                             name="satelliteId"
-                            render={({field}) => (
-                                <FormItem>
-                                    <FormLabel className="text-sm font-medium text-gray-700">
-                                        Satellite ID
-                                    </FormLabel>
-                                    <FormControl>
-                                        <Input
-                                            placeholder="Enter satellite ID"
-                                            {...field}
-                                            className="text-gray-900"
-                                        />
-                                    </FormControl>
-                                    <FormMessage/>
-                                </FormItem>
-                            )}
+                            label="Satellite ID"
+                            placeholder="Enter satellite ID"
                         />
-                        <FormField
+                        <FormFieldWrapper
                             control={form.control}
                             name="uplinkTimeRequested"
-                            render={({field}) => (
-                                <FormItem>
-                                    <FormLabel className="text-sm font-medium text-gray-700">
-                                        Uplink Time Requested
-                                    </FormLabel>
-                                    <FormControl>
-                                        <Input
-                                            type="number"
-                                            step="any"
-                                            min="0"
-                                            {...field}
-                                            className="text-gray-900"
-                                        />
-                                    </FormControl>
-                                    <FormMessage/>
-                                </FormItem>
-                            )}
+                            label="Uplink Time Requested"
+                            type="number"
+                            step="any"
+                            min="0"
                         />
-                        <FormField
+                        <FormFieldWrapper
                             control={form.control}
                             name="downlinkTime"
-                            render={({field}) => (
-                                <FormItem>
-                                    <FormLabel className="text-sm font-medium text-gray-700">
-                                        Downlink Time
-                                    </FormLabel>
-                                    <FormControl>
-                                        <Input
-                                            type="number"
-                                            step="any"
-                                            min="0"
-                                            {...field}
-                                            className="text-gray-900"
-                                        />
-                                    </FormControl>
-                                    <FormMessage/>
-                                </FormItem>
-                            )}
+                            label="Downlink Time"
+                            type="number"
+                            step="any"
+                            min="0"
                         />
-                        <FormField
+                        <FormFieldWrapper
                             control={form.control}
                             name="scienceTime"
-                            render={({field}) => (
-                                <FormItem>
-                                    <FormLabel className="text-sm font-medium text-gray-700">
-                                        Science Time
-                                    </FormLabel>
-                                    <FormControl>
-                                        <Input
-                                            type="number"
-                                            step="any"
-                                            min="0"
-                                            {...field}
-                                            className="text-gray-900"
-                                        />
-                                    </FormControl>
-                                    <FormMessage/>
-                                </FormItem>
-                            )}
+                            label="Science Time"
+                            type="number"
+                            step="any"
+                            min="0"
                         />
-                        <FormField
+                        <FormFieldWrapper
                             control={form.control}
                             name="minimumNumberOfPasses"
-                            render={({field}) => (
-                                <FormItem>
-                                    <FormLabel className="text-sm font-medium text-gray-700">
-                                        Minimum Number of Passes
-                                    </FormLabel>
-                                    <FormControl>
-                                        <Input
-                                            type="number"
-                                            step="1"
-                                            min="1"
-                                            {...field}
-                                            className="text-gray-900"
-                                        />
-                                    </FormControl>
-                                    <FormMessage/>
-                                </FormItem>
-                            )}
+                            label="Minimum Number of Passes"
+                            type="number"
+                            step="1"
+                            min="1"
                         />
                     </div>
+                    <Separator className="max-w-[50vw]"/>
                     {/* Location Display */}
                     <p className="text-sm text-gray-600">Location: {location.label}</p>
                     {/* Submit Button */}

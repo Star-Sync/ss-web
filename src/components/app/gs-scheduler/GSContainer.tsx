@@ -26,7 +26,7 @@ const GSContainer: FC = () => {
         const newTabId = `contact-req-${tabCounter.current}`;
         const newTab: Tab = {
             id: newTabId,
-            name: `Contact Req. ${tabCounter.current}`,
+            name: `Request Form. ${tabCounter.current}`,
             content: (location) => <RequestForm key={newTabId} location={location} />,
         };
         setTabs((prevTabs) => [...prevTabs, newTab]);
