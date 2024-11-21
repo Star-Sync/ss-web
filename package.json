@@ -9,7 +9,6 @@
     "lint": "next lint"
   },
   "dependencies": {
-    "@alptugidin/react-circular-progress-bar": "^1.1.4",
     "@hookform/resolvers": "^3.9.1",
     "@radix-ui/react-avatar": "^1.1.1",
     "@radix-ui/react-collapsible": "^1.1.1",
