@@ -14,7 +14,7 @@ const GSContainer: FC = () => {
         {
             id: "scheduler",
             name: "Scheduler",
-            content: (location) => <Scheduler />,
+            content: () => <Scheduler />,
             isPinned: true,
         },
     ]);
