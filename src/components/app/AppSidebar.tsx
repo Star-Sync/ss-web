@@ -76,9 +76,9 @@ const data: Data = {
         },
         {
             title: "GS-Calendar",
-            url: "/gs-calendar",
+            url: "/app/calendar", 
             isActive: false,
-            icon:  Antenna,
+            icon: Antenna,
         },
         {
             title: "Settings",
