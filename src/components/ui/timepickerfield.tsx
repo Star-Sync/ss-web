@@ -22,25 +22,32 @@ export const TimePickerField: React.FC<TimePickerFieldProps> = ({
                                                                     datePickerProps,
                                                                 }) => {
     return (
-            <FormItem>
-                <FormLabel className="block text-gray-700 mb-1">{label}</FormLabel>
-                <FormControl>
-                    <Controller
-                        control={control}
-                        name={name}
-                        render={({ field }) => (
+        <FormItem>
+            <FormLabel className="block text-gray-700 mb-1">{label}</FormLabel>
+            <FormControl>
+                <Controller
+                    control={control}
+                    name={name}
+                    render={({ field, fieldState: { error } }) => (
+                        <>
                             <DatePicker
                                 selected={field.value}
                                 onChange={(date) => field.onChange(date)}
                                 showTimeSelect
                                 dateFormat="yyyy-MM-dd HH:mm 'UTC'"
-                                className="w-[13vw] border border-gray-300 rounded-md p-2 text-gray-900"
+                                className={`w-[13vw] border rounded-md p-2 text-gray-900 ${
+                                    error ? "border-red-500" : "border-gray-300"
+                                }`}
                                 {...datePickerProps}
                             />
-                        )}
-                    />
-                </FormControl>
-                <FormMessage />
-            </FormItem>
+                            {error && (
+                                <p className="text-red-500 text-sm mt-1">{error.message}</p>
+                            )}
+                        </>
+                    )}
+                />
+            </FormControl>
+            <FormMessage />
+        </FormItem>
     );
 };

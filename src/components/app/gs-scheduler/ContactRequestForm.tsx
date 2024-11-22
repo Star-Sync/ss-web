@@ -1,66 +1,89 @@
-import React from "react";
-import {useForm} from "react-hook-form";
-import {Form} from "@/components/ui/form";
-import {Button} from "@/components/ui/button";
-import {z} from "zod";
-import {zodResolver} from "@hookform/resolvers/zod";
+import React, {useEffect} from "react";
+import {Controller, useForm} from "react-hook-form";
+import { Form } from "@/components/ui/form";
+import { Button } from "@/components/ui/button";
+import { zodResolver } from "@hookform/resolvers/zod";
 import "react-datepicker/dist/react-datepicker.css";
-import {Separator} from "@/components/ui/separator";
-import {TimePickerField} from "@/components/ui/timepickerfield";
-import {locations} from "@/api/gs-locations";
+import { Separator } from "@/components/ui/separator";
+import { TimePickerField } from "@/components/ui/timepickerfield";
+import { locations } from "@/api/gs-locations";
 import FormFieldWrapper from "@/components/ui/formfieldwrapper";
 import CheckboxFieldWrapper from "@/components/ui/checkboxfieldwrapper";
+import { ContactRequestFormSchema, ContactRequestFormData } from "./ContactRequestFormSchema";
+import Combobox from "@/components/ui/combobox";
+import { satellites } from "@/api/gs-satellites";
 
 interface ContactRequestFormProps {
     location: typeof locations[0];
 }
 
-const formSchema = z.object({
-    missionName: z.string().min(1, "Mission Name is required"),
-    satelliteName: z.string().min(1, "Satellite Name is required"),
-    station: z.string().min(1, "Station is required"),
-    orbit: z.number().positive("Orbit must be a positive number"),
-    uplink: z.boolean(),
-    telemetry: z.boolean(),
-    science: z.boolean(),
-    aosTime: z.date({required_error: "AOS Time is required"}),
-    rfOnTime: z.date({required_error: "RF On Time is required"}),
-    rfOffTime: z.date({required_error: "RF Off Time is required"}),
-    losTime: z.date({required_error: "LOS Time is required"}),
-});
+const satelliteOptions = satellites
+    .filter(sat => sat.satellite_id && sat.label)
+    .map((sat) => ({
+        value: sat.satellite_id.toString(),
+        label: sat.label,
+    }));
 
-const ContactRequestForm: React.FC<ContactRequestFormProps> = ({location}: ContactRequestFormProps) => {
-    const form = useForm({
-        resolver: zodResolver(formSchema),
+const ContactRequestForm: React.FC<ContactRequestFormProps> = ({ location }) => {
+    useEffect(() => {
+        console.log("ContactRequestForm: Location updated to", location.label);
+    }, []);
+
+    const form = useForm<ContactRequestFormData>({
+        resolver: zodResolver(ContactRequestFormSchema),
         defaultValues: {
             missionName: "",
-            satelliteName: "",
-            station: "",
+            satelliteId: satelliteOptions[0]?.value || "",
             orbit: 0,
             uplink: false,
             telemetry: false,
             science: false,
-            aosTime: null,
-            rfOnTime: null,
-            rfOffTime: null,
-            losTime: null,
+            aosTime: undefined,
+            rfOnTime: undefined,
+            rfOffTime: undefined,
+            losTime: undefined,
         },
     });
 
-    const onSubmit = (values: any) => {
+    const onSubmit = (values: ContactRequestFormData) => {
         const payload = {
             ...values,
-            aosTime: values.aosTime.toISOString(),
-            rfOnTime: values.rfOnTime.toISOString(),
-            rfOffTime: values.rfOffTime.toISOString(),
-            losTime: values.losTime.toISOString(),
+            aosTime: values.aosTime?.toISOString(),
+            rfOnTime: values.rfOnTime?.toISOString(),
+            rfOffTime: values.rfOffTime?.toISOString(),
+            losTime: values.losTime?.toISOString(),
+            location: location.label,
+            satellite_id: values.satelliteId,
         };
-        console.log("Submitted Contact Request: ", payload);
+        console.log("Submitted Contact Request for: ", location.label, payload);
+    };
+
+    const handleError = (errors: any) => {
+        console.error("Validation Errors:", errors);
     };
 
     return (
         <Form {...form}>
-            <form onSubmit={form.handleSubmit(onSubmit)} className="space-y-6">
+            <form onSubmit={form.handleSubmit(onSubmit, handleError)} className="space-y-6">
+                {/* Satellite Combobox */}
+                <div className="grid grid-cols-1 md:grid-cols-2 gap-4 max-w-[25vw]">
+                    <Controller
+                        name="satelliteId"
+                        control={form.control}
+                        render={({ field }) => (
+                            <Combobox
+                                items={satelliteOptions}
+                                value={field.value}
+                                onChange={field.onChange}
+                                placeholder="Select a Satellite"
+                                className="text-black"
+                            />
+                        )}
+                    />
+                </div>
+
+                <Separator className="max-w-[50vw]" />
+
                 {/* Time Fields */}
                 <div className="grid grid-cols-1 md:grid-cols-2 gap-4 max-w-[28vw]">
                     <TimePickerField
@@ -85,7 +108,7 @@ const ContactRequestForm: React.FC<ContactRequestFormProps> = ({location}: Conta
                     />
                 </div>
 
-                <Separator className="max-w-[50vw]"/>
+                <Separator className="max-w-[50vw]" />
 
                 {/* Text Fields */}
                 <div className="grid grid-cols-1 md:grid-cols-2 gap-4 max-w-[50vw]">
@@ -97,27 +120,18 @@ const ContactRequestForm: React.FC<ContactRequestFormProps> = ({location}: Conta
                     />
                     <FormFieldWrapper
                         control={form.control}
-                        name="satelliteName"
-                        label="Satellite Name"
-                        placeholder="Enter satellite name"
-                    />
-                    <FormFieldWrapper
-                        control={form.control}
-                        name="station"
-                        label="Station"
-                        placeholder="Enter station"
-                    />
-                    <FormFieldWrapper
-                        control={form.control}
                         name="orbit"
                         label="Orbit"
                         placeholder="Enter orbit number"
                         type="number"
-                        onChange={(e) => form.setValue("orbit", parseInt(e.target.value) || 0)}
+                        onChange={(e) =>
+                            form.setValue("orbit", parseInt(e.target.value) || 0)
+                        }
                     />
                 </div>
 
-                <Separator className="max-w-[50vw]"/>
+                <Separator className="max-w-[50vw]" />
+
                 {/* Boolean Flags */}
                 <div className="grid grid-cols-1 md:grid-cols-3 gap-4 max-w-[50vw]">
                     <CheckboxFieldWrapper
@@ -137,9 +151,10 @@ const ContactRequestForm: React.FC<ContactRequestFormProps> = ({location}: Conta
                     />
                 </div>
 
-                <Separator className="max-w-[50vw]"/>
+                <Separator className="max-w-[50vw]" />
 
                 <p className="text-sm text-gray-600">Location: {location.label}</p>
+
                 {/* Submit Button */}
                 <Button type="submit" className="w-full md:w-auto">
                     Submit Contact Request

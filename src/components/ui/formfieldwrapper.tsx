@@ -1,17 +1,23 @@
 import React from "react";
-import {FormField, FormItem, FormLabel, FormControl, FormMessage} from "@/components/ui/form";
-import {Input} from "@/components/ui/input";
+import {
+    FormField,
+    FormItem,
+    FormLabel,
+    FormControl,
+    FormMessage,
+} from "@/components/ui/form";
+import { Input } from "@/components/ui/input";
 
 interface FormFieldWrapperProps {
-    control: any,
-    name: string,
-    label: string,
-    placeholder?: string,
-    type?: string,
-    step?: string,
-    min?: string,
-    className?: string,
-    onChange?: (e: any) => void
+    control: any;
+    name: string;
+    label: string;
+    placeholder?: string;
+    type?: string;
+    step?: string;
+    min?: string;
+    className?: string;
+    onChange?: (e: any) => void;
 }
 
 const FormFieldWrapper: React.FC<FormFieldWrapperProps> = ({
@@ -23,12 +29,12 @@ const FormFieldWrapper: React.FC<FormFieldWrapperProps> = ({
                                                                step,
                                                                min,
                                                                className = "text-gray-900",
-                                                               onChange
+                                                               onChange,
                                                            }) => (
     <FormField
         control={control}
         name={name}
-        render={({field}) => (
+        render={({ field, fieldState: { error } }) => (
             <FormItem>
                 <FormLabel className="text-sm font-medium text-gray-700">
                     {label}
@@ -40,10 +46,16 @@ const FormFieldWrapper: React.FC<FormFieldWrapperProps> = ({
                         type={type}
                         step={step}
                         min={min}
-                        className={className}
+                        className={`${className} ${error ? "border-red-500" : "border-gray-300"}`}
+                        onChange={(e) => {
+                            field.onChange(e);
+                            if (onChange) {
+                                onChange(e);
+                            }
+                        }}
                     />
                 </FormControl>
-                <FormMessage/>
+                {error && <FormMessage>{error.message}</FormMessage>}
             </FormItem>
         )}
     />
