@@ -12,6 +12,7 @@ import Combobox from "@/components/ui/combobox";
 import { satellites } from "@/api/gs-satellites";
 import axios from "axios";
 import {formatToISOStringIgnoringTimezone} from "@/lib/formatToISOStringIgnoreTimezone";
+import {toast} from "@/hooks/use-toast";
 
 interface RFRequestFormProps {
     location: typeof locations[0];
@@ -56,9 +57,19 @@ const RFRequestForm: React.FC<RFRequestFormProps> = ({ location }) => {
             const response = await axios.post('http://localhost:8000/api/v1/request/rf-time', payload);
             console.log('Successfully submitted:', response.data);
             // Handle success
+            toast({
+                title: "Submission Success",
+                description: "Sucessfully sent!",
+                variant: "success",
+            });
         } catch (error) {
             console.error('Error submitting RFRequest:', error);
             // Handle errors
+            toast({
+                title: "Submission Error: " + error,
+                description: "Failed to submit!",
+                variant: "destructive",
+            });
         }
     };
 
@@ -89,12 +100,10 @@ const RFRequestForm: React.FC<RFRequestFormProps> = ({ location }) => {
                     <TimePickerField<RFRequestFormData>
                         name="startTime"
                         label="Start Time"
-                        control={form.control}
                     />
                     <TimePickerField<RFRequestFormData>
                         name="endTime"
                         label="End Time"
-                        control={form.control}
                     />
                 </div>
 

@@ -13,10 +13,11 @@ import Combobox from "@/components/ui/combobox";
 import { satellites } from "@/api/gs-satellites";
 import {formatToISOStringIgnoringTimezone} from "@/lib/formatToISOStringIgnoreTimezone";
 import axios from "axios";
+import {toast} from "@/hooks/use-toast";
 
-// interface ContactRequestFormProps {
-//     location: typeof locations[0];
-// }
+interface ContactRequestFormProps {
+    location: typeof locations[0];
+}
 
 const satelliteOptions = satellites
     .filter(sat => sat.satellite_id && sat.label)
@@ -25,7 +26,7 @@ const satelliteOptions = satellites
         label: sat.label,
     }));
 
-const ContactRequestForm: React.FC<locations[0]> = ({ location }) => {
+const ContactRequestForm: React.FC<ContactRequestFormProps> = ({ location }) => {
     useEffect(() => {
         console.log("ContactRequestForm: Location updated to", location.label);
     }, [location]);
@@ -61,9 +62,19 @@ const ContactRequestForm: React.FC<locations[0]> = ({ location }) => {
             const response = await axios.post('http://localhost:8000/api/v1/request/contact', payload);
             console.log('Successfully submitted:', response.data);
             // Handle success
+            toast({
+                title: "Submission Success",
+                description: "Sucessfully sent!",
+                variant: "success",
+            });
         } catch (error) {
-            console.error('Error submitting RFRequest:', error);
+            console.error('Error submitting ContactRequest:', error);
             // Handle errors
+            toast({
+                title: "Submission Error: " + error,
+                description: "There was an error submitting the contact request. Please try again.",
+                variant: "destructive",
+            });
         }
     };
 
@@ -98,22 +109,18 @@ const ContactRequestForm: React.FC<locations[0]> = ({ location }) => {
                     <TimePickerField
                         name="aosTime"
                         label="AOS Time"
-                        control={form.control}
                     />
                     <TimePickerField
                         name="losTime"
                         label="LOS Time"
-                        control={form.control}
                     />
                     <TimePickerField
                         name="rfOnTime"
                         label="RF On Time"
-                        control={form.control}
                     />
                     <TimePickerField
                         name="rfOffTime"
                         label="RF Off Time"
-                        control={form.control}
                     />
                 </div>
 
