@@ -1,7 +1,6 @@
 import React, { useEffect } from "react";
 import { locations } from "@/api/gs-locations";
-import { useForm, Controller } from "react-hook-form";
-import { Form } from "@/components/ui/form";
+import { useForm, Controller, FormProvider } from "react-hook-form";
 import { Button } from "@/components/ui/button";
 import { zodResolver } from "@hookform/resolvers/zod";
 import "react-datepicker/dist/react-datepicker.css";
@@ -11,6 +10,8 @@ import FormFieldWrapper from "@/components/ui/formfieldwrapper";
 import { RFRequestFormSchema, RFRequestFormData } from "./RFRequestFormSchema";
 import Combobox from "@/components/ui/combobox";
 import { satellites } from "@/api/gs-satellites";
+import axios from "axios";
+import {formatToISOStringIgnoringTimezone} from "@/lib/formatToISOStringIgnoreTimezone";
 
 interface RFRequestFormProps {
     location: typeof locations[0];
@@ -23,6 +24,7 @@ const satelliteOptions = satellites
         label: sat.label,
     }));
 
+
 const RFRequestForm: React.FC<RFRequestFormProps> = ({ location }) => {
     useEffect(() => {
         console.log("RFRequestForm: Location updated to", location.label);
@@ -32,47 +34,36 @@ const RFRequestForm: React.FC<RFRequestFormProps> = ({ location }) => {
         resolver: zodResolver(RFRequestFormSchema),
         defaultValues: {
             missionName: "",
-            satelliteId: "",
+            satelliteId: satelliteOptions[0]?.value || "",
             startTime: undefined,
             endTime: undefined,
-            uplinkTimeRequested: 0,
+            uplinkTime: 0,
             downlinkTime: 0,
             scienceTime: 0,
             minimumNumberOfPasses: 1,
         },
     });
 
-    const onSubmit = (values: RFRequestFormData) => {
+    const onSubmit = async (values: RFRequestFormData) => {
         const payload = {
             ...values,
-            startTime: new Date(
-                Date.UTC(
-                    values.startTime.getFullYear(),
-                    values.startTime.getMonth(),
-                    values.startTime.getDate(),
-                    values.startTime.getHours(),
-                    values.startTime.getMinutes(),
-                    values.startTime.getSeconds()
-                )
-            ).toISOString(),
-            endTime: new Date(
-                Date.UTC(
-                    values.endTime.getFullYear(),
-                    values.endTime.getMonth(),
-                    values.endTime.getDate(),
-                    values.endTime.getHours(),
-                    values.endTime.getMinutes(),
-                    values.endTime.getSeconds()
-                )
-            ).toISOString(),
-            location: location.label,
-            satellite_id: values.satelliteId,
+            startTime: formatToISOStringIgnoringTimezone(values.startTime),
+            endTime: formatToISOStringIgnoringTimezone(values.endTime),
         };
-        console.log("Submitted RFRequest for: ", location.label, " ", payload);
+
+        // Send the request to the backend using axios
+        try {
+            const response = await axios.post('http://localhost:8000/api/v1/request/rf-time', payload);
+            console.log('Successfully submitted:', response.data);
+            // Handle success
+        } catch (error) {
+            console.error('Error submitting RFRequest:', error);
+            // Handle errors
+        }
     };
 
     return (
-        <Form {...form}>
+        <FormProvider {...form}>
             <form onSubmit={form.handleSubmit(onSubmit)} className="space-y-6">
                 {/* Satellite Combobox */}
                 <div className="grid grid-cols-1 md:grid-cols-2 gap-4 max-w-[25vw]">
@@ -93,14 +84,14 @@ const RFRequestForm: React.FC<RFRequestFormProps> = ({ location }) => {
 
                 <Separator className="max-w-[50vw]" />
 
-                {/* Start and End Time at the top */}
+                {/* Start and End Time */}
                 <div className="grid grid-cols-1 md:grid-cols-2 gap-5 items-center max-w-[28vw]">
-                    <TimePickerField
+                    <TimePickerField<RFRequestFormData>
                         name="startTime"
                         label="Start Time"
                         control={form.control}
                     />
-                    <TimePickerField
+                    <TimePickerField<RFRequestFormData>
                         name="endTime"
                         label="End Time"
                         control={form.control}
@@ -109,23 +100,23 @@ const RFRequestForm: React.FC<RFRequestFormProps> = ({ location }) => {
 
                 <Separator className="max-w-[50vw]" />
 
-                {/* Other fields */}
+                {/* Other Fields */}
                 <div className="grid grid-cols-1 md:grid-cols-2 gap-4 max-w-[50vw]">
-                    <FormFieldWrapper
+                    <FormFieldWrapper<RFRequestFormData>
                         control={form.control}
                         name="missionName"
                         label="Mission Name"
                         placeholder="Enter mission name"
                     />
-                    <FormFieldWrapper
+                    <FormFieldWrapper<RFRequestFormData>
                         control={form.control}
-                        name="uplinkTimeRequested"
-                        label="Uplink Time Requested"
+                        name="uplinkTime"
+                        label="Uplink Time"
                         type="number"
                         step="any"
                         min="0"
                     />
-                    <FormFieldWrapper
+                    <FormFieldWrapper<RFRequestFormData>
                         control={form.control}
                         name="downlinkTime"
                         label="Downlink Time"
@@ -133,7 +124,7 @@ const RFRequestForm: React.FC<RFRequestFormProps> = ({ location }) => {
                         step="any"
                         min="0"
                     />
-                    <FormFieldWrapper
+                    <FormFieldWrapper<RFRequestFormData>
                         control={form.control}
                         name="scienceTime"
                         label="Science Time"
@@ -141,7 +132,7 @@ const RFRequestForm: React.FC<RFRequestFormProps> = ({ location }) => {
                         step="any"
                         min="0"
                     />
-                    <FormFieldWrapper
+                    <FormFieldWrapper<RFRequestFormData>
                         control={form.control}
                         name="minimumNumberOfPasses"
                         label="Minimum Number of Passes"
@@ -153,15 +144,12 @@ const RFRequestForm: React.FC<RFRequestFormProps> = ({ location }) => {
 
                 <Separator className="max-w-[50vw]" />
 
-                {/* Location Display */}
-                <p className="text-sm text-gray-600">Location: {location.label}</p>
-
                 {/* Submit Button */}
                 <Button type="submit" className="w-full md:w-auto">
                     Submit RF Request
                 </Button>
             </form>
-        </Form>
+        </FormProvider>
     );
 };
 

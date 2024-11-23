@@ -38,7 +38,7 @@ const RequestForm: React.FC<RequestFormProps> = ({ location }) => {
                         exit="exit"
                         transition={transition}
                     >
-                        <ContactRequestForm location={location} />
+                        <ContactRequestForm/>
                     </motion.div>
                 </TabsContent>
                 <TabsContent value="rf">

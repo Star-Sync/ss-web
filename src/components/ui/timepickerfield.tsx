@@ -1,5 +1,6 @@
+// TimePickerField.tsx
 import React from "react";
-import { Controller } from "react-hook-form";
+import { Controller, FieldValues, Path } from "react-hook-form";
 import {
     FormItem,
     FormLabel,
@@ -8,43 +9,43 @@ import {
 } from "@/components/ui/form";
 import DatePicker from "react-datepicker";
 
-interface TimePickerFieldProps {
-    name: string;
+interface TimePickerFieldProps<TFieldValues extends FieldValues> {
+    name: Path<TFieldValues>;
     label: string;
-    control: any;
-    datePickerProps?: any;
 }
 
-export const TimePickerField: React.FC<TimePickerFieldProps> = ({
-                                                                    name,
-                                                                    label,
-                                                                    control,
-                                                                    datePickerProps,
-                                                                }) => {
+export const TimePickerField = <TFieldValues extends FieldValues>({
+                                                                      name,
+                                                                      label,
+                                                                  }: TimePickerFieldProps<TFieldValues>) => {
     return (
         <FormItem>
             <FormLabel className="block text-gray-700 mb-1">{label}</FormLabel>
             <FormControl>
                 <Controller
-                    control={control}
                     name={name}
-                    render={({ field, fieldState: { error } }) => (
-                        <>
-                            <DatePicker
-                                selected={field.value}
-                                onChange={(date) => field.onChange(date)}
-                                showTimeSelect
-                                dateFormat="yyyy-MM-dd HH:mm 'UTC'"
-                                className={`w-[13vw] border rounded-md p-2 text-gray-900 ${
-                                    error ? "border-red-500" : "border-gray-300"
-                                }`}
-                                {...datePickerProps}
-                            />
-                            {error && (
-                                <p className="text-red-500 text-sm mt-1">{error.message}</p>
-                            )}
-                        </>
-                    )}
+                    render={({ field, fieldState }) => {
+                        const { error } = fieldState;
+                        return (
+                            <>
+                                <DatePicker
+                                    selected={field.value}
+                                    onChange={(date) => field.onChange(date)}
+                                    showTimeSelect
+                                    timeFormat="HH:mm"
+
+                                    dateFormat="yyyy-MM-dd HH:mm 'UTC'"
+
+                                    className={`w-[13vw] border rounded-md p-2 text-gray-900 ${
+                                        error ? "border-red-500" : "border-gray-300"
+                                    }`}
+                                />
+                                {error && (
+                                    <p className="text-red-500 text-sm mt-1">{error.message}</p>
+                                )}
+                            </>
+                        );
+                    }}
                 />
             </FormControl>
             <FormMessage />

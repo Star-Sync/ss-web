@@ -1,6 +1,5 @@
 import React, {useEffect} from "react";
-import {Controller, useForm} from "react-hook-form";
-import { Form } from "@/components/ui/form";
+import {Controller, FormProvider, useForm} from "react-hook-form";
 import { Button } from "@/components/ui/button";
 import { zodResolver } from "@hookform/resolvers/zod";
 import "react-datepicker/dist/react-datepicker.css";
@@ -12,10 +11,12 @@ import CheckboxFieldWrapper from "@/components/ui/checkboxfieldwrapper";
 import { ContactRequestFormSchema, ContactRequestFormData } from "./ContactRequestFormSchema";
 import Combobox from "@/components/ui/combobox";
 import { satellites } from "@/api/gs-satellites";
+import {formatToISOStringIgnoringTimezone} from "@/lib/formatToISOStringIgnoreTimezone";
+import axios from "axios";
 
-interface ContactRequestFormProps {
-    location: typeof locations[0];
-}
+// interface ContactRequestFormProps {
+//     location: typeof locations[0];
+// }
 
 const satelliteOptions = satellites
     .filter(sat => sat.satellite_id && sat.label)
@@ -24,17 +25,17 @@ const satelliteOptions = satellites
         label: sat.label,
     }));
 
-const ContactRequestForm: React.FC<ContactRequestFormProps> = ({ location }) => {
+const ContactRequestForm: React.FC<locations[0]> = ({ location }) => {
     useEffect(() => {
         console.log("ContactRequestForm: Location updated to", location.label);
-    }, []);
+    }, [location]);
 
     const form = useForm<ContactRequestFormData>({
         resolver: zodResolver(ContactRequestFormSchema),
         defaultValues: {
             missionName: "",
             satelliteId: satelliteOptions[0]?.value || "",
-            orbit: 0,
+            orbit: "",
             uplink: false,
             telemetry: false,
             science: false,
@@ -45,17 +46,25 @@ const ContactRequestForm: React.FC<ContactRequestFormProps> = ({ location }) => 
         },
     });
 
-    const onSubmit = (values: ContactRequestFormData) => {
+    const onSubmit = async (values: ContactRequestFormData) => {
         const payload = {
             ...values,
-            aosTime: values.aosTime?.toISOString(),
-            rfOnTime: values.rfOnTime?.toISOString(),
-            rfOffTime: values.rfOffTime?.toISOString(),
-            losTime: values.losTime?.toISOString(),
+            aosTime: formatToISOStringIgnoringTimezone(values.aosTime),
+            rfOnTime: formatToISOStringIgnoringTimezone(values.rfOnTime),
+            rfOffTime: formatToISOStringIgnoringTimezone(values.rfOffTime),
+            losTime: formatToISOStringIgnoringTimezone(values.losTime),
             location: location.label,
             satellite_id: values.satelliteId,
         };
-        console.log("Submitted Contact Request for: ", location.label, payload);
+        // Send the request to the backend using axios
+        try {
+            const response = await axios.post('http://localhost:8000/api/v1/request/contact', payload);
+            console.log('Successfully submitted:', response.data);
+            // Handle success
+        } catch (error) {
+            console.error('Error submitting RFRequest:', error);
+            // Handle errors
+        }
     };
 
     const handleError = (errors: any) => {
@@ -63,7 +72,7 @@ const ContactRequestForm: React.FC<ContactRequestFormProps> = ({ location }) => 
     };
 
     return (
-        <Form {...form}>
+        <FormProvider {...form}>
             <form onSubmit={form.handleSubmit(onSubmit, handleError)} className="space-y-6">
                 {/* Satellite Combobox */}
                 <div className="grid grid-cols-1 md:grid-cols-2 gap-4 max-w-[25vw]">
@@ -112,21 +121,17 @@ const ContactRequestForm: React.FC<ContactRequestFormProps> = ({ location }) => 
 
                 {/* Text Fields */}
                 <div className="grid grid-cols-1 md:grid-cols-2 gap-4 max-w-[50vw]">
-                    <FormFieldWrapper
+                    <FormFieldWrapper<ContactRequestFormData>
                         control={form.control}
                         name="missionName"
                         label="Mission Name"
                         placeholder="Enter mission name"
                     />
-                    <FormFieldWrapper
+                    <FormFieldWrapper<ContactRequestFormData>
                         control={form.control}
                         name="orbit"
                         label="Orbit"
                         placeholder="Enter orbit number"
-                        type="number"
-                        onChange={(e) =>
-                            form.setValue("orbit", parseInt(e.target.value) || 0)
-                        }
                     />
                 </div>
 
@@ -160,7 +165,7 @@ const ContactRequestForm: React.FC<ContactRequestFormProps> = ({ location }) => 
                     Submit Contact Request
                 </Button>
             </form>
-        </Form>
+        </FormProvider>
     );
 };
 

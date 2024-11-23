@@ -5,7 +5,7 @@ export const RFRequestFormSchema = z.object({
     satelliteId: z.string().min(1, "Satellite is required"),
     startTime: z.date({ required_error: "Start Time is required" }),
     endTime: z.date({ required_error: "End Time is required" }),
-    uplinkTimeRequested: z.preprocess(
+    uplinkTime: z.preprocess(
         (val) => Number(val),
         z.number().positive("Uplink Time must be a positive number")
     ),
