@@ -7,7 +7,7 @@ const nextConfig = {
         { source: '/dashboard', destination: '/app/dashboard' },
         { source: '/settings', destination: '/app/settings' },
         { source: '/scheduleTest', destination: '/app/gs-scheduler-test' },
-  
+
         // Web pages
         { source: '/', destination: '/web/' },
         { source: '/blog', destination: '/web/blog' },
@@ -16,9 +16,9 @@ const nextConfig = {
         { source: '/feature', destination: '/web/feature' },
         { source: '/brand', destination: '/web/brand' },
         { source: '/possibility', destination: '/web/possibility' },
-  
+
         // API Proxy to Backend
-        { source: '/api/:path*', destination: 'http://localhost:5000/api/:path*' }
+        { source: '/api/:path*', destination: process.env.NEXT_PUBLIC_API_BASE_URL+'/api/:path*' }
       ];
     },
 
@@ -34,8 +34,7 @@ const nextConfig = {
           },
         ]
       }
-    
+
   };
-  
+
   export default nextConfig;
-  
