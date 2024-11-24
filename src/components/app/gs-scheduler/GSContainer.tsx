@@ -3,7 +3,7 @@ import { locations, Location } from "@/api/gs-locations";
 import { Tab } from "./TabNav";
 import MotionWrapper from "../MotionWrapper";
 import Scheduler from "@/components/app/gs-scheduler/Scheduler";
-import RequestForm from "./RequestForm";
+import RequestForm from "./RequestForm/RequestForm";
 import TabNav from "./TabNav";
 import TabContent from "./TabContent";
 import HeaderSection from "./HeaderSection";

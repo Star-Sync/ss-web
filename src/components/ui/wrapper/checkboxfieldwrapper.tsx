@@ -1,5 +1,6 @@
 import {FormField, FormItem, FormLabel} from "@/components/ui/form";
 import {Checkbox} from "@/components/ui/checkbox";
+import React from "react";
 
 interface CheckboxFieldWrapperProps {
     control: any;

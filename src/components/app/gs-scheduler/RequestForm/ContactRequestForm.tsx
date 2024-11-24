@@ -4,14 +4,14 @@ import { Button } from "@/components/ui/button";
 import { zodResolver } from "@hookform/resolvers/zod";
 import "react-datepicker/dist/react-datepicker.css";
 import { Separator } from "@/components/ui/separator";
-import { TimePickerField } from "@/components/ui/timepickerfield";
+import { TimePickerField } from "@/components/ui/wrapper/timepickerfield";
 import { locations } from "@/api/gs-locations";
-import FormFieldWrapper from "@/components/ui/formfieldwrapper";
-import CheckboxFieldWrapper from "@/components/ui/checkboxfieldwrapper";
+import FormFieldWrapper from "@/components/ui/wrapper/formfieldwrapper";
+import CheckboxFieldWrapper from "@/components/ui/wrapper/checkboxfieldwrapper";
 import { ContactRequestFormSchema, ContactRequestFormData } from "./ContactRequestFormSchema";
 import Combobox from "@/components/ui/combobox";
 import { satellites } from "@/api/gs-satellites";
-import {formatToISOStringIgnoringTimezone} from "@/lib/formatToISOStringIgnoreTimezone";
+import {formatToISOString} from "@/lib/formatToISOString";
 import axios from "axios";
 import {toast} from "@/hooks/use-toast";
 
@@ -50,16 +50,16 @@ const ContactRequestForm: React.FC<ContactRequestFormProps> = ({ location }) => 
     const onSubmit = async (values: ContactRequestFormData) => {
         const payload = {
             ...values,
-            aosTime: formatToISOStringIgnoringTimezone(values.aosTime),
-            rfOnTime: formatToISOStringIgnoringTimezone(values.rfOnTime),
-            rfOffTime: formatToISOStringIgnoringTimezone(values.rfOffTime),
-            losTime: formatToISOStringIgnoringTimezone(values.losTime),
+            aosTime: formatToISOString(values.aosTime),
+            rfOnTime: formatToISOString(values.rfOnTime),
+            rfOffTime: formatToISOString(values.rfOffTime),
+            losTime: formatToISOString(values.losTime),
             location: location.label,
             satellite_id: values.satelliteId,
         };
         // Send the request to the backend using axios
         try {
-            const response = await axios.post('http://localhost:8000/api/v1/request/contact', payload);
+            const response = await axios.post(process.env.NEXT_PUBLIC_API_BASE_URL + '/api/v1/request/contact', payload);
             console.log('Successfully submitted:', response.data);
             // Handle success
             toast({

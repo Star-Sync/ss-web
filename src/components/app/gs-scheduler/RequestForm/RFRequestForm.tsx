@@ -5,13 +5,13 @@ import { Button } from "@/components/ui/button";
 import { zodResolver } from "@hookform/resolvers/zod";
 import "react-datepicker/dist/react-datepicker.css";
 import { Separator } from "@/components/ui/separator";
-import { TimePickerField } from "@/components/ui/timepickerfield";
-import FormFieldWrapper from "@/components/ui/formfieldwrapper";
+import { TimePickerField } from "@/components/ui/wrapper/timepickerfield";
+import FormFieldWrapper from "@/components/ui/wrapper/formfieldwrapper";
 import { RFRequestFormSchema, RFRequestFormData } from "./RFRequestFormSchema";
 import Combobox from "@/components/ui/combobox";
 import { satellites } from "@/api/gs-satellites";
 import axios from "axios";
-import {formatToISOStringIgnoringTimezone} from "@/lib/formatToISOStringIgnoreTimezone";
+import {formatToISOString} from "@/lib/formatToISOString";
 import {toast} from "@/hooks/use-toast";
 
 interface RFRequestFormProps {
@@ -48,13 +48,13 @@ const RFRequestForm: React.FC<RFRequestFormProps> = ({ location }) => {
     const onSubmit = async (values: RFRequestFormData) => {
         const payload = {
             ...values,
-            startTime: formatToISOStringIgnoringTimezone(values.startTime),
-            endTime: formatToISOStringIgnoringTimezone(values.endTime),
+            startTime: formatToISOString(values.startTime),
+            endTime: formatToISOString(values.endTime),
         };
 
         // Send the request to the backend using axios
         try {
-            const response = await axios.post('http://localhost:8000/api/v1/request/rf-time', payload);
+            const response = await axios.post(process.env.NEXT_PUBLIC_API_BASE_URL +'/api/v1/request/rf-time', payload);
             console.log('Successfully submitted:', response.data);
             // Handle success
             toast({
