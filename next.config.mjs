@@ -18,7 +18,7 @@ const nextConfig = {
         { source: '/possibility', destination: '/web/possibility' },
 
         // API Proxy to Backend
-        { source: '/api/:path*', destination: process.env.NEXT_PUBLIC_API_BASE_URL+'/api/:path*' }
+        { source: '/api/:path*', destination: process.env.NEXT_PUBLIC_API_URL+'/api/:path*' }
       ];
     },
 
