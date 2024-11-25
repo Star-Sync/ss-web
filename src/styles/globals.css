@@ -10,7 +10,7 @@
 @media (prefers-color-scheme: dark) {
   :root {
     --background: #0a0a0a;
-    --foreground: #ededed;
+    --foreground: #171717;
   }
 }
 
@@ -147,5 +147,5 @@ body {
   box-shadow: 0 4px 6px rgba(0, 0, 0, 0.1); /* Subtle shadow for better visuals */
   padding: 5px; /* Padding inside the box */
   overflow: auto; /* Handle content overflow inside the box */
-} 
+}
 
