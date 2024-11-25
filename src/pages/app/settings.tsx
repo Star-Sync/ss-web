@@ -3,6 +3,7 @@ import TabNavigation from "@/components/app/settings/TabNavigation";
 import TabContent from "@/components/app/settings/TabContent";
 import SettingsGeneral from "@/components/app/settings/settings-general";
 import MotionWrapper from "@/components/app/MotionWrapper";
+import Head from "next/head";
 
 const tabs = [
     { name: "General", key: "general", Component: SettingsGeneral },
@@ -20,26 +21,31 @@ const Settings = () => {
     const activeTabData = tabs.find((tab) => tab.key === activeTab);
 
     return (
-        <MotionWrapper className="w-full h-full bg-gray-50 p-4 space-y-4">
-            {/* Header Section */}
-            <div className="bg-white rounded-xl p-6 shadow-md">
-                <h1 className="text-2xl font-bold text-black">Settings</h1>
-                <h2 className="text-md text-gray-500 mb-3">
-                    Manage your plan and billing history here.
-                </h2>
-                {/* Tab Navigation */}
-                <TabNavigation
-                    tabs={tabs.map(({ name, key }) => ({ name, key }))}
-                    activeTab={activeTab}
-                    onTabChange={setActiveTab}
-                />
-            </div>
+        <>
+            <Head>
+                <title>Settings | Star-Sync</title>
+            </Head>
+            <MotionWrapper className="w-full h-full bg-gray-50 p-4 space-y-4">
+                {/* Header Section */}
+                <div className="bg-white rounded-xl p-6 shadow-md">
+                    <h1 className="text-2xl font-bold text-black">Settings</h1>
+                    <h2 className="text-md text-gray-500 mb-3">
+                        Manage your plan and billing history here.
+                    </h2>
+                    {/* Tab Navigation */}
+                    <TabNavigation
+                        tabs={tabs.map(({ name, key }) => ({ name, key }))}
+                        activeTab={activeTab}
+                        onTabChange={setActiveTab}
+                    />
+                </div>
 
-            {/* Tab Content */}
-            {activeTabData && (
-                <TabContent activeKey={activeTabData.key} Component={activeTabData.Component} />
-            )}
-        </MotionWrapper>
+                {/* Tab Content */}
+                {activeTabData && (
+                    <TabContent activeKey={activeTabData.key} Component={activeTabData.Component} />
+                )}
+            </MotionWrapper>
+        </>
     );
 };
 

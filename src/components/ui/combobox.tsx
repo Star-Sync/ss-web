@@ -41,13 +41,23 @@ const Combobox: React.FC<ComboboxProps> = ({
                                                className = "",
                                            }) => {
     const [open, setOpen] = React.useState(false);
+    const [searchTerm, setSearchTerm] = React.useState("");
 
-    const handleSelect = (currentValue: string) => {
-        if (currentValue.trim() === "" || currentValue === value) {
-            setOpen(false); // Close the dropdown without changing the value
+    const filteredItems = React.useMemo(() => {
+        const term = searchTerm.toLowerCase();
+        return items.filter(
+            (item) =>
+                item.label.toLowerCase().includes(term) || // Match against label
+                item.value.toLowerCase().includes(term) // Match against value
+        );
+    }, [items, searchTerm]);
+
+    const handleSelect = (selectedValue: string) => {
+        if (selectedValue.trim() === "" || selectedValue === value) {
+            setOpen(false);
             return;
         }
-        onChange(currentValue);
+        onChange(selectedValue);
         setOpen(false);
     };
 
@@ -69,10 +79,11 @@ const Combobox: React.FC<ComboboxProps> = ({
                             ? items.find((item) => item.value === value)?.icon
                             : null}
                         <span>
-                            {value
-                                ? items.find((item) => item.value === value)?.label
-                                : placeholder}
-                        </span>
+              {value
+                  ? items.find((item) => item.value === value)?.label ||
+                  items.find((item) => item.value === value)?.value
+                  : placeholder}
+            </span>
                     </div>
                     <ChevronsUpDown
                         className={cn(
@@ -83,37 +94,45 @@ const Combobox: React.FC<ComboboxProps> = ({
             </PopoverTrigger>
             <PopoverContent className={cn("p-0", className)}>
                 <Command>
-                    <CommandInput placeholder={`Search ${placeholder.toLowerCase()}`} />
+                    <CommandInput
+                        placeholder={`Search ${placeholder.toLowerCase()}`}
+                        value={searchTerm}
+                        onValueChange={setSearchTerm}
+                    />
                     <CommandList>
-                        <CommandEmpty>No options found.</CommandEmpty>
-                        <CommandGroup>
-                            {items.map((item) => (
-                                <CommandItem
-                                    key={item.value}
-                                    value={item.value}
-                                    onSelect={handleSelect}
-                                >
-                                    <div className="flex items-center space-x-2">
-                                        {/* Render Icon in Dropdown */}
-                                        {item.icon}
-                                        <span>{item.label}</span>
-                                    </div>
-                                    <Check
-                                        className={cn(
-                                            "ml-auto h-4 w-4",
-                                            value === item.value
-                                                ? "opacity-100"
-                                                : "opacity-0"
-                                        )}
-                                    />
-                                </CommandItem>
-                            ))}
-                        </CommandGroup>
+                        {filteredItems.length > 0 ? (
+                            <CommandGroup>
+                                {filteredItems.map((item) => (
+                                    <CommandItem
+                                        key={item.value}
+                                        value={item.label} // Use label for searching and display
+                                        onSelect={() => handleSelect(item.value)}
+                                    >
+                                        <div className="flex items-center space-x-2">
+                                            {/* Render Icon in Dropdown */}
+                                            {item.icon}
+                                            <span>{item.label}</span>
+                                        </div>
+                                        <Check
+                                            className={cn(
+                                                "ml-auto h-4 w-4",
+                                                value === item.value
+                                                    ? "opacity-100"
+                                                    : "opacity-0"
+                                            )}
+                                        />
+                                    </CommandItem>
+                                ))}
+                            </CommandGroup>
+                        ) : (
+                            <CommandEmpty>No options found.</CommandEmpty>
+                        )}
                     </CommandList>
                 </Command>
             </PopoverContent>
         </Popover>
     );
 };
+
 
 export default Combobox;
