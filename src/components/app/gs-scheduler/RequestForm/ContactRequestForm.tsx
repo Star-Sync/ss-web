@@ -59,7 +59,7 @@ const ContactRequestForm: React.FC<ContactRequestFormProps> = ({ location }) => 
         };
         // Send the request to the backend using axios
         try {
-            const response = await axios.post(process.env.NEXT_PUBLIC_API_BASE_URL + '/api/v1/request/contact', payload);
+            const response = await axios.post(process.env.NEXT_PUBLIC_API_URL + '/api/v1/request/contact', payload);
             console.log('Successfully submitted:', response.data);
 
             // Handle success
