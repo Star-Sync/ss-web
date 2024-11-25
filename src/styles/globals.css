@@ -10,7 +10,7 @@
 @media (prefers-color-scheme: dark) {
   :root {
     --background: #0a0a0a;
-    --foreground: #ededed;
+    --foreground: #171717;
   }
 }
 
@@ -121,3 +121,31 @@ body {
 .fade-in {
   animation: fadeIn 0.5s ease-out forwards;
 }
+
+
+
+/* Calendar-specific styles */
+.calendar-page {
+  display: flex;
+  flex-direction: column;
+  align-items: left; /* Center the content horizontally */
+  padding: 5px; /* Add some padding around the page */
+  background-color: #f9f9f9; /* Light background color */
+}
+
+.calendar-page h1 {
+  margin-bottom: 20px;
+  color: #333;
+}
+
+.calendar-container {
+  width: 100%; /* Adjust width as needed, e.g., 80% of the page width */
+  max-width: 1400px; /* Prevent it from exceeding 1200px */
+  background-color: #fff; /* White background for the container */
+  border: 1px solid #ddd; /* Light border */
+  border-radius: 8px; /* Rounded corners */
+  box-shadow: 0 4px 6px rgba(0, 0, 0, 0.1); /* Subtle shadow for better visuals */
+  padding: 5px; /* Padding inside the box */
+  overflow: auto; /* Handle content overflow inside the box */
+}
+

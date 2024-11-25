@@ -27,7 +27,6 @@ function MyApp({ Component, pageProps }: AppProps) {
     // Check if the current page is under `app`
     const isAppPage = router.pathname.startsWith('/app');
 
-
     // Dynamically choose the layout
     const Layout = isAppPage ? AppLayout : WebLayout;
 
