@@ -61,11 +61,13 @@ const ContactRequestForm: React.FC<ContactRequestFormProps> = ({ location }) => 
         try {
             const response = await axios.post(process.env.NEXT_PUBLIC_API_BASE_URL + '/api/v1/request/contact', payload);
             console.log('Successfully submitted:', response.data);
+
             // Handle success
             toast({
                 title: "Submission Success",
-                description: "Sucessfully sent!",
+                description: "Successfully sent!",
                 variant: "success",
+                duration: 5000,
             });
         } catch (error) {
             console.error('Error submitting ContactRequest:', error);
@@ -74,17 +76,15 @@ const ContactRequestForm: React.FC<ContactRequestFormProps> = ({ location }) => 
                 title: "Submission Error: " + error,
                 description: "There was an error submitting the contact request. Please try again.",
                 variant: "destructive",
+                duration: 5000,
             });
         }
     };
 
-    const handleError = (errors: any) => {
-        console.error("Validation Errors:", errors);
-    };
-
     return (
+
         <FormProvider {...form}>
-            <form onSubmit={form.handleSubmit(onSubmit, handleError)} className="space-y-6">
+            <form onSubmit={form.handleSubmit(onSubmit)} className="space-y-6">
                 {/* Satellite Combobox */}
                 <div className="grid grid-cols-1 md:grid-cols-2 gap-4 max-w-[25vw]">
                     <Controller

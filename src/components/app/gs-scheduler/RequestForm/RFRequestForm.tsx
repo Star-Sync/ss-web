@@ -59,8 +59,9 @@ const RFRequestForm: React.FC<RFRequestFormProps> = ({ location }) => {
             // Handle success
             toast({
                 title: "Submission Success",
-                description: "Sucessfully sent!",
+                description: "Successfully sent!",
                 variant: "success",
+                duration: 5000,
             });
         } catch (error) {
             console.error('Error submitting RFRequest:', error);
@@ -69,6 +70,7 @@ const RFRequestForm: React.FC<RFRequestFormProps> = ({ location }) => {
                 title: "Submission Error: " + error,
                 description: "Failed to submit!",
                 variant: "destructive",
+                duration: 5000,
             });
         }
     };
