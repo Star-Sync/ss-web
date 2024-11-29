@@ -59,7 +59,7 @@ const RFRequestForm: React.FC<RFRequestFormProps> = ({ location }) => {
             // Handle success
             toast({
                 title: "Submission Success",
-                description: "Successfully sent!",
+                description: "Successfully sent!" + response.data,
                 variant: "success",
                 duration: 5000,
             });

@@ -3,8 +3,9 @@ import Timeline from "react-calendar-timeline";
 import MotionWrapper from "@/components/app/MotionWrapper";
 import "react-calendar-timeline/lib/Timeline.css";
 import moment from "moment";
-import { fetchMissions } from "../../components/app/calendar/fetchMissions";
-import { createTimelineItems, TimelineItem } from "../../components/app/calendar/items";
+import { gsFetchMissions } from "@/api/gs-fetch-missions";
+import { createTimelineItems, TimelineItem } from "@/components/app/calendar/CalendarItems";
+import {toast} from "@/hooks/use-toast";
 
 const groups = [
   { id: 1, title: "Prince Albert" },
@@ -30,7 +31,7 @@ const CalendarPage = () => {
   useEffect(() => {
     const fetchAndSetMissions = async () => {
       try {
-        const missions = await fetchMissions();
+        const missions = await gsFetchMissions();
         const timelineItems = createTimelineItems(missions);
         setItems(timelineItems);
       } catch (err) {
@@ -44,8 +45,8 @@ const CalendarPage = () => {
   }, []);
 
   const handleTimeChange = (
-    newVisibleTimeStart: number, 
-    newVisibleTimeEnd: number, 
+    newVisibleTimeStart: number,
+    newVisibleTimeEnd: number,
     updateScrollCanvas: (start: number, end: number) => void
   ) => {
     if (newVisibleTimeStart < minTime && newVisibleTimeEnd > maxTime) {
@@ -68,16 +69,26 @@ const CalendarPage = () => {
     </div>
   );
 
-  if (error) return (
-    <div className="w-full h-full flex items-center justify-center">
-      <div className="text-red-600">{error}</div>
-    </div>
-  );
+  if (error) {
+    toast({
+      title: "Error: " + error,
+      description: "There was an error submitting the contact request. Please try again.",
+      variant: "destructive",
+      duration: 5000,
+    });
+    console.log('Error fetching missions test:', error);
+    return (
+        <div className="w-full h-full flex items-center justify-center">
+
+          <div className="text-red-600">{error}</div>
+        </div>
+    );
+  }
 
   return (
-    <MotionWrapper 
-      className="w-full h-full flex flex-col bg-gray-50 p-3" 
-      initial={{ opacity: 0, y: 10 }} 
+    <MotionWrapper
+      className="w-full h-full flex flex-col bg-gray-50 p-3"
+      initial={{ opacity: 0, y: 10 }}
       animate={{ opacity: 1, y: 0 }}
     >
       <MotionWrapper className="bg-white rounded-xl p-6 shadow-md mb-4">

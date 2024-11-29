@@ -1,5 +1,6 @@
 import moment from "moment";
-import { Mission } from "./fetchMissions";
+import { Mission } from "@/api/gs-fetch-missions";
+import React from "react";
 
 // Define TimelineItem interface
 export interface TimelineItem {
@@ -12,14 +13,15 @@ export interface TimelineItem {
     className: string;
     style: React.CSSProperties;
   };
+  description?: string;
 }
 
 // Map station names to group IDs
 const getGroupId = (station: string): number => {
-  if (station.includes("Inuvik")) return 3;
-  if (station.includes("Gatineau")) return 2;
-  if (station.includes("Prince Albert")) return 1;
-  return 2;
+  if (station.includes("Inuvik Northwest")) return 1;
+  if (station.includes("Prince Albert")) return 2;
+  if (station.includes("Gatineau Quebec")) return 3;
+    return 1;
 };
 
 // Convert missions to timeline items
