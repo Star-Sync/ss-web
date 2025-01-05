@@ -1,4 +1,4 @@
-import React, { useState, useEffect } from "react";
+import React, {useState, useEffect, useCallback} from "react";
 import Timeline, {
     TimelineHeaders,
     DateHeader,
@@ -7,7 +7,7 @@ import Timeline, {
     CustomMarker,
 } from "react-calendar-timeline";
 import MotionWrapper from "@/components/app/MotionWrapper";
-import "react-calendar-timeline/lib/Timeline.css";
+
 import moment from "moment";
 import { gsFetchMissions } from "@/api/gs-fetch-missions";
 import { createTimelineItems, TimelineItem } from "@/components/app/calendar/CalendarItems";
@@ -41,30 +41,44 @@ const CalendarContainer = () => {
         }
     };
 
+    // Edge case: Refresh the calendar when the sidebar button is clicked
+    // Ensure that calendar fills the available space after the sidebar is closed
+    useEffect(() => {
+        const handleSidebarButtonClick = () => {
+            setTimeout(() => {
+                fetchAndSetMissions();
+            }, 200);
+        };
+        window.addEventListener("sidebarButtonClick", handleSidebarButtonClick);
+
+        return () => {
+            window.removeEventListener("sidebarButtonClick", handleSidebarButtonClick);
+        };
+    }, []);
+
     // Set scrolling limits (6 months before and after current time)
     const minTime = moment().add(-6, "months").valueOf();
     const maxTime = moment().add(6, "months").valueOf();
 
-    // Extracted data fetching function
-    const fetchAndSetMissions = async () => {
+    const fetchAndSetMissions = useCallback(async () => {
         setIsLoading(true);
         setError(null);
         try {
-            const missions = await gsFetchMissions();
-            const timelineItems = createTimelineItems(missions);
-            setItems(timelineItems);
+            const missions = await gsFetchMissions(); // Await for the missions to be fetched
+            const timelineItems = createTimelineItems(missions); // Process the missions
+            setItems(timelineItems); // Update the state with new items
         } catch (err) {
             console.error("Error fetching missions:", err);
             setError(
                 err instanceof Error ? err.message : "An unknown error occurred"
             );
         } finally {
-            setIsLoading(false);
+            setIsLoading(false); // Ensure loading state is updated
         }
-    };
+    }, []);
 
     useEffect(() => {
-        fetchAndSetMissions();
+        fetchAndSetMissions().then(r => console.log('Missions fetched:', r));
     }, []);
 
     const handleTimeChange = (

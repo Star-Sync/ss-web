@@ -75,8 +75,8 @@ const data: Data = {
             icon: LayoutDashboard,
         },
         {
-            title: "GS-Calendar",
-            url: "/app/calendar", 
+            title: "Calendar",
+            url: "/app/calendar",
             isActive: false,
             icon: Antenna,
         },
@@ -86,12 +86,6 @@ const data: Data = {
             isActive: false,
             icon: CogIcon,
         },
-        {
-            title: "gs-scheduler-test",
-            url: "/scheduleTest",
-            isActive: false,
-            icon: CogIcon,
-        }
     ],
 };
 
