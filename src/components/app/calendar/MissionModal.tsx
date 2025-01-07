@@ -1,4 +1,4 @@
-// @ts-ignore
+// @ts-expect-error Parameter 'mission' implicitly has an 'any' type.
 import Modal from "react-modal";
 import {TimelineItem} from "@/components/app/calendar/CalendarItems";
 import moment from "moment";

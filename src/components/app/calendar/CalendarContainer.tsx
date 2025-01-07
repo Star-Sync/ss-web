@@ -46,7 +46,7 @@ const CalendarContainer = () => {
     useEffect(() => {
         const handleSidebarButtonClick = () => {
             setTimeout(() => {
-                fetchAndSetMissions();
+                fetchAndSetMissions().then(r => console.log('Missions fetched:', r));
             }, 200);
         };
         window.addEventListener("sidebarButtonClick", handleSidebarButtonClick);
