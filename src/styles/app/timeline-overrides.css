@@ -1,0 +1,168 @@
+/* timeline-overrides.css */
+
+/* -------------
+   BASE OVERRIDES
+   ------------- */
+
+/* Reset some basics to prevent old default styling */
+.react-calendar-timeline * {
+    box-sizing: border-box;
+}
+
+/* This is the outer container for the entire timeline. */
+.react-calendar-timeline .rct-outer {
+    display: block;
+    overflow: hidden;
+    white-space: nowrap;
+}
+
+/* This handles the horizontal scroll for the main timeline. */
+.react-calendar-timeline .rct-scroll {
+    display: inline-block;
+    white-space: normal;
+    vertical-align: top;
+    overflow-x: scroll;
+    overflow-y: hidden;
+    -ms-touch-action: none;
+    touch-action: none;
+}
+
+/* On item hover, bring it to front. */
+.react-calendar-timeline .rct-item:hover {
+    z-index: 88;
+}
+
+/* -------------
+   SIDEBAR STYLES
+   ------------- */
+
+/* Force the sidebar background to stay gray (Tailwind gray-500 = #6b7280). */
+.react-calendar-timeline .rct-sidebar {
+    background-color: #6b7280 !important;
+    border-right: 1px solid #bbb;
+    overflow: hidden;
+    display: inline-block;
+    vertical-align: top;
+    position: relative;
+    box-sizing: border-box;
+    transition: width 0.3s; /* Animate the collapse/expand */
+}
+
+/* Example: collapsed vs expanded widths;
+   you can tweak these to your desired widths. */
+.react-calendar-timeline .rct-sidebar.collapsed {
+    width: 50px !important;   /* collapsed width */
+}
+.react-calendar-timeline .rct-sidebar.expanded {
+    width: 200px !important;  /* expanded width */
+}
+
+/* The text rows in the sidebar. */
+.react-calendar-timeline .rct-sidebar .rct-sidebar-row {
+    /*padding: 4px 4px;*/
+    padding-left: 10%;
+    overflow: hidden;
+    white-space: nowrap;
+    text-overflow: ellipsis;
+    margin: 0;
+    border-bottom: 1px solid #bbb;
+    color: #fff; /* ensure text is visible on gray background */
+}
+
+.react-calendar-timeline .rct-sidebar .rct-sidebar-row:nth-child(1) {
+    background-color: #cd5c5c; /* Darker pastel red */
+}
+
+.react-calendar-timeline .rct-sidebar .rct-sidebar-row:nth-child(2) {
+    background-color: #4682b4; /* Darker pastel blue */
+}
+
+.react-calendar-timeline .rct-sidebar .rct-sidebar-row:nth-child(3) {
+    background-color: #66cdaa; /* Darker pastel green */
+}
+
+/* -------------
+   HORIZONTAL LINES
+   ------------- */
+.react-calendar-timeline .rct-horizontal-lines .rct-hl-even,
+.react-calendar-timeline .rct-horizontal-lines .rct-hl-odd {
+    border-bottom: 1px solid #bbb;
+    box-sizing: border-box;
+    z-index: 40;
+}
+.react-calendar-timeline .rct-horizontal-lines .rct-hl-odd {
+    background: rgba(0, 0, 0, 0.05);
+}
+.react-calendar-timeline .rct-horizontal-lines .rct-hl-even {
+    background: transparent;
+}
+
+/* -------------
+   VERTICAL LINES
+   ------------- */
+.react-calendar-timeline .rct-vertical-lines .rct-vl {
+    position: absolute;
+    border-left: 1px solid #bbb;
+    z-index: 30;
+}
+.react-calendar-timeline .rct-vertical-lines .rct-vl-first {
+    border-left-width: 2px;
+}
+
+/* -------------
+   CURSOR MARKER
+   ------------- */
+.react-calendar-timeline .rct-cursor-line {
+    position: absolute;
+    width: 2px;
+    background: red;
+    z-index: 51;
+}
+
+/* -------------
+   DATE HEADERS
+   ------------- */
+
+/* The container for all date headers. */
+.react-calendar-timeline .rct-header-root {
+    background-color: #6b7280 !important;
+    border-bottom: 1px solid #bbb;
+    color: #fff; /* white text */
+}
+
+/* Each individual date header block. */
+.react-calendar-timeline .rct-dateHeader {
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    height: 100%;
+    border-bottom: 1px solid #bbb;
+    border-left: 1px solid #bbb;
+    font-size: 14px;
+    color: #fff; /* White text */
+    background-color: #6b7280 !important; /* Keep consistent gray background */
+    cursor: pointer;
+}
+
+/* The “primary” row of date headers (e.g. year) can share the same color. */
+.react-calendar-timeline .rct-dateHeader-primary {
+    background-color: #6b7280 !important;
+    border-left: 1px solid #bbb;
+    border-right: 1px solid #bbb;
+    font-weight: bold;
+    color: #fff;
+}
+
+/* -------------
+   MISC
+   ------------- */
+
+/* Adjust item (mission) shape or color if desired.
+   By default, they are just placeholders. */
+/*.react-calendar-timeline .rct-item .rct-item-content {*/
+/*    border-radius: 4px;*/
+/*    padding: 0 6px;*/
+/*    height: 100%;*/
+/*    color: #fff;*/
+/*    background: #3b82f6; !* Tailwind blue-500 *!*/
+/*}*/

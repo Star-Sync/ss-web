@@ -6,6 +6,7 @@ import WebLayout from '@/components/web/WebLayout';
 
 // Global styles
 import '@/styles/globals.css';
+import "@/styles/app/timeline-overrides.css";
 
 // Web styles
 import '@/styles/web/navbar.css';
