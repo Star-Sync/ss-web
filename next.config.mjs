@@ -6,7 +6,9 @@ const nextConfig = {
         // App pages
         { source: '/dashboard', destination: '/app/dashboard' },
         { source: '/settings', destination: '/app/settings' },
-        { source: '/scheduleTest', destination: '/app/gs-scheduler-test' },
+        { source: '/calendar', destination: '/app/calendar' },
+        { source: '/satellite', destination: '/app/satellite' },
+        
 
         // Web pages
         { source: '/', destination: '/web/' },

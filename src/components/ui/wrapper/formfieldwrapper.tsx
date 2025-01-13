@@ -58,6 +58,7 @@ const FormFieldWrapper = <TFieldValues extends FieldValues>({
                     </FormLabel>
                     <FormControl>
                         <Input
+                            {...field} 
                             placeholder={placeholder}
                             type={type}
                             step={step}
