@@ -12,8 +12,16 @@ import { toast } from "@/hooks/use-toast";
 const SatelliteForm: React.FC = () => {
     const form = useForm<SatelliteFormData>({
         resolver: zodResolver(SatelliteFormSchema),
-        defaultValues: { satelliteName: "" },
-      });
+        defaultValues: {
+            satelliteName: "",
+            TLE: "",
+            priority: 1,               // Default priority
+            uplinkRate: 0,             // Default uplink rate
+            downlinkRate: 0,           // Default downlink rate
+            scienceDownlinkRate: 0,    // Default science downlink rate
+            exclusionCone: "",         // Default exclusion cone
+        },
+    });
 
     const onSubmit = async (values: SatelliteFormData) => {
         const payload = {
@@ -47,17 +55,71 @@ const SatelliteForm: React.FC = () => {
 
     return (
         <FormProvider {...form}>
-            <form onSubmit={form.handleSubmit(onSubmit, (errors) => {
-    console.log('Form errors:', errors);
-  })} className="space-y-6">
+            <form onSubmit={form.handleSubmit(onSubmit)} className="space-y-6">
                 <div className="grid grid-cols-1 md:grid-cols-2 gap-4 max-w-[50vw]">
                     <FormFieldWrapper<SatelliteFormData>
                                 control={form.control}
                                 name="satelliteName"
                                 label="Satellite Name"
-                                placeholder="Enter satellite Name"
+                                placeholder="Enter satellite name"
+                            />
+                    <FormFieldWrapper<SatelliteFormData>
+                        control={form.control}
+                        name="priority"
+                        label="Priority"
+                        placeholder="Enter priority"
+                        type="number"
+                    />  
+                </div>
+                <Separator className="max-w-[50vw]" />
+                <div className="grid grid-cols-1 md:grid-cols-3 gap-4 max-w-[50vw]">
+                <FormFieldWrapper<SatelliteFormData>
+                        control={form.control}
+                        name="uplinkRate"
+                        label="Uplink Rate"
+                        placeholder="Enter uplink rate"
+                        type="number"
+                    />
+
+                    <FormFieldWrapper<SatelliteFormData>
+                        control={form.control}
+                        name="downlinkRate"
+                        label="Downlink Rate"
+                        placeholder="Enter downlink rate"
+                        type="number"
+                    />
+
+                    <FormFieldWrapper<SatelliteFormData>
+                        control={form.control}
+                        name="scienceDownlinkRate"
+                        label="Science Downlink Rate"
+                        placeholder="Enter science downlink rate"
+                        type="number"
+                    />
+                </div>
+                <Separator className="max-w-[50vw]" />
+                <div className="grid grid-cols-1 md:grid-cols-1 gap-4 max-w-[50vw]">
+                    <FormFieldWrapper<SatelliteFormData>
+                                control={form.control}
+                                name="exclusionCone"
+                                label="Exclusion Cones"
+                                placeholder="Enter exlusion cones"
+                                isMultiline={true}
+                                className="h-auto resize-none max-h-[5vw]"
                             />
                 </div>
+                <Separator className="max-w-[50vw]" />
+                <div className="grid grid-cols-1 md:grid-cols-1 gap-4 max-w-[50vw]">
+                    <FormFieldWrapper<SatelliteFormData>
+                                control={form.control}
+                                name="TLE"
+                                label="Two Line Element (TLE)"
+                                placeholder="Enter TLE"
+                                isMultiline={true}
+                                className="h-auto resize-none max-h-[5vw]"
+                            />
+                </div>
+            
                 <Separator className="max-w-[50vw]" />
                 {/* Submit Button */}
                 <Button type="submit" className="w-full md:w-auto">
