@@ -32,6 +32,9 @@ FROM base
 COPY --from=build /app/.next/standalone /app
 COPY --from=build /app/.next/static /app/.next/static
 COPY --from=build /app/public /app/public
+COPY docker/entrypoint.sh /usr/bin/
+RUN chmod +x /usr/bin/entrypoint.sh
+ENTRYPOINT ["entrypoint.sh"]
 
 # Start the server
 EXPOSE 3000
