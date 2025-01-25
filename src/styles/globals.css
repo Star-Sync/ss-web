@@ -128,7 +128,6 @@ body {
 .calendar-page {
   display: flex;
   flex-direction: column;
-  align-items: left; /* Center the content horizontally */
   padding: 5px; /* Add some padding around the page */
   background-color: #f9f9f9; /* Light background color */
 }
