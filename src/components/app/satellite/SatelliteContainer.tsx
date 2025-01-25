@@ -5,17 +5,17 @@ import MotionWrapper from "../MotionWrapper";
 import TabNav from "@/components/app/satellite/TabNav";
 import HeaderSection from "@/components/app/satellite/HeaderSection";
 import FormManager from "./Form/FormManager";
-import SettingsGeneral from "../settings/settings-general";
 import TabContent from "./TabContent";
+import SatelliteGeneral from "@/components/app/satellite/SatelliteGeneral";
 
 const SatelliteContainer: FC = () => {
     const [tabs, setTabs] = useState<Tab[]>([
         {
             id: "overview",
             name: "Overview",
-            content: <SettingsGeneral></SettingsGeneral>,
+            content: <SatelliteGeneral/>,
             isPinned: true,
-        
+
         },
     ]);
     const [activeTabId, setActiveTabId] = useState("overview");

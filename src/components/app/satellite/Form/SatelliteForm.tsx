@@ -1,6 +1,6 @@
 // SatelliteForm.tsx
 import React from "react";
-import { useForm, Controller, FormProvider } from "react-hook-form";
+import { useForm, FormProvider } from "react-hook-form";
 import { Button } from "@/components/ui/button";
 import { zodResolver } from "@hookform/resolvers/zod";
 import { Separator } from "@/components/ui/separator";
@@ -69,7 +69,7 @@ const SatelliteForm: React.FC = () => {
                         label="Priority"
                         placeholder="Enter priority"
                         type="number"
-                    />  
+                    />
                 </div>
                 <Separator className="max-w-[50vw]" />
                 <div className="grid grid-cols-1 md:grid-cols-3 gap-4 max-w-[50vw]">
@@ -119,7 +119,7 @@ const SatelliteForm: React.FC = () => {
                                 className="h-auto resize-none max-h-[5vw]"
                             />
                 </div>
-            
+
                 <Separator className="max-w-[50vw]" />
                 {/* Submit Button */}
                 <Button type="submit" className="w-full md:w-auto">
@@ -127,7 +127,7 @@ const SatelliteForm: React.FC = () => {
                 </Button>
 
             </form>
-        </FormProvider>            
+        </FormProvider>
     );
 };
 

@@ -1,5 +1,5 @@
 import React, { FC } from "react";
-import { motion } from "framer-motion";
+import { motion, AnimatePresence } from "framer-motion";
 import { Tab } from "./TabNav";
 
 interface TabContentProps {
@@ -8,24 +8,40 @@ interface TabContentProps {
 }
 
 const TabContent: FC<TabContentProps> = ({ tabs, activeTabId }) => {
-    const activeTab = tabs.find((tab) => tab.id === activeTabId);
-
     return (
         <div className="flex-grow relative">
-            {activeTab ? (
-                <motion.div
-                    key={activeTab.id}
-                    initial={{ opacity: 0, x: -20 }}
-                    animate={{ opacity: 1, x: 0 }}
-                    exit={{ opacity: 0, x: 20 }}
-                    transition={{ duration: 0.3 }}
-                    style={{ width: "100%", height: "100%" }}
-                >
-                    {activeTab.content}
-                </motion.div>
-            ) : (
-                <div>No content available.</div>
-            )}
+            <AnimatePresence mode="wait">
+                {tabs.map((tab) => (
+                    tab.id === activeTabId ? (
+                        <motion.div
+                            key={tab.id}
+                            initial={{ opacity: 0, x: -20 }}
+                            animate={{ opacity: 1, x: 0 }}
+                            exit={{ opacity: 0, x: 20 }}
+                            transition={{ duration: 0.3 }}
+                            style={{
+                                position: 'absolute',
+                                width: "100%",
+                                height: "100%",
+                            }}
+                        >
+                            {tab.content}
+                        </motion.div>
+                    ) : (
+                        <div
+                            key={`hidden-${tab.id}`}
+                            style={{
+                                position: 'absolute',
+                                visibility: 'hidden',
+                                width: "100%",
+                                height: "100%",
+                            }}
+                        >
+                            {tab.content}
+                        </div>
+                    )
+                ))}
+            </AnimatePresence>
         </div>
     );
 };

@@ -1,6 +1,6 @@
 // FormManager.tsx
 import React from "react";
-import { Tabs, TabsList, TabsTrigger, TabsContent } from "@/components/ui/tabs";
+import { Tabs, TabsContent } from "@/components/ui/tabs";
 import { motion } from "framer-motion";
 import MotionWrapper from "@/components/app/MotionWrapper";
 import SatelliteForm from "./SatelliteForm";
