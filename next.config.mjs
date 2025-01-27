@@ -8,7 +8,7 @@ const nextConfig = {
         { source: '/settings', destination: '/app/settings' },
         { source: '/calendar', destination: '/app/calendar' },
         { source: '/satellite', destination: '/app/satellite' },
-        
+
 
         // Web pages
         { source: '/', destination: '/web/' },
@@ -18,6 +18,8 @@ const nextConfig = {
         { source: '/feature', destination: '/web/feature' },
         { source: '/brand', destination: '/web/brand' },
         { source: '/possibility', destination: '/web/possibility' },
+
+        { source: '/login', destination: '/auth/login' },
 
         // API Proxy to Backend
         { source: '/api/:path*', destination: process.env.NEXT_PUBLIC_API_URL+'/api/:path*' }
