@@ -1,4 +1,4 @@
-import React, {useState, useEffect, useCallback} from "react";
+import React, { useState, useEffect, useCallback } from "react";
 import Timeline, {
     TimelineHeaders,
     DateHeader,
@@ -7,12 +7,11 @@ import Timeline, {
     CustomMarker,
 } from "react-calendar-timeline";
 import MotionWrapper from "@/components/app/MotionWrapper";
-
 import moment from "moment";
 import { gsFetchMissions } from "@/api/gs-fetch-missions";
 import { createTimelineItems, TimelineItem } from "@/components/app/calendar/CalendarItems";
 import { MissionModal } from "@/components/app/calendar/MissionModal";
-import {toast} from "@/hooks/use-toast";
+import { toast } from "@/hooks/use-toast";
 
 const groups = [
     { id: 1, title: "Prince Albert" },
@@ -33,29 +32,6 @@ const CalendarContainer = () => {
         moment().endOf("day").valueOf()
     );
 
-    const handleItemClick = (itemId: number) => {
-        const mission = items.find((item) => item.id === itemId);
-        if (mission) {
-            setSelectedMission(mission);
-            setIsModalOpen(true);
-        }
-    };
-
-    // Edge case: Refresh the calendar when the sidebar button is clicked
-    // Ensure that calendar fills the available space after the sidebar is closed
-    useEffect(() => {
-        const handleSidebarButtonClick = () => {
-            setTimeout(() => {
-                fetchAndSetMissions().then(r => console.log('Missions fetched:', r));
-            }, 200);
-        };
-        window.addEventListener("sidebarButtonClick", handleSidebarButtonClick);
-
-        return () => {
-            window.removeEventListener("sidebarButtonClick", handleSidebarButtonClick);
-        };
-    }, []);
-
     // Set scrolling limits (6 months before and after current time)
     const minTime = moment().add(-6, "months").valueOf();
     const maxTime = moment().add(6, "months").valueOf();
@@ -64,24 +40,28 @@ const CalendarContainer = () => {
         setIsLoading(true);
         setError(null);
         try {
-            const missions = await gsFetchMissions(); // Await for the missions to be fetched
-            const timelineItems = createTimelineItems(missions); // Process the missions
-            setItems(timelineItems); // Update the state with new items
+            const missions = await gsFetchMissions();
+            const timelineItems = createTimelineItems(missions);
+            setItems(timelineItems);
         } catch (err) {
             console.error("Error fetching missions:", err);
             setError(
                 err instanceof Error ? err.message : "An unknown error occurred"
             );
         } finally {
-            setIsLoading(false); // Ensure loading state is updated
+            setIsLoading(false);
         }
-    }, []);
+    }, []); // Empty dependency array since it doesn't depend on any props or state
 
-    useEffect(() => {
-        fetchAndSetMissions().then(r => console.log('Missions fetched:', r));
-    }, []);
+    const handleItemClick = useCallback((itemId: number) => {
+        const mission = items.find((item) => item.id === itemId);
+        if (mission) {
+            setSelectedMission(mission);
+            setIsModalOpen(true);
+        }
+    }, [items]);
 
-    const handleTimeChange = (
+    const handleTimeChange = useCallback((
         newVisibleTimeStart: number,
         newVisibleTimeEnd: number,
         updateScrollCanvas: (start: number, end: number) => void
@@ -104,7 +84,27 @@ const CalendarContainer = () => {
 
         setVisibleTimeStart(newVisibleTimeStart);
         setVisibleTimeEnd(newVisibleTimeEnd);
-    };
+    }, [minTime, maxTime]);
+
+    // Initial fetch of missions
+    useEffect(() => {
+        fetchAndSetMissions();
+    }, [fetchAndSetMissions]);
+
+    // Handle sidebar button click
+    useEffect(() => {
+        const handleSidebarButtonClick = () => {
+            setTimeout(() => {
+                fetchAndSetMissions();
+            }, 200);
+        };
+
+        window.addEventListener("sidebarButtonClick", handleSidebarButtonClick);
+
+        return () => {
+            window.removeEventListener("sidebarButtonClick", handleSidebarButtonClick);
+        };
+    }, [fetchAndSetMissions]);
 
     if (isLoading)
         return (
@@ -123,7 +123,6 @@ const CalendarContainer = () => {
         console.log('Error fetching missions test:', error);
         return (
             <div className="w-full h-full flex items-center justify-center">
-
                 <div className="text-red-600">{error}</div>
             </div>
         );
@@ -138,9 +137,8 @@ const CalendarContainer = () => {
                         View and manage your schedule effortlessly.
                     </p>
                 </div>
-                {/* Refresh Button */}
                 <button
-                    onClick={fetchAndSetMissions}
+                    onClick={() => fetchAndSetMissions()}
                     className="bg-blue-500 hover:bg-blue-600 text-white font-semibold py-2 px-4 rounded"
                 >
                     Refresh
@@ -158,21 +156,19 @@ const CalendarContainer = () => {
                     canResize="both"
                     lineHeight={50}
                     itemHeightRatio={0.8}
-                    minZoom={60 * 60 * 1000} // 1 hour minimum zoom
-                    maxZoom={7 * 24 * 60 * 60 * 1000} // 7 days maximum zoom
-                    buffer={1} // Disable extra rendering to reduce scroll sensitivity
+                    minZoom={60 * 60 * 1000}
+                    maxZoom={7 * 24 * 60 * 60 * 1000}
+                    buffer={1}
                 >
                     <TimelineHeaders>
                         <SidebarHeader>
-                            {({ getRootProps }) => {
-                                return (
-                                    <div className="bg-gray-500" {...getRootProps()}>
-                                        <div className="p-6 text-center text-white font-bold">
-                                            Groundstations
-                                        </div>
+                            {({ getRootProps }) => (
+                                <div className="bg-gray-500" {...getRootProps()}>
+                                    <div className="p-6 text-center text-white font-bold">
+                                        Groundstations
                                     </div>
-                                );
-                            }}
+                                </div>
+                            )}
                         </SidebarHeader>
                         <DateHeader
                             unit="primaryHeader"
