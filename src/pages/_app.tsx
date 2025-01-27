@@ -1,8 +1,5 @@
 import React from 'react';
 import { AppProps } from 'next/app';
-import { useRouter } from 'next/router';
-import AppLayout from '@/components/layout/AppLayout'
-import WebLayout from '@/components/layout/WebLayout';
 
 // Global styles
 import '@/styles/globals.css';
@@ -24,8 +21,6 @@ import '@/styles/web/article.css';
 import LayoutWrapper from "@/components/layout/LayoutWrapper";
 
 function MyApp({ Component, pageProps }: AppProps) {
-    const router = useRouter();
-
     return (
             <LayoutWrapper>
                 <Component {...pageProps} />
