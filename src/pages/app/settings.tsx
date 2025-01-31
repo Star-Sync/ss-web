@@ -4,10 +4,11 @@ import TabContent from "@/components/app/settings/TabContent";
 import SettingsGeneral from "@/components/app/settings/settings-general";
 import MotionWrapper from "@/components/app/MotionWrapper";
 import Head from "next/head";
+import SettingsUser from "@/components/app/settings/settings-user";
 
 const tabs = [
     { name: "General", key: "general", Component: SettingsGeneral },
-    { name: "Users", key: "users", Component: () => <div>User management settings content goes here.</div> },
+    { name: "Users", key: "users",  Component: SettingsUser},
     { name: "Analytics", key: "analytics", Component: () => <div>Analytics settings content goes here.</div> },
     { name: "Apps", key: "apps", Component: () => <div>Apps settings content goes here.</div> },
     { name: "Security", key: "security", Component: () => <div>Security settings content goes here.</div> },
