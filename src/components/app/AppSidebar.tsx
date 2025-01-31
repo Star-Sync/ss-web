@@ -7,7 +7,7 @@ import { FaQuestionCircle } from "react-icons/fa";
 import { useRouter } from "next/router";
 
 // Icons
-import { ChevronsUpDown, CogIcon, LayoutDashboard, LogOut, Calendar, Satellite} from "lucide-react";
+import { ChevronsUpDown, CogIcon, LayoutDashboard, Calendar, Satellite} from "lucide-react";
 
 // Custom Hooks
 import { useIsMobile } from "@/hooks/use-mobile";
