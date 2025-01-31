@@ -39,6 +39,10 @@ import {
     useSidebar,
 } from "@/components/ui/sidebar";
 
+import { UserDataLoader } from "@/auth/userdataloader";
+import { useKeycloak } from "@react-keycloak/web";
+import { LogoutButton } from "@/auth/logoutbutton";
+
 // Types
 interface User {
     name: string;
@@ -60,12 +64,12 @@ interface Data {
 }
 
 // Data
-const data: Data = {
+const defaultData: Data = {
     user: {
-        name: "Sathira Williams",
-        email: "sathira.williams@gmail.com",
+        name: "Loading...",
+        email: "Loading...",
         avatar: "/logo/ss-logo-favicon.png",
-        role: "CSA Admin",
+        role: "CSA",
     },
     navMain: [
         {
@@ -230,8 +234,7 @@ const UserDropdownMenu: React.FC<UserDropdownMenuProps> = ({ user }) => {
                     </DropdownMenuItem>
                 </DropdownMenuGroup>
                 <DropdownMenuItem>
-                    <LogOut className="mr-2 h-4 w-4" />
-                    Log out
+                <LogoutButton className="flex items-center gap-2 w-full" />
                 </DropdownMenuItem>
             </DropdownMenuContent>
         </DropdownMenu>
@@ -243,24 +246,41 @@ export const AppSidebar: React.FC = () => {
     const { state } = useSidebar();
     const isCollapsed = state === "collapsed";
     const isMobile = useIsMobile();
+    const { keycloak } = useKeycloak();
 
     return (
-        <Sidebar collapsible="icon" className="flex flex-col overflow-hidden">
-            <Logo isCollapsed={isCollapsed} isMobile={isMobile} />
-            <SidebarContent className="ml-1 flex-1 overflow-y-auto">
-                <NavigationMenu navMain={data.navMain} />
-            </SidebarContent>
-            <SidebarFooter
-                className={`flex items-center justify-center ${
-                    isMobile || isCollapsed ? "ml-2" : ""
-                }`}
-            >
-                <SidebarMenu>
-                    <SidebarMenuItem>
-                        <UserDropdownMenu user={data.user} />
-                    </SidebarMenuItem>
-                </SidebarMenu>
-            </SidebarFooter>
-        </Sidebar>
+        <UserDataLoader keycloak={keycloak}>
+            {(userData) => {
+                const transformedData = {
+                    user: {
+                        name: userData.fullName || "Fallback USer",
+                        email: userData.email || "fallback@csa.com",
+                        avatar: "/logo/ss-logo-favicon.png", 
+                        role: "CSA",
+                    },
+                    navMain: defaultData.navMain,
+                };
+
+                return (
+                    <Sidebar collapsible="icon" className="flex flex-col overflow-hidden">
+                        <Logo isCollapsed={isCollapsed} isMobile={isMobile} />
+                        <SidebarContent className="ml-1 flex-1 overflow-y-auto">
+                            <NavigationMenu navMain={transformedData.navMain} />
+                        </SidebarContent>
+                        <SidebarFooter
+                            className={`flex items-center justify-center ${
+                                isMobile || isCollapsed ? "ml-2" : ""
+                            }`}
+                        >
+                            <SidebarMenu>
+                                <SidebarMenuItem>
+                                    <UserDropdownMenu user={transformedData.user} />
+                                </SidebarMenuItem>
+                            </SidebarMenu>
+                        </SidebarFooter>
+                    </Sidebar>
+                );
+            }}
+        </UserDataLoader>
     );
 };
