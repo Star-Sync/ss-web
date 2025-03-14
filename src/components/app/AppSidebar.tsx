@@ -7,7 +7,7 @@ import { FaQuestionCircle } from "react-icons/fa";
 import { useRouter } from "next/router";
 
 // Icons
-import { ChevronsUpDown, CogIcon, LayoutDashboard, LogOut, Calendar, Satellite} from "lucide-react";
+import { ChevronsUpDown, CogIcon, LayoutDashboard, LogOut, Calendar, Satellite, Globe} from "lucide-react";
 
 // Custom Hooks
 import { useIsMobile } from "@/hooks/use-mobile";
@@ -85,6 +85,12 @@ const data: Data = {
             url: "/satellite",
             isActive: true,
             icon: Satellite,
+        },
+        {
+            title: "Ground Station",  
+            url: "/ground",  
+            isActive: true,         
+            icon: Globe,         
         },
         {
             title: "Settings",
