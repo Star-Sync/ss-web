@@ -39,7 +39,10 @@ import {
     useSidebar,
 } from "@/components/ui/sidebar";
 
-// Types
+// Import the fetchCurrentUser function and type from CurrentUser.ts
+import { fetchCurrentUser, CurrentUser } from "@/auth/CurrentUser";
+
+// Local interfaces
 interface User {
     name: string;
     email: string;
@@ -145,7 +148,6 @@ const NavigationMenu: React.FC<NavigationMenuProps> = ({ navMain }) => {
     const [activeNav, setActiveNav] = useState(navMain);
 
     useEffect(() => {
-        // Update the active state based on the current path
         setActiveNav(
             navMain.map((item) => ({
                 ...item,
@@ -188,6 +190,15 @@ interface UserDropdownMenuProps {
 }
 
 const UserDropdownMenu: React.FC<UserDropdownMenuProps> = ({ user }) => {
+    const router = useRouter();
+
+    const handleSignOut = () => {
+        // Remove the access token from localStorage
+        localStorage.removeItem("access_token");
+        // Redirect the user to the sign in page.
+        router.push("/");
+    };
+
     return (
         <DropdownMenu>
             <DropdownMenuTrigger asChild>
@@ -235,7 +246,7 @@ const UserDropdownMenu: React.FC<UserDropdownMenuProps> = ({ user }) => {
                         Help
                     </DropdownMenuItem>
                 </DropdownMenuGroup>
-                <DropdownMenuItem>
+                <DropdownMenuItem onClick={handleSignOut}>
                     <LogOut className="mr-2 h-4 w-4" />
                     Log out
                 </DropdownMenuItem>
@@ -249,12 +260,57 @@ export const AppSidebar: React.FC = () => {
     const { state } = useSidebar();
     const isCollapsed = state === "collapsed";
     const isMobile = useIsMobile();
+    const router = useRouter();
+
+    // State to hold the current user, initially null
+    const [user, setUser] = useState<User | null>(null);
+
+    useEffect(() => {
+        // Set a timeout of 10 seconds. If fetching the user takes too long, sign out.
+        const timeoutDuration = 10000;
+        const timeoutId = setTimeout(() => {
+            console.error("User load timed out. Signing out.");
+            localStorage.removeItem("access_token");
+            router.push("/signin"); // Redirect to sign-in page
+        }, timeoutDuration);
+
+        const loadUser = async () => {
+            try {
+                // Fetch current user data from the backend via the CurrentUser.ts helper.
+                const currentUserResponse: CurrentUser = await fetchCurrentUser();
+
+                // Successfully loaded user data; clear the timeout.
+                clearTimeout(timeoutId);
+
+                // Transform the response to match the User interface required by the sidebar.
+                const transformedUser: User = {
+                    name: currentUserResponse.username,
+                    email: currentUserResponse.email,
+                    avatar: "/logo/ss-logo-favicon.png",
+                    role: "CSA Admin",
+                };
+
+                setUser(transformedUser);
+            } catch (error) {
+                console.error("Failed to load current user", error);
+                clearTimeout(timeoutId);
+                // If there's an error, sign the user out.
+                localStorage.removeItem("access_token");
+                router.push("/signin");
+            }
+        };
+
+        loadUser();
+
+        // Cleanup timeout if component unmounts.
+        return () => clearTimeout(timeoutId);
+    }, [router]);
 
     return (
         <Sidebar collapsible="icon" className="flex flex-col overflow-hidden">
             <Logo isCollapsed={isCollapsed} isMobile={isMobile} />
             <SidebarContent className="ml-1 flex-1 overflow-y-auto">
-                <NavigationMenu navMain={data.navMain} />
+                <NavigationMenu navMain={navMain} />
             </SidebarContent>
             <SidebarFooter
                 className={`flex items-center justify-center ${
@@ -263,7 +319,7 @@ export const AppSidebar: React.FC = () => {
             >
                 <SidebarMenu>
                     <SidebarMenuItem>
-                        <UserDropdownMenu user={data.user} />
+                        {user ? <UserDropdownMenu user={user} /> : <div>Loading...</div>}
                     </SidebarMenuItem>
                 </SidebarMenu>
             </SidebarFooter>

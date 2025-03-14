@@ -13,37 +13,34 @@ const SatelliteForm: React.FC = () => {
     const form = useForm<SatelliteFormData>({
         resolver: zodResolver(SatelliteFormSchema),
         defaultValues: {
-            satelliteName: "",
-            TLE: "",
-            priority: 1,               // Default priority
-            uplinkRate: 0,             // Default uplink rate
-            downlinkRate: 0,           // Default downlink rate
-            scienceDownlinkRate: 0,    // Default science downlink rate
-            exclusionCone: "",         // Default exclusion cone
+            name: "",
+            tle: "",
+            uplink: 0,
+            telemetry: 0,
+            science: 0,
+            priority: 1,
         },
     });
 
     const onSubmit = async (values: SatelliteFormData) => {
-        const payload = {
-            ...values,
-        };
+        const payload = { ...values };
 
         console.log("Validated values:", values);
 
-        // Send the request to the backend using axios
         try {
-            const response = await axios.post(process.env.NEXT_PUBLIC_API_URL +'/api/v1/request/rf-time', payload);
-            console.log('Successfully submitted:', response.data);
-            // Handle success
+            const response = await axios.post(
+                process.env.NEXT_PUBLIC_API_URL + "/api/v1/satellites/",
+                payload
+            );
+            console.log("Successfully submitted:", response.data);
             toast({
                 title: "Submission Success",
-                description: "Successfully sent!" + response.data,
+                description: "Successfully sent! " + response.data,
                 variant: "success",
                 duration: 5000,
             });
         } catch (error) {
-            console.error('Error submitting RFRequest:', error);
-            // Handle errors
+            console.error("Error submitting Satellite:", error);
             toast({
                 title: "Submission Error: " + error,
                 description: "Failed to submit!",
@@ -58,11 +55,11 @@ const SatelliteForm: React.FC = () => {
             <form onSubmit={form.handleSubmit(onSubmit)} className="space-y-6">
                 <div className="grid grid-cols-1 md:grid-cols-2 gap-4 max-w-[50vw]">
                     <FormFieldWrapper<SatelliteFormData>
-                                control={form.control}
-                                name="satelliteName"
-                                label="Satellite Name"
-                                placeholder="Enter satellite name"
-                            />
+                        control={form.control}
+                        name="name"
+                        label="Satellite Name"
+                        placeholder="Enter satellite name"
+                    />
                     <FormFieldWrapper<SatelliteFormData>
                         control={form.control}
                         name="priority"
@@ -73,59 +70,43 @@ const SatelliteForm: React.FC = () => {
                 </div>
                 <Separator className="max-w-[50vw]" />
                 <div className="grid grid-cols-1 md:grid-cols-3 gap-4 max-w-[50vw]">
-                <FormFieldWrapper<SatelliteFormData>
+                    <FormFieldWrapper<SatelliteFormData>
                         control={form.control}
-                        name="uplinkRate"
+                        name="uplink"
                         label="Uplink Rate"
                         placeholder="Enter uplink rate"
                         type="number"
                     />
-
                     <FormFieldWrapper<SatelliteFormData>
                         control={form.control}
-                        name="downlinkRate"
-                        label="Downlink Rate"
+                        name="telemetry"
+                        label="Telemetry Downlink Rate"
                         placeholder="Enter downlink rate"
                         type="number"
                     />
-
                     <FormFieldWrapper<SatelliteFormData>
                         control={form.control}
-                        name="scienceDownlinkRate"
+                        name="science"
                         label="Science Downlink Rate"
                         placeholder="Enter science downlink rate"
                         type="number"
                     />
                 </div>
                 <Separator className="max-w-[50vw]" />
-                <div className="grid grid-cols-1 md:grid-cols-1 gap-4 max-w-[50vw]">
+                <div className="grid grid-cols-1 gap-4 max-w-[50vw]">
                     <FormFieldWrapper<SatelliteFormData>
-                                control={form.control}
-                                name="exclusionCone"
-                                label="Exclusion Cones"
-                                placeholder="Enter exlusion cones"
-                                isMultiline={true}
-                                className="h-auto resize-none max-h-[5vw]"
-                            />
+                        control={form.control}
+                        name="tle"
+                        label="Two Line Element (TLE)"
+                        placeholder="Enter TLE"
+                        isMultiline={true}
+                        className="h-auto resize-none max-h-[5vw]"
+                    />
                 </div>
                 <Separator className="max-w-[50vw]" />
-                <div className="grid grid-cols-1 md:grid-cols-1 gap-4 max-w-[50vw]">
-                    <FormFieldWrapper<SatelliteFormData>
-                                control={form.control}
-                                name="TLE"
-                                label="Two Line Element (TLE)"
-                                placeholder="Enter TLE"
-                                isMultiline={true}
-                                className="h-auto resize-none max-h-[5vw]"
-                            />
-                </div>
-
-                <Separator className="max-w-[50vw]" />
-                {/* Submit Button */}
                 <Button type="submit" className="w-full md:w-auto">
                     Submit
                 </Button>
-
             </form>
         </FormProvider>
     );
