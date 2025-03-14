@@ -13,6 +13,7 @@ import {
     Calendar,
     Cone,
     Satellite,
+    Globe,
 } from "lucide-react";
 
 // Custom Hooks
@@ -82,6 +83,12 @@ const navMain: NavItem[] = [
         url: "/satellite",
         isActive: true,
         icon: Satellite,
+    },
+    { 
+        title: "Ground Station",
+        url: "/ground",
+        isActive: true,
+        icon: Globe,
     },
     {
         title: "Exclusion Cones",
