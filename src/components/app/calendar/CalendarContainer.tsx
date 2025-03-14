@@ -165,7 +165,7 @@ const CalendarContainer = () => {
                             {({ getRootProps }) => (
                                 <div className="bg-gray-500" {...getRootProps()}>
                                     <div className="p-6 text-center text-white font-bold">
-                                        Groundstations
+                                        GroundStations
                                     </div>
                                 </div>
                             )}
