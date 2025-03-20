@@ -6,14 +6,14 @@ import TabNav from "@/components/ui/tab/TabNav";
 import HeaderSection from "@/components/app/satellite/HeaderSection";
 import FormManager from "./Form/FormManager";
 import TabContent from "@/components/ui/tab/TabContent";
-import SatelliteGeneral from "@/components/app/satellite/SatelliteGeneral";
+import ExclusionGeneral from "@/components/app/exclusioncones/ExclusionGeneral";
 
 const SatelliteContainer: FC = () => {
     const [tabs, setTabs] = useState<Tab[]>([
         {
             id: "overview",
             name: "Overview",
-            content: <SatelliteGeneral/>,
+            content: <ExclusionGeneral/>,
             isPinned: true,
 
         },
