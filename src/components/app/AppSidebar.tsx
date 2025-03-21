@@ -11,6 +11,7 @@ import {
     LayoutDashboard,
     LogOut,
     Calendar,
+    Cone,
     Satellite,
 } from "lucide-react";
 
@@ -81,6 +82,12 @@ const navMain: NavItem[] = [
         url: "/satellite",
         isActive: true,
         icon: Satellite,
+    },
+    {
+        title: "Exclusion Cones",
+        url: "/exclusion-cones",
+        isActive: true,
+        icon: Cone,
     },
     {
         title: "Settings",
