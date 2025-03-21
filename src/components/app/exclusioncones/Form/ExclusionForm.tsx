@@ -139,14 +139,14 @@ const ExclusionForm: React.FC = () => {
             label="Satellite"
             placeholder="Select a satellite"
             items={satelliteOptions}
-            className="w-full"
+            className="mt-2 w-full border-[0.1vw] border-gray-300 rounded-md text-gray-700"
           />
           <FormCombobox
             name="gs_id"
             label="Ground Station"
             placeholder="Select a ground station"
             items={groundStationOptions}
-            className="w-full"
+            className="mt-2 w-full border-[0.1vw] border-gray-300 rounded-md text-gray-700"
           />
         </div>
         <Separator className="max-w-[50vw]" />

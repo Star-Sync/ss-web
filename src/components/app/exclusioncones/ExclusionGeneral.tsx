@@ -245,13 +245,6 @@ const ExclusionGeneral: React.FC = () => {
                     >
                       <Edit2 className="h-4 w-4" />
                     </Button>
-                    <Button
-                      variant="destructive"
-                      size="sm"
-                      onClick={() => handleDelete(cone.id)}
-                    >
-                      <Trash className="h-4 w-4" />
-                    </Button>
                   </TableCell>
                 </TableRow>
               ))
@@ -362,6 +355,21 @@ const ExclusionGeneral: React.FC = () => {
           )}
 
           <DialogFooter>
+          <Button
+          className="mr-[5vw]"
+            variant="destructive"
+            onClick={() => {
+              const confirmDelete = window.confirm(
+                "Are you sure you want to delete this exclusion cone?"
+              );
+              if (confirmDelete && editingCone) {
+                handleDelete(editingCone.id);
+                setIsEditDialogOpen(false);
+              }
+            }}
+          >
+          <Trash className="h-4" />
+          </Button>
             <Button
               variant="outline"
               onClick={() => {

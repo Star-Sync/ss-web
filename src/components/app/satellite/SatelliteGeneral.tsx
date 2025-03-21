@@ -280,13 +280,6 @@ const SatelliteGeneral: React.FC = () => {
                                         >
                                             <Edit2 className="h-4 w-4" />
                                         </Button>
-                                        <Button
-                                            variant="destructive"
-                                            size="sm"
-                                            onClick={() => handleDelete(satellite.id)}
-                                        >
-                                            <Trash className="h-4 w-4" />
-                                        </Button>
                                     </TableCell>
                                 </TableRow>
                             ))
@@ -402,6 +395,21 @@ const SatelliteGeneral: React.FC = () => {
                     )}
 
                     <DialogFooter>
+                         <Button
+                                  className="mr-[5vw]"
+                                    variant="destructive"
+                                    onClick={() => {
+                                      const confirmDelete = window.confirm(
+                                        "Are you sure you want to delete this exclusion cone?"
+                                      );
+                                      if (confirmDelete && editingSatellite) {
+                                        handleDelete(editingSatellite.id);
+                                        setIsEditDialogOpen(false);
+                                      }
+                                    }}
+                                  >
+                                  <Trash className="h-4" />
+                                  </Button>
                         <Button
                             variant="outline"
                             onClick={() => {

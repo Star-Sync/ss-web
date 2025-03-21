@@ -69,7 +69,7 @@ const Combobox: React.FC<ComboboxProps> = ({
                     role="combobox"
                     aria-expanded={open}
                     className={cn(
-                        "justify-between items-center px-0 hover:bg-transparent hover:text-black",
+                        "justify-between items-center px-2 hover:bg-transparent hover:text-black",
                         className
                     )}
                 >
@@ -95,7 +95,7 @@ const Combobox: React.FC<ComboboxProps> = ({
             <PopoverContent className={cn("p-0", className)}>
                 <Command>
                     <CommandInput
-                        placeholder={`Search ${placeholder.toLowerCase()}`}
+                        placeholder={`Search`}
                         value={searchTerm}
                         onValueChange={setSearchTerm}
                     />

@@ -31,7 +31,7 @@ const FormCombobox: React.FC<FormComboboxProps> = ({
 
   return (
     <div className="flex flex-col">
-      <label className="text-sm font-medium mb-1">{label}</label>
+      <label className="text-sm font-medium mb-1 text-gray-700">{label}</label>
       <Controller
         name={name}
         control={control}
