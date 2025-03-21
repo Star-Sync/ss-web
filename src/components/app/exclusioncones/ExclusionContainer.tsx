@@ -1,21 +1,19 @@
-// SatelliteContainer.tsx
 import React, { FC, useState, useRef } from "react";
 import { Tab } from "@/components/ui/tab/TabNav";
 import MotionWrapper from "../MotionWrapper";
 import TabNav from "@/components/ui/tab/TabNav";
-import HeaderSection from "@/components/app/satellite/HeaderSection";
+import HeaderSection from "@/components/app/exclusioncones/HeaderSection";
 import FormManager from "./Form/FormManager";
 import TabContent from "@/components/ui/tab/TabContent";
 import ExclusionGeneral from "@/components/app/exclusioncones/ExclusionGeneral";
 
-const SatelliteContainer: FC = () => {
+const ExclusionContainer: FC = () => {
     const [tabs, setTabs] = useState<Tab[]>([
         {
             id: "overview",
             name: "Overview",
             content: <ExclusionGeneral/>,
             isPinned: true,
-
         },
     ]);
     const [activeTabId, setActiveTabId] = useState("overview");
@@ -23,7 +21,7 @@ const SatelliteContainer: FC = () => {
 
     const addNewTab = () => {
         tabCounter.current += 1;
-        const newTabId = `satellite-form-${tabCounter.current}`;
+        const newTabId = `exclusion-form-${tabCounter.current}`;
         const newTab: Tab = {
             id: newTabId,
             name: `Form ${tabCounter.current}`,
@@ -62,4 +60,4 @@ const SatelliteContainer: FC = () => {
     );
 };
 
-export default SatelliteContainer;
+export default ExclusionContainer;

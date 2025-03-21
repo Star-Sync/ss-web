@@ -1,115 +1,161 @@
-// SatelliteForm.tsx
-import React from "react";
+import React, { useEffect, useState } from "react";
 import { useForm, FormProvider } from "react-hook-form";
-import { Button } from "@/components/ui/button";
 import { zodResolver } from "@hookform/resolvers/zod";
+import { Button } from "@/components/ui/button";
 import { Separator } from "@/components/ui/separator";
-import FormFieldWrapper from "@/components/ui/wrapper/formfieldwrapper";
-import { ExclusionFormSchema, ExclusionFormData } from "@/components/app/exclusioncones/Form/ExclusionFormSchema";
 import axios from "axios";
 import { toast } from "@/hooks/use-toast";
+import {
+  ExclusionFormSchema,
+  ExclusionFormData,
+} from "@/components/app/exclusioncones/Form/ExclusionFormSchema";
+import FormFieldWrapper from "@/components/ui/wrapper/formfieldwrapper";
+import FormCombobox, { Option } from "@/components/ui/wrapper/comboboxwrapper";
 
 const ExclusionForm: React.FC = () => {
-    const form = useForm<ExclusionFormData>({
-        resolver: zodResolver(ExclusionFormSchema),
-        defaultValues: {
-            name: "",
-            tle: "",
-            uplink: 0,
-            telemetry: 0,
-            science: 0,
-            priority: 1,
-        },
-    });
+  const form = useForm<ExclusionFormData>({
+    resolver: zodResolver(ExclusionFormSchema),
+    defaultValues: {
+      mission: "",
+      angle_limit: 0,
+      interfering_satellite: "",
+      satellite_id: "",
+      gs_id: 0,
+    },
+  });
 
-    const onSubmit = async (values: ExclusionFormData) => {
-        const payload = { ...values };
+  // Option states for Satellite and Ground Station selection.
+  const [satelliteOptions, setSatelliteOptions] = useState<Option[]>([]);
+  const [groundStationOptions, setGroundStationOptions] = useState<Option[]>([]);
 
-        console.log("Validated values:", values);
+  useEffect(() => {
+    async function fetchSatellites() {
+      try {
+        const response = await axios.get(
+          process.env.NEXT_PUBLIC_API_URL + "/api/v1/satellites"
+        );
+        // Map the API response so that:
+        // - value is set to the satellite's "id"
+        // - label is set to the satellite's "name"
+        const options = response.data.map((sat: any) => ({
+          value: sat.id,
+          label: sat.name,
+        }));
+        setSatelliteOptions(options);
+      } catch (error) {
+        console.error("Failed to fetch satellites", error);
+      }
+    }
+    fetchSatellites();
+  }, []);
 
-        try {
-            const response = await axios.post(
-                process.env.NEXT_PUBLIC_API_URL + "/api/v1/satellites/",
-                payload
-            );
-            console.log("Successfully submitted:", response.data);
-            toast({
-                title: "Submission Success",
-                description: "Successfully sent! " + response.data,
-                variant: "success",
-                duration: 5000,
-            });
-        } catch (error) {
-            console.error("Error submitting Satellite:", error);
-            toast({
-                title: "Submission Error: " + error,
-                description: "Failed to submit!",
-                variant: "destructive",
-                duration: 5000,
-            });
-        }
-    };
+  useEffect(() => {
+    async function fetchGroundStations() {
+      try {
+        const response = await axios.get(
+          process.env.NEXT_PUBLIC_API_URL + "/api/v1/gs"
+        );
+        // Map the API response so that:
+        // - value is set to the ground station's "id" (converted to a string)
+        // - label is set to the ground station's "name"
+        const options = response.data.map((gs: any) => ({
+          value: String(gs.id),
+          label: gs.name,
+        }));
+        setGroundStationOptions(options);
+      } catch (error) {
+        console.error("Failed to fetch ground stations", error);
+      }
+    }
+    fetchGroundStations();
+  }, []);
 
-    return (
-        <FormProvider {...form}>
-            <form onSubmit={form.handleSubmit(onSubmit)} className="space-y-6">
-                <div className="grid grid-cols-1 md:grid-cols-2 gap-4 max-w-[50vw]">
-                    <FormFieldWrapper<ExclusionFormData>
-                        control={form.control}
-                        name="name"
-                        label="Satellite Name"
-                        placeholder="Enter satellite name"
-                    />
-                    <FormFieldWrapper<ExclusionFormData>
-                        control={form.control}
-                        name="priority"
-                        label="Priority"
-                        placeholder="Enter priority"
-                        type="number"
-                    />
-                </div>
-                <Separator className="max-w-[50vw]" />
-                <div className="grid grid-cols-1 md:grid-cols-3 gap-4 max-w-[50vw]">
-                    <FormFieldWrapper<ExclusionFormData>
-                        control={form.control}
-                        name="uplink"
-                        label="Uplink Rate"
-                        placeholder="Enter uplink rate"
-                        type="number"
-                    />
-                    <FormFieldWrapper<ExclusionFormData>
-                        control={form.control}
-                        name="telemetry"
-                        label="Telemetry Downlink Rate"
-                        placeholder="Enter downlink rate"
-                        type="number"
-                    />
-                    <FormFieldWrapper<ExclusionFormData>
-                        control={form.control}
-                        name="science"
-                        label="Science Downlink Rate"
-                        placeholder="Enter science downlink rate"
-                        type="number"
-                    />
-                </div>
-                <Separator className="max-w-[50vw]" />
-                <div className="grid grid-cols-1 gap-4 max-w-[50vw]">
-                    <FormFieldWrapper<ExclusionFormData>
-                        control={form.control}
-                        name="tle"
-                        label="Two Line Element (TLE)"
-                        placeholder="Enter TLE"
-                        isMultiline={true}
-                        className="h-auto resize-none max-h-[5vw]"
-                    />
-                </div>
-                <Separator className="max-w-[50vw]" />
-                <Button type="submit" className="w-full md:w-auto">
-                    Submit
-                </Button>
-            </form>
-        </FormProvider>
-    );
+  const onSubmit = async (values: ExclusionFormData) => {
+    // The payload will have the following structure:
+    // {
+    //   mission: "SCISAT",
+    //   angle_limit: 5,
+    //   interfering_satellite: "OTHER SAT",
+    //   satellite_id: "bd9aa11b-4502-4f2c-958d-140ccb750d96",
+    //   gs_id: 1
+    // }
+    const payload = { ...values };
+
+    console.log("Validated values:", values);
+
+    try {
+      const response = await axios.post(
+        process.env.NEXT_PUBLIC_API_URL + "/api/v1/excones/",
+        payload
+      );
+      console.log("Successfully submitted:", response.data);
+      toast({
+        title: "Submission Success",
+        description: "Exclusion cone successfully created!",
+        variant: "success",
+        duration: 5000,
+      });
+      // Optionally reset the form.
+      form.reset();
+    } catch (error) {
+      console.error("Error submitting exclusion cone:", error);
+      toast({
+        title: "Submission Error: " + error,
+        description: "Failed to create exclusion cone!",
+        variant: "destructive",
+        duration: 5000,
+      });
+    }
+  };
+
+  return (
+    <FormProvider {...form}>
+      <form onSubmit={form.handleSubmit(onSubmit)} className="space-y-6">
+        <div className="grid grid-cols-1 md:grid-cols-2 gap-4 max-w-[50vw]">
+          <FormFieldWrapper<ExclusionFormData>
+            control={form.control}
+            name="mission"
+            label="Mission"
+            placeholder="Enter mission name"
+          />
+          <FormFieldWrapper<ExclusionFormData>
+            control={form.control}
+            name="interfering_satellite"
+            label="Interfering Satellite"
+            placeholder="Enter interfering satellite"
+          />
+        </div>
+        <Separator className="max-w-[50vw]" />
+        <div className="grid grid-cols-1 md:grid-cols-3 gap-4 max-w-[50vw]">
+          <FormFieldWrapper<ExclusionFormData>
+            control={form.control}
+            name="angle_limit"
+            label="Angle Limit"
+            placeholder="Enter angle limit"
+            type="number"
+          />
+          <FormCombobox
+            name="satellite_id"
+            label="Satellite"
+            placeholder="Select a satellite"
+            items={satelliteOptions}
+            className="w-full"
+          />
+          <FormCombobox
+            name="gs_id"
+            label="Ground Station"
+            placeholder="Select a ground station"
+            items={groundStationOptions}
+            className="w-full"
+          />
+        </div>
+        <Separator className="max-w-[50vw]" />
+        <Button type="submit" className="w-full md:w-auto">
+          Submit
+        </Button>
+      </form>
+    </FormProvider>
+  );
 };
 
 export default ExclusionForm;

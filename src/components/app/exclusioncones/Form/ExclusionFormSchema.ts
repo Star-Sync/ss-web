@@ -1,32 +1,19 @@
 import { z } from "zod";
 
 export const ExclusionFormSchema = z.object({
-    name: z.string().min(1, "Satellite name is required"),
-    tle: z.string().min(1, "TLE is required"),
-    priority: z
-        .coerce.number({
-            required_error: "Priority is required",
-            invalid_type_error: "Priority must be a number",
-        })
-        .min(1, "Priority must be at least 1"),
-    uplink: z
-        .coerce.number({
-            required_error: "Uplink rate is required",
-            invalid_type_error: "Uplink rate must be a number",
-        })
-        .positive("Uplink rate must be positive"),
-    telemetry: z
-        .coerce.number({
-            required_error: "Telemetry rate is required",
-            invalid_type_error: "Telemetry rate must be a number",
-        })
-        .positive("Telemetry rate must be positive"),
-    science: z
-        .coerce.number({
-            required_error: "Science rate is required",
-            invalid_type_error: "Science rate must be a number",
-        })
-        .positive("Science rate must be positive"),
+  mission: z.string().min(1, "Mission is required"),
+  angle_limit: z
+    .coerce.number({
+      required_error: "Angle limit is required",
+      invalid_type_error: "Angle limit must be a number",
+    })
+    .positive("Angle limit must be positive"),
+  interfering_satellite: z.string().min(1, "Interfering satellite is required"),
+  satellite_id: z.string().min(1, "Satellite ID is required"),
+  gs_id: z.coerce.number({
+    required_error: "GS ID is required",
+    invalid_type_error: "GS ID must be a number",
+  }),
 });
 
 export type ExclusionFormData = z.infer<typeof ExclusionFormSchema>;

@@ -2,7 +2,7 @@ import React from "react";
 import Head from "next/head";
 import ExclusionContainer from "@/components/app/exclusioncones/ExclusionContainer";
 
-const SatellitePage: React.FC = () => {
+const ExclusionConesPage: React.FC = () => {
     return (
         <>
             <Head>
@@ -15,4 +15,4 @@ const SatellitePage: React.FC = () => {
     );
 };
 
-export default SatellitePage;
+export default ExclusionConesPage;
