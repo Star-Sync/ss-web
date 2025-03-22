@@ -1,4 +1,4 @@
-import axios from "axios";
+import apiClient from "@/lib/api";
 
 // Define Mission interface
 export interface Mission {
@@ -17,11 +17,6 @@ export interface Mission {
 
 // API call to fetch missions
 export const gsFetchMissions = async (): Promise<Mission[]> => {
-  const axiosInstance = axios.create({
-    baseURL: process.env.NEXT_PUBLIC_API_URL,
-    headers: { "Content-Type": "application/json" },
-  });
-
-  const response = await axiosInstance.get<Mission[]>("/api/v1/request/");
+  const response = await apiClient.get<Mission[]>("/api/v1/request/");
   return response.data;
 };
