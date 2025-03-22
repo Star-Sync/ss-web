@@ -36,7 +36,7 @@ const ContactRequestForm: React.FC<ContactRequestFormProps> = ({ location }) => 
         defaultValues: {
             missionName: "",
             satelliteId: satelliteOptions[0]?.value || "",
-            orbit: "",
+            orbit: 0,
             uplink: false,
             telemetry: false,
             science: false,
