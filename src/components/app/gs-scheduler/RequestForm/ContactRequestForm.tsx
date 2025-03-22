@@ -1,5 +1,5 @@
-import React, {useEffect} from "react";
-import {Controller, FormProvider, useForm} from "react-hook-form";
+import React, { useEffect } from "react";
+import { Controller, FormProvider, useForm } from "react-hook-form";
 import { Button } from "@/components/ui/button";
 import { zodResolver } from "@hookform/resolvers/zod";
 import "react-datepicker/dist/react-datepicker.css";
@@ -10,23 +10,44 @@ import FormFieldWrapper from "@/components/ui/wrapper/formfieldwrapper";
 import CheckboxFieldWrapper from "@/components/ui/wrapper/checkboxfieldwrapper";
 import { ContactRequestFormSchema, ContactRequestFormData } from "./ContactRequestFormSchema";
 import Combobox from "@/components/ui/combobox";
-import { satellites } from "@/api/gs-satellites";
-import {formatToISOString} from "@/lib/formatToISOString";
+import { gsFetchSatellites, Satellite } from "@/api/gs-satellites";
+import { formatToISOString } from "@/lib/formatToISOString";
 import axios from "axios";
-import {toast} from "@/hooks/use-toast";
+import { toast } from "@/hooks/use-toast";
 
 interface ContactRequestFormProps {
     location: typeof locations[0];
 }
 
-const satelliteOptions = satellites
-    .filter(sat => sat.satellite_id && sat.label)
-    .map((sat) => ({
-        value: sat.satellite_id.toString(),
-        label: sat.label,
-    }));
-
 const ContactRequestForm: React.FC<ContactRequestFormProps> = ({ location }) => {
+    const [satelliteOptions, setSatelliteOptions] = React.useState<{ value: string; label: string; }[]>([]);
+
+    useEffect(() => {
+        const fetchSatellites = async () => {
+            try {
+                console.log('Fetching satellites...');
+                const satellites = await gsFetchSatellites();
+                console.log('Received satellites:', satellites);
+                const options = satellites
+                    .filter((sat: Satellite) => sat.id && sat.name)
+                    .map((sat: Satellite) => ({
+                        value: sat.id,
+                        label: sat.name,
+                    }));
+                console.log('Processed satellite options:', options);
+                setSatelliteOptions(options);
+            } catch (error) {
+                console.error('Error fetching satellites:', error);
+                toast({
+                    title: "Error",
+                    description: "Failed to load satellites",
+                    variant: "destructive",
+                });
+            }
+        };
+        fetchSatellites();
+    }, []);
+
     useEffect(() => {
         console.log("ContactRequestForm: Location updated to", location.label);
     }, [location]);

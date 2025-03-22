@@ -9,24 +9,44 @@ import { TimePickerField } from "@/components/ui/wrapper/timepickerfield";
 import FormFieldWrapper from "@/components/ui/wrapper/formfieldwrapper";
 import { RFRequestFormSchema, RFRequestFormData } from "./RFRequestFormSchema";
 import Combobox from "@/components/ui/combobox";
-import { satellites } from "@/api/gs-satellites";
+import { gsFetchSatellites, Satellite } from "@/api/gs-satellites";
 import axios from "axios";
-import {formatToISOString} from "@/lib/formatToISOString";
-import {toast} from "@/hooks/use-toast";
+import { formatToISOString } from "@/lib/formatToISOString";
+import { toast } from "@/hooks/use-toast";
 
 interface RFRequestFormProps {
     location: typeof locations[0];
 }
 
-const satelliteOptions = satellites
-    .filter((sat) => sat.satellite_id && sat.label)
-    .map((sat) => ({
-        value: sat.satellite_id.toString(),
-        label: sat.label,
-    }));
-
-
 const RFRequestForm: React.FC<RFRequestFormProps> = ({ location }) => {
+    const [satelliteOptions, setSatelliteOptions] = React.useState<{ value: string; label: string; }[]>([]);
+
+    useEffect(() => {
+        const fetchSatellites = async () => {
+            try {
+                console.log('Fetching satellites...');
+                const satellites = await gsFetchSatellites();
+                console.log('Received satellites:', satellites);
+                const options = satellites
+                    .filter((sat: Satellite) => sat.id && sat.name)
+                    .map((sat: Satellite) => ({
+                        value: sat.id,
+                        label: sat.name,
+                    }));
+                console.log('Processed satellite options:', options);
+                setSatelliteOptions(options);
+            } catch (error) {
+                console.error('Error fetching satellites:', error);
+                toast({
+                    title: "Error",
+                    description: "Failed to load satellites",
+                    variant: "destructive",
+                });
+            }
+        };
+        fetchSatellites();
+    }, []);
+
     useEffect(() => {
         console.log("RFRequestForm: Location updated to", location.label);
     }, [location]);
@@ -35,7 +55,7 @@ const RFRequestForm: React.FC<RFRequestFormProps> = ({ location }) => {
         resolver: zodResolver(RFRequestFormSchema),
         defaultValues: {
             missionName: "",
-            satelliteId: satelliteOptions[0]?.value || "",
+            satelliteId: "",
             startTime: undefined,
             endTime: undefined,
             uplinkTime: 0,
@@ -44,6 +64,13 @@ const RFRequestForm: React.FC<RFRequestFormProps> = ({ location }) => {
             minimumNumberOfPasses: 1,
         },
     });
+
+    // Update form when satellites are loaded
+    useEffect(() => {
+        if (satelliteOptions.length > 0 && !form.getValues('satelliteId')) {
+            form.setValue('satelliteId', satelliteOptions[0].value);
+        }
+    }, [satelliteOptions, form]);
 
     const onSubmit = async (values: RFRequestFormData) => {
         const payload = {
@@ -54,7 +81,7 @@ const RFRequestForm: React.FC<RFRequestFormProps> = ({ location }) => {
 
         // Send the request to the backend using axios
         try {
-            const response = await axios.post(process.env.NEXT_PUBLIC_API_URL +'/api/v1/request/rf-time', payload);
+            const response = await axios.post(process.env.NEXT_PUBLIC_API_URL + '/api/v1/request/rf-time', payload);
             console.log('Successfully submitted:', response.data);
             // Handle success
             toast({
