@@ -12,3 +12,14 @@ services:
                 - path: ../src
                   action: sync
                   target: /app/src
+        networks:
+            - star-sync
+
+
+networks:
+    # assuming ss-deploy's db is running
+    star-sync:
+        driver: bridge
+        name: star-sync_star-sync
+        external: true
+

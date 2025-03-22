@@ -56,7 +56,7 @@ const SatelliteGeneral: React.FC = () => {
             setLoading(true);
             try {
                 const response = await axios.get<Satellite[]>(
-                    "/api/v1/satellites/"
+                    `${process.env.NEXT_PUBLIC_API_URL}/api/v1/satellites/`
                 );
 
                 const processedData = response.data.map(sat => ({
@@ -101,7 +101,7 @@ const SatelliteGeneral: React.FC = () => {
         if (!editingSatellite) return;
 
         try {
-            await axios.patch(`/api/v1/satellites/${editingSatellite.id}`, editingSatellite);
+            await axios.patch(`${process.env.NEXT_PUBLIC_API_URL}/api/v1/satellites/${editingSatellite.id}`, editingSatellite);
 
             // Update the local state
             setSatellites((prev) =>
@@ -135,7 +135,7 @@ const SatelliteGeneral: React.FC = () => {
         if (!confirmDelete) return;
 
         try {
-            await axios.delete(`/api/v1/satellites/${satelliteId}`);
+            await axios.delete(`${process.env.NEXT_PUBLIC_API_URL}/api/v1/satellites/${satelliteId}`);
             setSatellites((prev) => prev.filter((sat) => sat.id !== satelliteId));
             toast({
                 title: "Satellite deleted successfully.",
