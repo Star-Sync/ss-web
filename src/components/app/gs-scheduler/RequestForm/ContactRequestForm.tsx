@@ -160,6 +160,9 @@ const ContactRequestForm: React.FC<ContactRequestFormProps> = ({ location }) => 
                         name="orbit"
                         label="Orbit"
                         placeholder="Enter orbit number"
+                        type="number"
+                        min="0"
+                        step="1"
                     />
                 </div>
 
