@@ -11,8 +11,8 @@ import { RFRequestFormSchema, RFRequestFormData } from "./RFRequestFormSchema";
 import Combobox from "@/components/ui/combobox";
 import { satellites } from "@/api/gs-satellites";
 import axios from "axios";
-import {formatToISOString} from "@/lib/formatToISOString";
-import {toast} from "@/hooks/use-toast";
+import { formatToISOString } from "@/lib/formatToISOString";
+import { toast } from "@/hooks/use-toast";
 
 interface RFRequestFormProps {
     location: typeof locations[0];
@@ -54,7 +54,7 @@ const RFRequestForm: React.FC<RFRequestFormProps> = ({ location }) => {
 
         // Send the request to the backend using axios
         try {
-            const response = await axios.post(process.env.NEXT_PUBLIC_API_URL +'/api/v1/request/rf-time', payload);
+            const response = await axios.post(process.env.NEXT_PUBLIC_API_URL + '/api/v1/request/rf-time/', payload);
             console.log('Successfully submitted:', response.data);
             // Handle success
             toast({

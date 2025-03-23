@@ -1,5 +1,5 @@
-import React, {useEffect} from "react";
-import {Controller, FormProvider, useForm} from "react-hook-form";
+import React, { useEffect } from "react";
+import { Controller, FormProvider, useForm } from "react-hook-form";
 import { Button } from "@/components/ui/button";
 import { zodResolver } from "@hookform/resolvers/zod";
 import "react-datepicker/dist/react-datepicker.css";
@@ -11,9 +11,9 @@ import CheckboxFieldWrapper from "@/components/ui/wrapper/checkboxfieldwrapper";
 import { ContactRequestFormSchema, ContactRequestFormData } from "./ContactRequestFormSchema";
 import Combobox from "@/components/ui/combobox";
 import { satellites } from "@/api/gs-satellites";
-import {formatToISOString} from "@/lib/formatToISOString";
+import { formatToISOString } from "@/lib/formatToISOString";
 import axios from "axios";
-import {toast} from "@/hooks/use-toast";
+import { toast } from "@/hooks/use-toast";
 
 interface ContactRequestFormProps {
     location: typeof locations[0];
@@ -36,7 +36,7 @@ const ContactRequestForm: React.FC<ContactRequestFormProps> = ({ location }) => 
         defaultValues: {
             missionName: "",
             satelliteId: satelliteOptions[0]?.value || "",
-            orbit: "",
+            orbit: 0,
             uplink: false,
             telemetry: false,
             science: false,
@@ -55,11 +55,10 @@ const ContactRequestForm: React.FC<ContactRequestFormProps> = ({ location }) => 
             rfOffTime: formatToISOString(values.rfOffTime),
             losTime: formatToISOString(values.losTime),
             location: location.label,
-            satellite_id: values.satelliteId,
         };
         // Send the request to the backend using axios
         try {
-            const response = await axios.post(process.env.NEXT_PUBLIC_API_URL + '/api/v1/request/contact', payload);
+            const response = await axios.post(process.env.NEXT_PUBLIC_API_URL + '/api/v1/request/contact/', payload);
             console.log('Successfully submitted:', response.data);
 
             // Handle success
@@ -139,6 +138,9 @@ const ContactRequestForm: React.FC<ContactRequestFormProps> = ({ location }) => 
                         name="orbit"
                         label="Orbit"
                         placeholder="Enter orbit number"
+                        type="number"
+                        min="0"
+                        step="1"
                     />
                 </div>
 
