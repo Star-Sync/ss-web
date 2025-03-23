@@ -3,10 +3,10 @@ import { z } from "zod";
 export const ContactRequestFormSchema = z.object({
     missionName: z.string().min(1, "Mission Name is required"),
     satelliteId: z.string().min(1, "Satellite is required"),
-    orbit: z.preprocess(
-        (val) => Number(val),
-        z.number().int("Orbit must be an integer").nonnegative("Orbit must be a non-negative number")
-    ),
+    orbit: z.coerce.number({
+        required_error: "Orbit is required",
+        invalid_type_error: "Orbit must be a number",
+    }),
     uplink: z.boolean(),
     telemetry: z.boolean(),
     science: z.boolean(),
