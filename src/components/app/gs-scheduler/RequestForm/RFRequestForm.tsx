@@ -53,7 +53,7 @@ const RFRequestForm: React.FC<RFRequestFormProps> = ({ location }) => {
 
     // Send the request to the backend using apiClient
     try {
-      const response = await apiClient.post("/api/v1/request/rf-time", payload);
+      const response = await apiClient.post("/api/v1/request/rf-time/", payload);
       console.log("Successfully submitted:", response.data);
       // Handle success
       toast({
