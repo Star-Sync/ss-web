@@ -41,7 +41,7 @@ const ContactRequestForm: React.FC<ContactRequestFormProps> = ({
     defaultValues: {
       missionName: "",
       satelliteId: satelliteOptions[0]?.value || "",
-      orbit: "",
+      orbit: 0,
       uplink: false,
       telemetry: false,
       science: false,
@@ -60,7 +60,6 @@ const ContactRequestForm: React.FC<ContactRequestFormProps> = ({
       rfOffTime: formatToISOString(values.rfOffTime),
       losTime: formatToISOString(values.losTime),
       location: location.label,
-      satellite_id: values.satelliteId,
     };
     // Send the request to the backend using apiClient
     try {
@@ -132,6 +131,9 @@ const ContactRequestForm: React.FC<ContactRequestFormProps> = ({
             name="orbit"
             label="Orbit"
             placeholder="Enter orbit number"
+            type="number"
+            min="0"
+            step="1"
           />
         </div>
 
