@@ -1,14 +1,9 @@
 import React from "react";
 import { Tabs, TabsList, TabsTrigger, TabsContent } from "@/components/ui/tabs";
 import { motion } from "framer-motion";
-import { locations } from "@/api/gs-locations";
 import RFRequestForm from "./RFRequestForm";
 import ContactRequestForm from "./ContactRequestForm";
 import MotionWrapper from "@/components/app/MotionWrapper";
-
-interface RequestFormProps {
-    location: typeof locations[0];
-}
 
 const formVariants = {
     initial: { opacity: 0, scale: 0.95 },
@@ -18,7 +13,7 @@ const formVariants = {
 
 const transition = { duration: 0.4, ease: "easeInOut" };
 
-const RequestForm: React.FC<RequestFormProps> = ({ location }) => {
+const RequestForm = () => {
     return (
         <MotionWrapper>
             <Tabs defaultValue="contact" className="w-full">
@@ -38,7 +33,7 @@ const RequestForm: React.FC<RequestFormProps> = ({ location }) => {
                         exit="exit"
                         transition={transition}
                     >
-                        <ContactRequestForm location={location}/>
+                        <ContactRequestForm/>
                     </motion.div>
                 </TabsContent>
                 <TabsContent value="rf">
@@ -50,7 +45,7 @@ const RequestForm: React.FC<RequestFormProps> = ({ location }) => {
                         exit="exit"
                         transition={transition}
                     >
-                        <RFRequestForm location={location} />
+                        <RFRequestForm/>
                     </motion.div>
                 </TabsContent>
             </Tabs>

@@ -3,6 +3,7 @@ import { z } from "zod";
 export const ContactRequestFormSchema = z.object({
     missionName: z.string().min(1, "Mission Name is required"),
     satelliteId: z.string().min(1, "Satellite is required"),
+    groundStationId: z.string().min(1, "Ground Station is required"),
     orbit: z.string().min(1, "Orbit is required"),
     uplink: z.boolean(),
     telemetry: z.boolean(),

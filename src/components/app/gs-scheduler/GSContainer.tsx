@@ -1,5 +1,5 @@
 import React, { FC, useState, useRef } from "react";
-import { locations, Location } from "@/api/gs-locations";
+import { Location } from "@/api/gs-locations";
 import { Tab } from "./TabNav";
 import MotionWrapper from "../MotionWrapper";
 import Scheduler from "@/components/app/gs-scheduler/Scheduler";
@@ -9,7 +9,6 @@ import TabContent from "./TabContent";
 import HeaderSection from "./HeaderSection";
 
 const GSContainer: FC = () => {
-    const [selectedLocation, setSelectedLocation] = useState<Location>(locations[0]);
     const [tabs, setTabs] = useState<Tab[]>([
         {
             id: "scheduler",
@@ -27,7 +26,7 @@ const GSContainer: FC = () => {
         const newTab: Tab = {
             id: newTabId,
             name: `Request Form. ${tabCounter.current}`,
-            content: (location) => <RequestForm key={newTabId} location={location} />,
+            content: () => <RequestForm key={newTabId}/>,
         };
         setTabs((prevTabs) => [...prevTabs, newTab]);
         setActiveTabId(newTabId);
@@ -45,21 +44,10 @@ const GSContainer: FC = () => {
         }
     };
 
-    const handleLocationChange = (value: string) => {
-        const newLocation = locations.find((loc) => loc.station_id === value);
-        if (newLocation) {
-            setSelectedLocation(newLocation);
-        }
-    };
-
     return (
         <MotionWrapper className="w-full h-full flex flex-col bg-gray-50 p-6">
             <div className="bg-white rounded-xl p-6 shadow-lg flex flex-col h-full overflow-hidden">
-                <HeaderSection
-                    selectedLocation={selectedLocation}
-                    handleLocationChange={handleLocationChange}
-                    locations={locations}
-                />
+                <HeaderSection />
                 <TabNav
                     tabs={tabs}
                     activeTabId={activeTabId}
@@ -67,7 +55,7 @@ const GSContainer: FC = () => {
                     addNewTab={addNewTab}
                     closeTab={closeTab}
                 />
-                <TabContent tabs={tabs} activeTabId={activeTabId} selectedLocation={selectedLocation} />
+                <TabContent tabs={tabs} activeTabId={activeTabId} />
             </div>
         </MotionWrapper>
     );
