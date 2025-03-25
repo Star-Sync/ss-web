@@ -1,5 +1,5 @@
 import moment from "moment";
-import { Mission } from "@/api/gs-fetch-missions";
+import { Booking } from "@/api/gs-fetch-missions";
 import React from "react";
 
 // Define TimelineItem interface
@@ -16,19 +16,11 @@ export interface TimelineItem {
   description?: string;
 }
 
-// Map station names to group IDs
-const getGroupId = (station: string): number => {
-  if (station.includes("Inuvik Northwest")) return 1;
-  if (station.includes("Prince Albert")) return 2;
-  if (station.includes("Gatineau Quebec")) return 3;
-    return 1;
-};
-
-// Convert missions to timeline items
-export const createTimelineItems = (missions: Mission[]): TimelineItem[] => {
-  return missions.map((mission: Mission, index: number) => {
-    let start = moment(mission.startTime);
-    let end = moment(mission.endTime);
+// Convert bookings to timeline items
+export const createTimelineItems = (bookings: Booking[]): TimelineItem[] => {
+  return bookings.map((booking: Booking, index: number) => {
+    let start = moment(booking.slot.start_time);
+    let end = moment(booking.slot.end_time);
 
     // Ensure start and end times are correctly ordered
     if (end.isBefore(start)) {
@@ -37,8 +29,8 @@ export const createTimelineItems = (missions: Mission[]): TimelineItem[] => {
 
     return {
       id: index + 1,
-      group: getGroupId(mission.station),
-      title: `${mission.mission} - ${mission.satellite}`,
+      group: booking.gs_id,
+      title: `Booking ${booking.id.slice(0, 5)}`,
       start_time: start,
       end_time: end,
       itemProps: {
@@ -50,6 +42,7 @@ export const createTimelineItems = (missions: Mission[]): TimelineItem[] => {
           padding: "2px 6px",
         },
       },
+      description: `Request ID: ${booking.request_id}\nBooking ID: ${booking.id}`,
     };
   });
 };

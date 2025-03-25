@@ -8,7 +8,7 @@ import Timeline, {
 } from "react-calendar-timeline";
 import MotionWrapper from "@/components/app/MotionWrapper";
 import moment from "moment";
-import { gsFetchMissions } from "@/api/gs-fetch-missions";
+import { gsFetchBookings } from "@/api/gs-fetch-missions";
 import { createTimelineItems, TimelineItem } from "@/components/app/calendar/CalendarItems";
 import { MissionModal } from "@/components/app/calendar/MissionModal";
 import { toast } from "@/hooks/use-toast";
@@ -40,11 +40,11 @@ const CalendarContainer = () => {
         setIsLoading(true);
         setError(null);
         try {
-            const missions = await gsFetchMissions();
-            const timelineItems = createTimelineItems(missions);
+            const bookings = await gsFetchBookings();
+            const timelineItems = createTimelineItems(bookings);
             setItems(timelineItems);
         } catch (err) {
-            console.error("Error fetching missions:", err);
+            console.error("Error fetching bookings:", err);
             setError(
                 err instanceof Error ? err.message : "An unknown error occurred"
             );
