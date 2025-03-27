@@ -20,7 +20,7 @@ import {
     DialogFooter,
 } from "@/components/ui/dialog";
 import { Label } from "@/components/ui/label";
-import { Textarea } from "@/components/ui/textarea";
+
 
 interface Ground {
     id: string;
@@ -150,7 +150,7 @@ const GroundGeneral: React.FC = () => {
     const [sortedGrounds, setSortedGrounds] = useState<Ground[]>([]);
 
     useEffect(() => {
-        let sorted = [...grounds];
+        const sorted = [...grounds];
     
         if (sortConfig) {
             sorted.sort((a, b) => {
