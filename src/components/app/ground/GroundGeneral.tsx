@@ -1,8 +1,26 @@
 import React, { useState, useEffect } from "react";
 import { Input } from "@/components/ui/input";
-import { Table, TableBody, TableCell, TableHead, TableHeader, TableRow } from "@/components/ui/table";
+import {
+    Table,
+    TableBody,
+    TableCell,
+    TableHead,
+    TableHeader,
+    TableRow,
+} from "@/components/ui/table";
 import { Button } from "@/components/ui/button";
-import { ArrowUpDown, Trash2, Edit, Check, X } from "lucide-react";
+import { ArrowUpDown, Edit2, Trash } from "lucide-react";
+import axios from "axios";
+import { toast } from "@/hooks/use-toast";
+import {
+    Dialog,
+    DialogContent,
+    DialogHeader,
+    DialogTitle,
+    DialogFooter,
+} from "@/components/ui/dialog";
+import { Label } from "@/components/ui/label";
+import { Textarea } from "@/components/ui/textarea";
 
 interface Ground {
     id: string;
@@ -16,327 +34,429 @@ interface Ground {
     science: string;
 }
 
-type SortableColumn = 'name' | 'latitude' | 'longtitude' | 'height' | 'mask' | 'uplink' | 'downlink' | 'science' | 'id';
-type EditableField = keyof Omit<Ground, 'id'>;
+type SortableColumn = 'name' | 'lat' | 'lon' | 'height' | 'mask' | 'uplink' | 'downlink' | 'science';
 
 const GroundGeneral: React.FC = () => {
-    const [grounds, setGrounds] = useState<Ground[]>([]);
     const [searchTerm, setSearchTerm] = useState("");
-    const [sortConfig, setSortConfig] = useState<{ key: SortableColumn; direction: 'asc' | 'desc' } | null>(null);
-    
-    // Mode states
-    const [mode, setMode] = useState<'view' | 'delete' | 'edit'>('view');
-    const [selectedGrounds, setSelectedGrounds] = useState<Set<string>>(new Set());
-    
-    // Edit states
-    const [editingGround, setEditingGround] = useState<string | null>(null);
-    const [editValues, setEditValues] = useState<Partial<Ground>>({});
+    const [sortConfig, setSortConfig] = useState<
+        { key: SortableColumn; direction: "asc" | "desc" } | null
+    >(null);
+    const [grounds, setGrounds] = useState<Ground[]>([]);
+    const [loading, setLoading] = useState(true);
+    const [error, setError] = useState<string | null>(null);
+    const [editingGround, setEditingGround] = useState<Ground | null>(null);
+    const [isEditDialogOpen, setIsEditDialogOpen] = useState(false);
 
-    // Fetch ground stations from API
     useEffect(() => {
+        const fetchGroundStations = async () => {
+            setLoading(true);
+            try {
+                const response = await axios.get<Ground[]>("/api/v1/gs/");
+                setGrounds(response.data);
+            } catch (err) {
+                setError("Failed to fetch ground stations.");
+                console.error(err);
+                toast({
+                    title: "Error: " + err,
+                    description: "There was an error fetching from the API. Please try again.",
+                    variant: "destructive",
+                    duration: 5000,
+                });
+            } finally {
+                setLoading(false);
+            }
+        };
+
         fetchGroundStations();
     }, []);
 
-    const fetchGroundStations = () => {
-        fetch("/api/v1/gs/")
-            .then(response => response.json())
-            .then(data => {
-                if (Array.isArray(data)) {
-                    setGrounds(data);
-                } else {
-                    console.error("API did not return an array:", data);
-                    setGrounds([]);
-                }
-            })
-            .catch(error => {
-                console.error("Error fetching ground stations:", error);
-                setGrounds([]);
-            });
-    };
-
     const handleSort = (key: SortableColumn) => {
-        let direction: 'asc' | 'desc' = 'asc';
-        if (sortConfig && sortConfig.key === key && sortConfig.direction === 'asc') {
-            direction = 'desc';
+        let direction: "asc" | "desc" = "asc";
+        if (sortConfig && sortConfig.key === key && sortConfig.direction === "asc") {
+            direction = "desc";
         }
         setSortConfig({ key, direction });
     };
 
-    const handleDelete = () => {
-        // Send DELETE request for selected grounds
-        selectedGrounds.forEach((id) => {
-            fetch(`/api/v1/gs/${id}`, { method: "DELETE" })
-                .then(() => {
-                    setGrounds((prevGrounds) =>
-                        prevGrounds.filter((station) => station.id !== id)
-                    );
-                })
-                .catch((error) => {
-                    console.error("Error deleting ground station:", error);
-                });
-        });
-
-        resetModes();
+    const handleEdit = (ground: Ground) => {
+        setEditingGround({ ...ground });
+        setIsEditDialogOpen(true);
     };
 
-    const handleEdit = async () => {
+    const handleSaveEdit = async () => {
         if (!editingGround) return;
-        
+
         try {
-            const response = await fetch(`/api/v1/gs/${editingGround}`, {
-                method: "PATCH",
-                headers: {
-                    "Content-Type": "application/json",
-                },
-                body: JSON.stringify(editValues),
+            await axios.patch(`/api/v1/gs/${editingGround.id}`, editingGround);
+
+            // Update the local state
+            setGrounds((prev) =>
+                prev.map((ground) =>
+                    ground.id === editingGround.id ? editingGround : ground
+                )
+            );
+
+            toast({
+                title: "Ground Station updated successfully.",
+                description: `Ground Station "${editingGround.name}" was updated.`,
             });
-            
-            if (response.ok) {
-                // Update local state with edited values
-                setGrounds(prevGrounds => 
-                    prevGrounds.map(station => 
-                        station.id === editingGround 
-                            ? { ...station, ...editValues } 
-                            : station
-                    )
-                );
-                
-                // Reset edit state
-                resetModes();
-            } else {
-                console.error("Failed to update ground station:", await response.text());
-            }
-        } catch (error) {
-            console.error("Error updating ground station:", error);
-        }
-    };
 
-    const resetModes = () => {
-        setMode('view');
-        setSelectedGrounds(new Set());
-        setEditingGround(null);
-        setEditValues({});
-    };
-
-    const handleModeChange = (newMode: 'view' | 'delete' | 'edit') => {
-        if (mode === newMode) {
-            resetModes();
-        } else {
-            setMode(newMode);
-            setSelectedGrounds(new Set());
+            // Close the edit dialog
+            setIsEditDialogOpen(false);
             setEditingGround(null);
-            setEditValues({});
-        }
-    };
+        } catch (err) {
+            console.error(err);
+            
+            // Check if it's an axios error with a response
+            const errorMessage = axios.isAxiosError(err) && err.response?.data?.detail 
+                ? err.response.data.detail 
+                : "There was an error updating the ground station.";
 
-    const handleSelectGround = (id: string) => {
-        if (mode === 'delete') {
-            setSelectedGrounds(prev => {
-                const newSelectedGrounds = new Set(prev);
-                if (newSelectedGrounds.has(id)) {
-                    newSelectedGrounds.delete(id);
-                } else {
-                    newSelectedGrounds.add(id);
-                }
-                return newSelectedGrounds;
+            toast({
+                title: "Error updating ground station.",
+                description: errorMessage,
+                variant: "destructive",
             });
-        } else if (mode === 'edit') {
-            // In edit mode, we only select one ground station at a time
-            if (editingGround === id) {
-                setEditingGround(null);
-                setEditValues({});
-            } else {
-                setEditingGround(id);
-                // Initialize edit values with the current ground station values
-                const groundToEdit = grounds.find(station => station.id === id);
-                if (groundToEdit) {
-                    setEditValues({
-                        name: groundToEdit.name,
-                        lat: groundToEdit.lat,
-                        lon: groundToEdit.lon,
-                        height: groundToEdit.height,
-                        mask: groundToEdit.mask,
-                        uplink: groundToEdit.uplink,
-                        downlink: groundToEdit.downlink,
-                        science: groundToEdit.science,
-                    });
+        }
+    };
+
+    const handleDelete = async (groundId: string) => {
+        const confirmDelete = window.confirm(
+            "Are you sure you want to delete this ground station?"
+        );
+        if (!confirmDelete) return;
+
+        try {
+            await axios.delete(`/api/v1/gs/${groundId}`);
+            setGrounds((prev) => prev.filter((ground) => ground.id !== groundId));
+            toast({
+                title: "Ground Station deleted successfully.",
+            });
+        } catch (err) {
+            console.error(err);
+            // Check if it's an axios error with a response
+            const errorMessage = axios.isAxiosError(err) && err.response?.data?.detail 
+                ? err.response.data.detail 
+                : "There was an error deleting the ground station.";
+
+            toast({
+                title: "Error deleting ground station.",
+                description: errorMessage,
+                variant: "destructive",
+            });
+        }
+    };
+
+    const [sortedGrounds, setSortedGrounds] = useState<Ground[]>([]);
+
+    useEffect(() => {
+        let sorted = [...grounds];
+    
+        if (sortConfig) {
+            sorted.sort((a, b) => {
+                const aValue = a[sortConfig.key as keyof Ground];
+                const bValue = b[sortConfig.key as keyof Ground];
+    
+                // Columns that should be sorted numerically
+                const numericColumns: SortableColumn[] = ['height', 'mask', 'downlink', 'science'];
+    
+                if (numericColumns.includes(sortConfig.key)) {
+                    // Custom parsing to handle numeric strings, including decimal and scientific notation
+                    const parseNumericString = (value: string | number): number => {
+                        // Remove any non-numeric characters except decimal point and scientific notation
+                        const cleanValue = String(value)
+                            .replace(/[^\d.-eE]/g, '')
+                            .trim();
+                        
+                        // Parse the cleaned string
+                        const parsed = parseFloat(cleanValue);
+                        
+                        // Return parsed number or 0 if parsing fails
+                        return isNaN(parsed) ? 0 : parsed;
+                    };
+    
+                    const aNum = parseNumericString(aValue);
+                    const bNum = parseNumericString(bValue);
+    
+                    return sortConfig.direction === "asc" 
+                        ? aNum - bNum 
+                        : bNum - aNum;
                 }
-            }
+    
+                // String comparison for other fields (case-insensitive)
+                return sortConfig.direction === "asc"
+                    ? String(aValue || "").localeCompare(String(bValue || ""), undefined, { sensitivity: 'base' })
+                    : String(bValue || "").localeCompare(String(aValue || ""), undefined, { sensitivity: 'base' });
+            });
         }
-    };
+    
+        setSortedGrounds(sorted);
+    }, [grounds, sortConfig]);
 
-    const handleFieldEdit = (field: EditableField, value: string | number) => {
-        setEditValues(prev => ({
-            ...prev,
-            [field]: value
-        }));
-    };
 
-    const sortedGrounds = [...grounds].sort((a, b) => {
-        if (!sortConfig) return 0;
-
-        const aValue = a[sortConfig.key as keyof Ground];
-        const bValue = b[sortConfig.key as keyof Ground];
-
-        const numericKeys: SortableColumn[] = ['latitude', 'longtitude', 'height', 'mask', 'uplink', 'downlink', 'science'];
-        if (numericKeys.includes(sortConfig.key)) {
-            return sortConfig.direction === 'asc'
-                ? parseFloat(aValue as string) - parseFloat(bValue as string)
-                : parseFloat(bValue as string) - parseFloat(aValue as string);
-        }
-
-        return sortConfig.direction === 'asc'
-            ? (aValue as string).localeCompare(bValue as string)
-            : (bValue as string).localeCompare(aValue as string);
+    const filteredGrounds = sortedGrounds.filter((ground) => {
+        return ground.name
+            .toLowerCase()
+            .includes(searchTerm.toLowerCase());
     });
 
-    const filteredGrounds = sortedGrounds.filter(station =>
-        station.name.toLowerCase().includes(searchTerm.toLowerCase()) ||
-        station.id.toString().includes(searchTerm)
-    );
+    if (loading) {
+        return <div>Loading ground stations...</div>;
+    }
 
-    // Helper function to render editable cell
-    const renderEditableCell = (station: Ground, field: EditableField) => {
-        if (mode === 'edit' && editingGround === station.id) {
-            return (
-                <input
-                    type="text"
-                    value={editValues[field] !== undefined ? editValues[field] : station[field]}
-                    onChange={(e) => handleFieldEdit(field, e.target.value)}
-                    className="w-full p-1 border rounded"
-                />
-            );
-        }
-        return station[field];
+    if (error) {
+        return <div>Error: {error}</div>;
+    }
+
+    const formatValue = (value: any) => {
+        if (value === undefined || value === null) return "-";
+        return value.toString();
     };
 
     return (
         <div className="space-y-4 p-4">
             <h3 className="text-xl font-semibold">Ground Station Overview</h3>
 
-            <div className="flex gap-4 items-center">
+            <div className="flex gap-4">
                 <Input
-                    placeholder="Search ground stations by name or ID"
+                    placeholder="Search ground stations..."
                     value={searchTerm}
                     onChange={(e) => setSearchTerm(e.target.value)}
                     className="max-w-sm"
                 />
-                <Button
-                    variant={mode === 'delete' ? "default" : "destructive"}
-                    className="ml-4"
-                    onClick={() => handleModeChange('delete')}
-                >
-                    <Trash2 className="h-5 w-5" />
-                </Button>
-
-                <Button
-                    variant={mode === 'edit' ? "default" : "outline"}
-                    className={`ml-4 ${mode !== 'edit' ? "text-white border-blue-500 bg-blue-500 hover:bg-blue-400" : ""}`}
-                    onClick={() => handleModeChange('edit')}
-                >
-                    <Edit className={`h-5 w-5 ${mode !== 'edit' ? "text-white" : ""}`} />
-                </Button>
             </div>
 
-            {mode === 'delete' && (
-                <div className="flex gap-2">
-                    <Button
-                        variant="destructive"
-                        onClick={handleDelete}
-                        disabled={selectedGrounds.size === 0}
-                    >
-                        Confirm Deletion
-                    </Button>
-                    <Button
-                        variant="outline"
-                        onClick={resetModes}
-                        className="border-black"
-                    >
-                        Cancel
-                    </Button>
-                </div>
-            )}
-
-            {mode === 'edit' && editingGround && (
-                <div className="flex gap-2">
-                    <Button
-                        variant="outline"
-                        className="text-white border-blue-500 bg-blue-500 hover:bg-blue-400"
-                        onClick={handleEdit}
-                    >
-                        <Check className="h-5 w-5 mr-1" /> Save Changes
-                    </Button>
-                    <Button
-                        variant="outline"
-                        onClick={resetModes}
-                        className="border-black"
-                    >
-                        <X className="h-5 w-5 mr-1" /> Cancel
-                    </Button>
-                </div>
-            )}
-
-            <Table>
-                <TableHeader>
-                    <TableRow>
-                        {([
-                            ['name', 'Name'],
-                            ['lat', 'Latitude'],
-                            ['lon', 'Longitude'],
-                            ['height', 'Height'],
-                            ['mask', 'Mask'],
-                            ['uplink', 'Uplink'],
-                            ['downlink', 'Downlink'],
-                            ['science', 'Science'],
-                            ['id', 'ID'],
-                        ] as [SortableColumn, string][]).map(([key, label]) => (
-                            <TableHead key={key}>
-                                <Button
-                                    variant="ghost"
-                                    onClick={() => handleSort(key)}
-                                    className="p-0 hover:bg-transparent"
-                                >
-                                    {label}
-                                    <ArrowUpDown className="ml-2 h-4 w-4" />
-                                    {sortConfig?.key === key && (
-                                        <span className="ml-1">
-                                            {sortConfig.direction === 'asc' ? '↑' : '↓'}
-                                        </span>
+            <div className="border rounded-md">
+                <Table>
+                    <TableHeader>
+                        <TableRow>
+                            {([
+                                ["name", "Name"],
+                                ["lat", "Latitude"],
+                                ["lon", "Longitude"],
+                                ["height", "Height"],
+                                ["mask", "Mask"],
+                                ["uplink", "Uplink"],
+                                ["downlink", "Downlink"],
+                                ["science", "Science"],
+                            ] as [SortableColumn | string, string][]).map(([key, label]) => (
+                                <TableHead key={key} className="px-4 py-3">
+                                    {[
+                                        "name", "lat", "lon", "height", "mask", 
+                                        "uplink", "downlink", "science"
+                                    ].includes(key) ? (
+                                        <Button
+                                            variant="ghost"
+                                            onClick={() =>
+                                                handleSort(key as SortableColumn)
+                                            }
+                                            className="p-0 hover:bg-transparent flex items-center"
+                                        >
+                                            {label}
+                                            <ArrowUpDown className="ml-2 h-4 w-4" />
+                                            {/* {sortConfig?.key === key && (
+                                                <span className="ml-1">
+                                                    {sortConfig.direction === "asc" ? "↑" : "↓"}
+                                                </span>
+                                            )} */}
+                                        </Button>
+                                    ) : (
+                                        label
                                     )}
-                                </Button>
-                            </TableHead>
-                        ))}
-                    </TableRow>
-                </TableHeader>
-                <TableBody>
-                    {filteredGrounds.map((station) => (
-                        <TableRow 
-                            key={station.id} 
-                            className={editingGround === station.id ? "bg-blue-50" : ""}
-                        >
-                            <TableCell className="font-medium">
-                                {mode !== 'view' && (
-                                    <input
-                                        type="checkbox"
-                                        checked={mode === 'delete' ? selectedGrounds.has(station.id) : editingGround === station.id}
-                                        onChange={() => handleSelectGround(station.id)}
-                                        className="mr-2"
-                                    />
-                                )}
-                                {renderEditableCell(station, 'name')}
-                            </TableCell>
-                            <TableCell>{renderEditableCell(station, 'lat')}</TableCell>
-                            <TableCell>{renderEditableCell(station, 'lon')}</TableCell>
-                            <TableCell>{renderEditableCell(station, 'height')}</TableCell>
-                            <TableCell>{renderEditableCell(station, 'mask')}</TableCell>
-                            <TableCell>{renderEditableCell(station, 'uplink')}</TableCell>
-                            <TableCell>{renderEditableCell(station, 'downlink')}</TableCell>
-                            <TableCell>{renderEditableCell(station, 'science')}</TableCell>
-                            <TableCell>{station.id}</TableCell>
+                                </TableHead>
+                            ))}
+                            <TableHead key="actions" className="px-4 py-3">Actions</TableHead>
                         </TableRow>
-                    ))}
-                </TableBody>
-            </Table>
+                    </TableHeader>
+                    <TableBody>
+                        {filteredGrounds.length === 0 ? (
+                            <TableRow>
+                                <TableCell colSpan={9} className="text-center py-4">
+                                    No ground stations found
+                                </TableCell>
+                            </TableRow>
+                        ) : (
+                            filteredGrounds.map((ground) => (
+                                <TableRow key={ground.id}>
+                                    <TableCell className="font-medium px-4 py-3">
+                                        {formatValue(ground.name)}
+                                    </TableCell>
+                                    <TableCell className="px-4 py-3">{formatValue(ground.lat)}</TableCell>
+                                    <TableCell className="px-4 py-3">{formatValue(ground.lon)}</TableCell>
+                                    <TableCell className="px-4 py-3">{formatValue(ground.height)}</TableCell>
+                                    <TableCell className="px-4 py-3">{formatValue(ground.mask)}</TableCell>
+                                    <TableCell className="px-4 py-3">{formatValue(ground.uplink)}</TableCell>
+                                    <TableCell className="px-4 py-3">{formatValue(ground.downlink)}</TableCell>
+                                    <TableCell className="px-4 py-3">{formatValue(ground.science)}</TableCell>
+                                    <TableCell className="space-x-2 px-4 py-3">
+                                        <Button
+                                            variant="outline"
+                                            size="sm"
+                                            onClick={() => handleEdit(ground)}
+                                        >
+                                            <Edit2 className="h-4 w-4" />
+                                        </Button>
+                                        <Button
+                                            variant="destructive"
+                                            size="sm"
+                                            onClick={() => handleDelete(ground.id)}
+                                        >
+                                            <Trash className="h-4 w-4" />
+                                        </Button>
+                                    </TableCell>
+                                </TableRow>
+                            ))
+                        )}
+                    </TableBody>
+                </Table>
+            </div>
+
+            {/* Edit Dialog */}
+            <Dialog open={isEditDialogOpen} onOpenChange={setIsEditDialogOpen}>
+                <DialogContent className="bg-white border shadow-lg">
+                    <DialogHeader>
+                        <DialogTitle>Edit Ground Station</DialogTitle>
+                    </DialogHeader>
+
+                    {editingGround && (
+                        <div className="grid gap-4 py-4 ">
+                            <div className="grid grid-cols-4 items-center gap-4">
+                                <Label htmlFor="name" className="text-right">
+                                    Name
+                                </Label>
+                                <Input
+                                    id="name"
+                                    value={editingGround.name}
+                                    onChange={(e) => setEditingGround({
+                                        ...editingGround,
+                                        name: e.target.value
+                                    })}
+                                    className="col-span-3"
+                                />
+                            </div>
+
+                            <div className="grid grid-cols-4 items-center gap-4">
+                                <Label htmlFor="lat" className="text-right">
+                                    Latitude
+                                </Label>
+                                <Input
+                                    id="lat"
+                                    value={editingGround.lat}
+                                    onChange={(e) => setEditingGround({
+                                        ...editingGround,
+                                        lat: e.target.value
+                                    })}
+                                    className="col-span-3"
+                                />
+                            </div>
+
+                            <div className="grid grid-cols-4 items-center gap-4">
+                                <Label htmlFor="lon" className="text-right">
+                                    Longitude
+                                </Label>
+                                <Input
+                                    id="lon"
+                                    value={editingGround.lon}
+                                    onChange={(e) => setEditingGround({
+                                        ...editingGround,
+                                        lon: e.target.value
+                                    })}
+                                    className="col-span-3"
+                                />
+                            </div>
+
+                            <div className="grid grid-cols-4 items-center gap-4">
+                                <Label htmlFor="height" className="text-right">
+                                    Height
+                                </Label>
+                                <Input
+                                    id="height"
+                                    value={editingGround.height}
+                                    onChange={(e) => setEditingGround({
+                                        ...editingGround,
+                                        height: e.target.value
+                                    })}
+                                    className="col-span-3"
+                                />
+                            </div>
+
+                            <div className="grid grid-cols-4 items-center gap-4">
+                                <Label htmlFor="mask" className="text-right">
+                                    Mask
+                                </Label>
+                                <Input
+                                    id="mask"
+                                    type="number"
+                                    value={editingGround.mask}
+                                    onChange={(e) => setEditingGround({
+                                        ...editingGround,
+                                        mask: Number(e.target.value)
+                                    })}
+                                    className="col-span-3"
+                                />
+                            </div>
+
+                            <div className="grid grid-cols-4 items-center gap-4">
+                                <Label htmlFor="uplink" className="text-right">
+                                    Uplink
+                                </Label>
+                                <Input
+                                    id="uplink"
+                                    value={editingGround.uplink}
+                                    onChange={(e) => setEditingGround({
+                                        ...editingGround,
+                                        uplink: e.target.value
+                                    })}
+                                    className="col-span-3"
+                                />
+                            </div>
+
+                            <div className="grid grid-cols-4 items-center gap-4">
+                                <Label htmlFor="downlink" className="text-right">
+                                    Downlink
+                                </Label>
+                                <Input
+                                    id="downlink"
+                                    value={editingGround.downlink}
+                                    onChange={(e) => setEditingGround({
+                                        ...editingGround,
+                                        downlink: e.target.value
+                                    })}
+                                    className="col-span-3"
+                                />
+                            </div>
+
+                            <div className="grid grid-cols-4 items-center gap-4">
+                                <Label htmlFor="science" className="text-right">
+                                    Science
+                                </Label>
+                                <Input
+                                    id="science"
+                                    value={editingGround.science}
+                                    onChange={(e) => setEditingGround({
+                                        ...editingGround,
+                                        science: e.target.value
+                                    })}
+                                    className="col-span-3"
+                                />
+                            </div>
+                        </div>
+                    )}
+
+                    <DialogFooter>
+                        <Button
+                            variant="outline"
+                            onClick={() => {
+                                setIsEditDialogOpen(false);
+                                setEditingGround(null);
+                            }}
+                        >
+                            Cancel
+                        </Button>
+                        <Button onClick={handleSaveEdit}>Save Changes</Button>
+                    </DialogFooter>
+                </DialogContent>
+            </Dialog>
         </div>
     );
 };
