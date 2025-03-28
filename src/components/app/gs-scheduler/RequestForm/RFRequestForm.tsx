@@ -1,5 +1,4 @@
-import React, { useEffect } from "react";
-import { locations } from "@/api/gs-locations";
+import React, { useState, useEffect } from "react";
 import { useForm, Controller, FormProvider } from "react-hook-form";
 import { Button } from "@/components/ui/button";
 import { zodResolver } from "@hookform/resolvers/zod";
@@ -9,32 +8,32 @@ import { TimePickerField } from "@/components/ui/wrapper/timepickerfield";
 import FormFieldWrapper from "@/components/ui/wrapper/formfieldwrapper";
 import { RFRequestFormSchema, RFRequestFormData } from "./RFRequestFormSchema";
 import Combobox from "@/components/ui/combobox";
-import { satellites } from "@/api/gs-satellites";
+import { getSatellites, Satellite } from "@/api/gs-satellites";
 import apiClient from "@/lib/api";
 import { formatToISOString } from "@/lib/formatToISOString";
 import { toast } from "@/hooks/use-toast";
 
-interface RFRequestFormProps {
-  location: (typeof locations)[0];
-}
 
-const satelliteOptions = satellites
-  .filter((sat) => sat.satellite_id && sat.label)
-  .map((sat) => ({
-    value: sat.satellite_id.toString(),
-    label: sat.label,
+const RFRequestForm = () => {
+  const [satellites, setSatellites] = useState<Satellite[]>([]);
+  const satelliteOptions = satellites.map((sat) => ({
+    value: sat.id.toString(),
+    label: sat.name,
   }));
 
-const RFRequestForm: React.FC<RFRequestFormProps> = ({ location }) => {
-  useEffect(() => {
-    console.log("RFRequestForm: Location updated to", location.label);
-  }, [location]);
-
+   useEffect(() => {
+        const fetchSatellites = async () => {
+          const sats = await getSatellites();
+          setSatellites(sats);
+        };
+        fetchSatellites();
+      }, []);
+  
   const form = useForm<RFRequestFormData>({
     resolver: zodResolver(RFRequestFormSchema),
     defaultValues: {
       missionName: "",
-      satelliteId: satelliteOptions[0]?.value || "",
+      satelliteId: "",
       startTime: undefined,
       endTime: undefined,
       uplinkTime: 0,
@@ -51,11 +50,9 @@ const RFRequestForm: React.FC<RFRequestFormProps> = ({ location }) => {
       endTime: formatToISOString(values.endTime),
     };
 
-    // Send the request to the backend using apiClient
     try {
       const response = await apiClient.post("/api/v1/request/rf-time/", payload);
       console.log("Successfully submitted:", response.data);
-      // Handle success
       toast({
         title: "Submission Success",
         description: "Successfully sent!" + response.data,
@@ -64,7 +61,6 @@ const RFRequestForm: React.FC<RFRequestFormProps> = ({ location }) => {
       });
     } catch (error) {
       console.error("Error submitting RFRequest:", error);
-      // Handle errors
       toast({
         title: "Submission Error: " + error,
         description: "Failed to submit!",

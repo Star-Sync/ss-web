@@ -1,10 +1,23 @@
+import apiClient from '@/lib/api';
+
 export interface Location {
-    station_id: string;
-    label: string;
+    id: number;
+    name: string;
+    lat: number;
+    lon: number;
+    height: number;
+    mask: number;
+    uplink: number;
+    downlink: number;
+    science: number;
 }
 
-export const locations: Location[] = [
-    { station_id: "1", label: "Inuvik Northwest" },
-    { station_id: "2", label: "Prince Albert" },
-    { station_id: "3", label: "Gatineau Quebec" },
-];
+export const getLocations = async (): Promise<Location[]> => {
+    try {
+        const response = await apiClient.get<Location[]>('/api/v1/gs');
+        return response.data;
+    } catch (error) {
+        console.error('Error fetching ground station locations:', error);
+        return [];
+    }
+};
