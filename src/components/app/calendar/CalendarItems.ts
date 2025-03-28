@@ -17,7 +17,12 @@ export interface TimelineItem {
 }
 
 // Convert bookings to timeline items
-export const createTimelineItems = (bookings: Booking[]): TimelineItem[] => {
+export const createTimelineItems = (bookings: Booking[], visibleTimeStart?: number, visibleTimeEnd?: number): TimelineItem[] => {
+    // Calculate time range in hours if provided
+    const timeRangeInHours = visibleTimeStart && visibleTimeEnd 
+        ? (visibleTimeEnd - visibleTimeStart) / (1000 * 60 * 60)
+        : 0;
+
     return bookings.map((booking: Booking, index: number) => {
         let start = moment(booking.slot.start_time);
         let end = moment(booking.slot.end_time);
@@ -28,11 +33,11 @@ export const createTimelineItems = (bookings: Booking[]): TimelineItem[] => {
         }
 
         const backgroundColor = getColorFromId(booking.request_id);
-
+        console.log(timeRangeInHours)
         return {
             id: index + 1,
             group: booking.gs_id,
-            title: `${booking.id.slice(0, 5)}`,
+            title: timeRangeInHours > 24 ? '' : `${booking.id.slice(0, 5)}`,
             start_time: start,
             end_time: end,
             itemProps: {
@@ -44,6 +49,7 @@ export const createTimelineItems = (bookings: Booking[]): TimelineItem[] => {
                     padding: "2px 6px",
                     border: "1px solid rgba(0,0,0,0.1)",
                     boxShadow: "0 1px 2px rgba(0,0,0,0.05)",
+                    minWidth: "4px",
                 },
             },
             description: `Request ID: ${booking.request_id}\nBooking ID: ${booking.id}`,
