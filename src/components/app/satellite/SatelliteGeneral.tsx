@@ -413,7 +413,7 @@ const SatelliteGeneral: React.FC = () => {
                                     variant="destructive"
                                     onClick={() => {
                                       const confirmDelete = window.confirm(
-                                        "Are you sure you want to delete this exclusion cone?"
+                                        "Are you sure you want to delete this satellite cone?"
                                       );
                                       if (confirmDelete && editingSatellite) {
                                         handleDelete(editingSatellite.id);

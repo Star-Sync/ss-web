@@ -39,7 +39,7 @@ const ExclusionForm: React.FC = () => {
         // - label is set to the satellite's "name"
         const options = response.data.map((sat: any) => ({
           value: sat.id,
-          label: sat.name,
+          label: `${sat.name} (${sat.id.slice(0, 5) + "..."})`
         }));
         setSatelliteOptions(options);
       } catch (error) {

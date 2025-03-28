@@ -31,15 +31,17 @@ export interface ComboboxProps {
     onChange: (value: string) => void;
     placeholder?: string;
     className?: string;
+    error?: string;
 }
 
 const Combobox: React.FC<ComboboxProps> = ({
-                                               items,
-                                               value,
-                                               onChange,
-                                               placeholder = "Select an option...",
-                                               className = "",
-                                           }) => {
+    items,
+    value,
+    onChange,
+    placeholder = "Select an option...",
+    className = "",
+    error,
+}) => {
     const [open, setOpen] = React.useState(false);
     const [searchTerm, setSearchTerm] = React.useState("");
 
@@ -62,77 +64,80 @@ const Combobox: React.FC<ComboboxProps> = ({
     };
 
     return (
-        <Popover open={open} onOpenChange={setOpen}>
-            <PopoverTrigger asChild>
-                <Button
-                    variant="ghost"
-                    role="combobox"
-                    aria-expanded={open}
-                    className={cn(
-                        "justify-between items-center px-2 hover:bg-transparent hover:text-black",
-                        className
-                    )}
-                >
-                    <div className="flex items-center space-x-2">
-                        {/* Render Icon for Selected Item */}
-                        {value
-                            ? items.find((item) => item.value === value)?.icon
-                            : null}
-                        <span>
-              {value
-                  ? items.find((item) => item.value === value)?.label ||
-                  items.find((item) => item.value === value)?.value
-                  : placeholder}
-            </span>
-                    </div>
-                    <ChevronsUpDown
+        <div className="flex flex-col gap-1.5">
+            <Popover open={open} onOpenChange={setOpen}>
+                <PopoverTrigger asChild>
+                    <Button
+                        variant="ghost"
+                        role="combobox"
+                        aria-expanded={open}
                         className={cn(
-                            "ml-2 h-4 w-4 opacity-50 group-hover:opacity-100 transition-opacity"
+                            "justify-between items-center px-2 hover:bg-transparent hover:text-black",
+                            error ? "border-red-500" : "",
+                            className
                         )}
-                    />
-                </Button>
-            </PopoverTrigger>
-            <PopoverContent className={cn("p-0", className)}>
-                <Command>
-                    <CommandInput
-                        placeholder={`Search`}
-                        value={searchTerm}
-                        onValueChange={setSearchTerm}
-                    />
-                    <CommandList>
-                        {filteredItems.length > 0 ? (
-                            <CommandGroup>
-                                {filteredItems.map((item) => (
-                                    <CommandItem
-                                        key={item.value}
-                                        value={item.label} // Use label for searching and display
-                                        onSelect={() => handleSelect(item.value)}
-                                    >
-                                        <div className="flex items-center space-x-2">
-                                            {/* Render Icon in Dropdown */}
-                                            {item.icon}
-                                            <span>{item.label}</span>
-                                        </div>
-                                        <Check
-                                            className={cn(
-                                                "ml-auto h-4 w-4",
-                                                value === item.value
-                                                    ? "opacity-100"
-                                                    : "opacity-0"
-                                            )}
-                                        />
-                                    </CommandItem>
-                                ))}
-                            </CommandGroup>
-                        ) : (
-                            <CommandEmpty>No options found.</CommandEmpty>
-                        )}
-                    </CommandList>
-                </Command>
-            </PopoverContent>
-        </Popover>
+                    >
+                        <div className="flex items-center space-x-2">
+                            {value
+                                ? items.find((item) => item.value === value)?.icon
+                                : null}
+                            <span>
+                                {value
+                                    ? items.find((item) => item.value === value)?.label ||
+                                    items.find((item) => item.value === value)?.value
+                                    : placeholder}
+                            </span>
+                        </div>
+                        <ChevronsUpDown
+                            className={cn(
+                                "ml-2 h-4 w-4 opacity-50 group-hover:opacity-100 transition-opacity shrink-0"
+                            )}
+                        />
+                    </Button>
+                </PopoverTrigger>
+                <PopoverContent className={cn("p-0", className)}>
+                    <Command>
+                        <CommandInput
+                            placeholder={`Search`}
+                            value={searchTerm}
+                            onValueChange={setSearchTerm}
+                        />
+                        <CommandList>
+                            {filteredItems.length > 0 ? (
+                                <CommandGroup>
+                                    {filteredItems.map((item) => (
+                                        <CommandItem
+                                            key={item.value}
+                                            value={item.label}
+                                            onSelect={() => handleSelect(item.value)}
+                                        >
+                                            <div className="flex items-center space-x-2">
+                                                {item.icon}
+                                                <span>{item.label}</span>
+                                            </div>
+                                            <Check
+                                                className={cn(
+                                                    "ml-auto h-4 w-4",
+                                                    value === item.value
+                                                        ? "opacity-100"
+                                                        : "opacity-0"
+                                                )}
+                                            />
+                                        </CommandItem>
+                                    ))}
+                                </CommandGroup>
+                            ) : (
+                                <CommandEmpty>No options found.</CommandEmpty>
+                            )}
+                        </CommandList>
+                    </Command>
+                </PopoverContent>
+            </Popover>
+            {error && (
+                <span className="text-sm text-red-500">{error}</span>
+            )}
+        </div>
     );
 };
-
 
 export default Combobox;

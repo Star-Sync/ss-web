@@ -96,6 +96,8 @@ const ExclusionGeneral: React.FC = () => {
       toast({
         title: "Exclusion cone updated successfully.",
         description: `Exclusion cone for mission "${editingCone.mission}" was updated.`,
+        variant: "success",
+        duration: 5000,
       });
       setIsEditDialogOpen(false);
       setEditingCone(null);
@@ -125,7 +127,7 @@ const ExclusionGeneral: React.FC = () => {
       console.error(err);
       toast({
         title: "Error deleting exclusion cone.",
-        description: "There was an error deleting the exclusion cone.",
+        description: err instanceof Error ? err.message : "An unknown error occurred",
         variant: "destructive",
       });
     }

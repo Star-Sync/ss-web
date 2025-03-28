@@ -4,7 +4,7 @@ export const ContactRequestFormSchema = z.object({
     missionName: z.string().min(1, "Mission Name is required"),
     satelliteId: z.string().min(1, "Satellite is required"),
     station_id: z.string().min(1, "Ground Station is required"),
-    orbit: z.string().min(1, "Orbit is required"),
+    orbit: z.coerce.number().min(0, "Orbit is required"),
     uplink: z.boolean(),
     telemetry: z.boolean(),
     science: z.boolean(),

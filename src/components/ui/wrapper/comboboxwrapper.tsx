@@ -43,12 +43,10 @@ const FormCombobox: React.FC<FormComboboxProps> = ({
             onChange={field.onChange}
             placeholder={placeholder}
             className={className}
+            error={errorMessage}
           />
         )}
       />
-      {errorMessage && (
-        <span className="text-xs text-red-600 mt-1">{errorMessage}</span>
-      )}
     </div>
   );
 };
