@@ -3,7 +3,6 @@ import { useForm, FormProvider } from "react-hook-form";
 import { zodResolver } from "@hookform/resolvers/zod";
 import { Button } from "@/components/ui/button";
 import { Separator } from "@/components/ui/separator";
-import axios from "axios";
 import { toast } from "@/hooks/use-toast";
 import {
   ExclusionFormSchema,
@@ -11,6 +10,7 @@ import {
 } from "@/components/app/exclusioncones/Form/ExclusionFormSchema";
 import FormFieldWrapper from "@/components/ui/wrapper/formfieldwrapper";
 import FormCombobox, { Option } from "@/components/ui/wrapper/comboboxwrapper";
+import apiClient from "@/lib/api";
 
 const ExclusionForm: React.FC = () => {
   const form = useForm<ExclusionFormData>({
@@ -26,12 +26,14 @@ const ExclusionForm: React.FC = () => {
 
   // Option states for Satellite and Ground Station selection.
   const [satelliteOptions, setSatelliteOptions] = useState<Option[]>([]);
-  const [groundStationOptions, setGroundStationOptions] = useState<Option[]>([]);
+  const [groundStationOptions, setGroundStationOptions] = useState<Option[]>(
+    []
+  );
 
   useEffect(() => {
     async function fetchSatellites() {
       try {
-        const response = await axios.get(
+        const response = await apiClient.get(
           process.env.NEXT_PUBLIC_API_URL + "/api/v1/satellites"
         );
         // Map the API response so that:
@@ -39,7 +41,7 @@ const ExclusionForm: React.FC = () => {
         // - label is set to the satellite's "name"
         const options = response.data.map((sat: any) => ({
           value: sat.id,
-          label: `${sat.name} (${sat.id.slice(0, 5) + "..."})`
+          label: `${sat.name} (${sat.id.slice(0, 5) + "..."})`,
         }));
         setSatelliteOptions(options);
       } catch (error) {
@@ -52,7 +54,7 @@ const ExclusionForm: React.FC = () => {
   useEffect(() => {
     async function fetchGroundStations() {
       try {
-        const response = await axios.get(
+        const response = await apiClient.get(
           process.env.NEXT_PUBLIC_API_URL + "/api/v1/gs"
         );
         // Map the API response so that:
@@ -84,7 +86,7 @@ const ExclusionForm: React.FC = () => {
     console.log("Validated values:", values);
 
     try {
-      const response = await axios.post(
+      const response = await apiClient.post(
         process.env.NEXT_PUBLIC_API_URL + "/api/v1/excones/",
         payload
       );
