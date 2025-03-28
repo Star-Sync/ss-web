@@ -1,4 +1,4 @@
-import axios from "axios";
+import apiClient from '@/lib/api';
 
 export interface Satellite {
     id: string;
@@ -8,16 +8,15 @@ export interface Satellite {
     telemetry: number;
     science: number;
     priority: number;
-    ex_cones: any[];
+    ex_cones?: any[];
 }
 
-// API call to fetch satellites
-export const gsFetchSatellites = async (): Promise<Satellite[]> => {
-    const axiosInstance = axios.create({
-        baseURL: process.env.NEXT_PUBLIC_API_URL,
-        headers: { "Content-Type": "application/json" },
-    });
-
-    const response = await axiosInstance.get<Satellite[]>("/api/v1/satellites/");
-    return response.data;
+export const getSatellites = async (): Promise<Satellite[]> => {
+    try {
+        const response = await apiClient.get<Satellite[]>('/api/v1/satellites');
+        return response.data;
+    } catch (error) {
+        console.error('Error fetching satellites:', error);
+        return [];
+    }
 };

@@ -1,203 +1,207 @@
-import React, { useEffect } from "react";
+import React, { useEffect, useState } from "react";
 import { Controller, FormProvider, useForm } from "react-hook-form";
 import { Button } from "@/components/ui/button";
 import { zodResolver } from "@hookform/resolvers/zod";
 import "react-datepicker/dist/react-datepicker.css";
 import { Separator } from "@/components/ui/separator";
 import { TimePickerField } from "@/components/ui/wrapper/timepickerfield";
-import { locations } from "@/api/gs-locations";
 import FormFieldWrapper from "@/components/ui/wrapper/formfieldwrapper";
 import CheckboxFieldWrapper from "@/components/ui/wrapper/checkboxfieldwrapper";
-import { ContactRequestFormSchema, ContactRequestFormData } from "./ContactRequestFormSchema";
+import {
+  ContactRequestFormSchema,
+  ContactRequestFormData,
+} from "./ContactRequestFormSchema";
 import Combobox from "@/components/ui/combobox";
-import { gsFetchSatellites, Satellite } from "@/api/gs-satellites";
+import { getSatellites, Satellite } from "@/api/gs-satellites";
+import { getLocations, Location } from "@/api/gs-locations";
 import { formatToISOString } from "@/lib/formatToISOString";
-import axios from "axios";
+import apiClient from "@/lib/api";
 import { toast } from "@/hooks/use-toast";
 
-interface ContactRequestFormProps {
-    location: typeof locations[0];
-}
 
-const ContactRequestForm: React.FC<ContactRequestFormProps> = ({ location }) => {
-    const [satelliteOptions, setSatelliteOptions] = React.useState<{ value: string; label: string; }[]>([]);
+
+const ContactRequestForm = ({ }) => {
+   const [groundStations, setGroundStations] = useState<Location[]>([]);
+   const [satellites, setSatellites] = useState<Satellite[]>([]);
+
+    // Transform ground stations into combobox format
+    const groundStationOptions = groundStations.map((station) => ({
+      value: station.id.toString(),
+      label: station.name,
+    }));
+
+    const satelliteOptions = satellites.map((sat) => ({
+      value: sat.id.toString(),
+      label: sat.name,
+    }));
 
     useEffect(() => {
-        const fetchSatellites = async () => {
-            try {
-                console.log('Fetching satellites...');
-                const satellites = await gsFetchSatellites();
-                console.log('Received satellites:', satellites);
-                const options = satellites
-                    .filter((sat: Satellite) => sat.id && sat.name)
-                    .map((sat: Satellite) => ({
-                        value: sat.id,
-                        label: sat.name,
-                    }));
-                console.log('Processed satellite options:', options);
-                setSatelliteOptions(options);
-            } catch (error) {
-                console.error('Error fetching satellites:', error);
-                toast({
-                    title: "Error",
-                    description: "Failed to load satellites",
-                    variant: "destructive",
-                });
-            }
-        };
-        fetchSatellites();
+      const fetchGroundStations = async () => {
+        const stations = await getLocations();
+        setGroundStations(stations);
+      };
+      fetchGroundStations();
     }, []);
 
     useEffect(() => {
-        console.log("ContactRequestForm: Location updated to", location.label);
-    }, [location]);
+      const fetchSatellites = async () => {
+        const sats = await getSatellites();
+        setSatellites(sats);
+      };
+      fetchSatellites();
+    }
+, []);
 
-    const form = useForm<ContactRequestFormData>({
-        resolver: zodResolver(ContactRequestFormSchema),
-        defaultValues: {
-            missionName: "",
-            satelliteId: satelliteOptions[0]?.value || "",
-            orbit: 0,
-            uplink: false,
-            telemetry: false,
-            science: false,
-            aosTime: undefined,
-            rfOnTime: undefined,
-            rfOffTime: undefined,
-            losTime: undefined,
-        },
-    });
+  const form = useForm<ContactRequestFormData>({
+    resolver: zodResolver(ContactRequestFormSchema),
+    defaultValues: {
+      missionName: "",
+      satelliteId: "",
+      station_id: "",
+      orbit: "",
+      uplink: false,
+      telemetry: false,
+      science: false,
+      aosTime: undefined,
+      rfOnTime: undefined,
+      rfOffTime: undefined,
+      losTime: undefined,
+    },
+  });
 
-    const onSubmit = async (values: ContactRequestFormData) => {
-        const payload = {
-            ...values,
-            aosTime: formatToISOString(values.aosTime),
-            rfOnTime: formatToISOString(values.rfOnTime),
-            rfOffTime: formatToISOString(values.rfOffTime),
-            losTime: formatToISOString(values.losTime),
-            location: location.label,
-            satellite_id: values.satelliteId,
-        };
-        // Send the request to the backend using axios
-        try {
-            const response = await axios.post(process.env.NEXT_PUBLIC_API_URL + '/api/v1/request/contact', payload);
-            console.log('Successfully submitted:', response.data);
-
-            // Handle success
-            toast({
-                title: "Submission Success",
-                description: "Successfully sent!",
-                variant: "success",
-                duration: 5000,
-            });
-        } catch (error) {
-            console.error('Error submitting ContactRequest:', error);
-            // Handle errors
-            toast({
-                title: "Submission Error: " + error,
-                description: "There was an error submitting the contact request. Please try again.",
-                variant: "destructive",
-                duration: 5000,
-            });
-        }
+  const onSubmit = async (values: ContactRequestFormData) => {
+    const payload = {
+      ...values,
+      aosTime: formatToISOString(values.aosTime),
+      rfOnTime: formatToISOString(values.rfOnTime),
+      rfOffTime: formatToISOString(values.rfOffTime),
+      losTime: formatToISOString(values.losTime),
     };
+    // Send the request to the backend using apiClient
+    try {
+      const response = await apiClient.post("/api/v1/request/contact/", payload);
+      console.log("Successfully submitted:", response.data);
 
-    return (
+      // Handle success
+      toast({
+        title: "Submission Success",
+        description: "Successfully sent!",
+        variant: "success",
+        duration: 5000,
+      });
+    } catch (error) {
+      console.error("Error submitting ContactRequest:", error);
+      // Handle errors
+      toast({
+        title: "Submission Error: " + error,
+        description:
+          "There was an error submitting the contact request. Please try again.",
+        variant: "destructive",
+        duration: 5000,
 
-        <FormProvider {...form}>
-            <form onSubmit={form.handleSubmit(onSubmit)} className="space-y-6">
-                {/* Satellite Combobox */}
-                <div className="grid grid-cols-1 md:grid-cols-2 gap-4 max-w-[25vw]">
+      });
+      console.log(payload);
+    }
+  };
+
+  return (
+    <FormProvider {...form}>
+      <form onSubmit={form.handleSubmit(onSubmit)} className="space-y-6">
+        {/* Satellite Combobox */}
+        <div className="grid grid-cols-1 md:grid-cols-2 gap-4 max-w-[25vw]">
+          <Controller
+            name="satelliteId"
+            control={form.control}
+            render={({ field }) => (
+              <Combobox
+                items={satelliteOptions}
+                value={field.value}
+                onChange={field.onChange}
+                placeholder="Select a Satellite"
+                className="text-black"
+              />
+            )}
+          />
+                  {/* Ground Station Combobox */}
+                  <div className="grid grid-cols-1 md:grid-cols-2 gap-4 max-w-[25vw]">
                     <Controller
-                        name="satelliteId"
-                        control={form.control}
-                        render={({ field }) => (
-                            <Combobox
-                                items={satelliteOptions}
-                                value={field.value}
-                                onChange={field.onChange}
-                                placeholder="Select a Satellite"
-                                className="text-black"
-                            />
-                        )}
+                      name="station_id"
+                      control={form.control}
+                      render={({ field }) => (
+                        <Combobox
+                          items={groundStationOptions}
+                          value={field.value}
+                          onChange={field.onChange}
+                          placeholder="Select a Ground Station"
+                          className="text-black"
+                        />
+                      )}
                     />
-                </div>
+                  </div>
+        </div>
 
-                <Separator className="max-w-[50vw]" />
 
-                {/* Time Fields */}
-                <div className="grid grid-cols-1 md:grid-cols-2 gap-4 max-w-[28vw]">
-                    <TimePickerField
-                        name="aosTime"
-                        label="AOS Time"
-                    />
-                    <TimePickerField
-                        name="losTime"
-                        label="LOS Time"
-                    />
-                    <TimePickerField
-                        name="rfOnTime"
-                        label="RF On Time"
-                    />
-                    <TimePickerField
-                        name="rfOffTime"
-                        label="RF Off Time"
-                    />
-                </div>
+        <Separator className="max-w-[50vw]" />
 
-                <Separator className="max-w-[50vw]" />
+        {/* Time Fields */}
+        <div className="grid grid-cols-1 md:grid-cols-2 gap-4 max-w-[28vw]">
+          <TimePickerField name="aosTime" label="AOS Time" />
+          <TimePickerField name="losTime" label="LOS Time" />
+          <TimePickerField name="rfOnTime" label="RF On Time" />
+          <TimePickerField name="rfOffTime" label="RF Off Time" />
+        </div>
 
-                {/* Text Fields */}
-                <div className="grid grid-cols-1 md:grid-cols-2 gap-4 max-w-[50vw]">
-                    <FormFieldWrapper<ContactRequestFormData>
-                        control={form.control}
-                        name="missionName"
-                        label="Mission Name"
-                        placeholder="Enter mission name"
-                    />
-                    <FormFieldWrapper<ContactRequestFormData>
-                        control={form.control}
-                        name="orbit"
-                        label="Orbit"
-                        placeholder="Enter orbit number"
-                        type="number"
-                        min="0"
-                        step="1"
-                    />
-                </div>
+        <Separator className="max-w-[50vw]" />
 
-                <Separator className="max-w-[50vw]" />
+        {/* Text Fields */}
+        <div className="grid grid-cols-1 md:grid-cols-2 gap-4 max-w-[50vw]">
+          <FormFieldWrapper<ContactRequestFormData>
+            control={form.control}
+            name="missionName"
+            label="Mission Name"
+            placeholder="Enter mission name"
+          />
+          <FormFieldWrapper<ContactRequestFormData>
+            control={form.control}
+            name="orbit"
+            label="Orbit"
+            placeholder="Enter orbit number"
+            type="number"
+            min="0"
+            step="1"
+          />
+        </div>
 
-                {/* Boolean Flags */}
-                <div className="grid grid-cols-1 md:grid-cols-3 gap-4 max-w-[50vw]">
-                    <CheckboxFieldWrapper
-                        control={form.control}
-                        name="uplink"
-                        label="Uplink"
-                    />
-                    <CheckboxFieldWrapper
-                        control={form.control}
-                        name="telemetry"
-                        label="Telemetry"
-                    />
-                    <CheckboxFieldWrapper
-                        control={form.control}
-                        name="science"
-                        label="Science"
-                    />
-                </div>
+        <Separator className="max-w-[50vw]" />
 
-                <Separator className="max-w-[50vw]" />
+        {/* Boolean Flags */}
+        <div className="grid grid-cols-1 md:grid-cols-3 gap-4 max-w-[50vw]">
+          <CheckboxFieldWrapper
+            control={form.control}
+            name="uplink"
+            label="Uplink"
+          />
+          <CheckboxFieldWrapper
+            control={form.control}
+            name="telemetry"
+            label="Telemetry"
+          />
+          <CheckboxFieldWrapper
+            control={form.control}
+            name="science"
+            label="Science"
+          />
+        </div>
 
-                <p className="text-sm text-gray-600">Location: {location.label}</p>
+        <Separator className="max-w-[50vw]" />
 
-                {/* Submit Button */}
-                <Button type="submit" className="w-full md:w-auto">
-                    Submit Contact Request
-                </Button>
-            </form>
-        </FormProvider>
-    );
+        {/* Submit Button */}
+        <Button type="submit" className="w-full md:w-auto">
+          Submit Contact Request
+        </Button>
+      </form>
+    </FormProvider>
+  );
 };
 
 export default ContactRequestForm;
