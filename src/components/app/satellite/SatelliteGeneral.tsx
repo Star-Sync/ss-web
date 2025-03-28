@@ -210,101 +210,84 @@ const SatelliteGeneral: React.FC = () => {
         />
       </div>
 
-      <div className="border rounded-md">
-        <Table>
-          <TableHeader>
-            <TableRow>
-              {(
-                [
-                  ["name", "Name"],
-                  ["priority", "Priority"],
-                  ["uplink", "Uplink"],
-                  ["telemetry", "Telemetry"],
-                  ["science", "Science"],
-                  ["tle", "TLE"],
-                ] as [SortableColumn | string, string][]
-              ).map(([key, label]) => (
-                <TableHead key={key} className="px-4 py-3">
-                  {[
-                    "name",
-                    "priority",
-                    "uplink",
-                    "telemetry",
-                    "science",
-                  ].includes(key) ? (
-                    <Button
-                      variant="ghost"
-                      onClick={() => handleSort(key as SortableColumn)}
-                      className="p-0 hover:bg-transparent"
-                    >
-                      {label}
-                      <ArrowUpDown className="ml-2 h-4 w-4" />
-                      {sortConfig?.key === key && (
-                        <span className="ml-1">
-                          {sortConfig.direction === "asc" ? "↑" : "↓"}
-                        </span>
-                      )}
-                    </Button>
-                  ) : (
-                    label
-                  )}
-                </TableHead>
-              ))}
-              <TableHead key="actions" className="px-4 py-3">
-                Actions
-              </TableHead>
-            </TableRow>
-          </TableHeader>
-          <TableBody>
-            {filteredSatellites.length === 0 ? (
-              <TableRow>
-                <TableCell colSpan={7} className="text-center py-4">
-                  No satellites found
-                </TableCell>
-              </TableRow>
-            ) : (
-              filteredSatellites.map((satellite) => (
-                <TableRow key={satellite.id}>
-                  <TableCell className="font-medium px-4 py-3">
-                    {formatValue(satellite.name)}
-                  </TableCell>
-                  <TableCell className="px-4 py-3">
-                    {formatValue(satellite.priority)}
-                  </TableCell>
-                  <TableCell className="px-4 py-3">
-                    {formatValue(satellite.uplink)}
-                  </TableCell>
-                  <TableCell className="px-4 py-3">
-                    {formatValue(satellite.telemetry)}
-                  </TableCell>
-                  <TableCell className="px-4 py-3">
-                    {formatValue(satellite.science)}
-                  </TableCell>
-                  <TableCell className="max-w-[200px] truncate px-4 py-3">
-                    {formatValue(satellite.tle)}
-                  </TableCell>
-                  <TableCell className="space-x-2 px-4 py-3">
-                    <Button
-                      variant="outline"
-                      size="sm"
-                      onClick={() => handleEdit(satellite)}
-                    >
-                      <Edit2 className="h-4 w-4" />
-                    </Button>
-                    <Button
-                      variant="destructive"
-                      size="sm"
-                      onClick={() => handleDelete(satellite.id)}
-                    >
-                      <Trash className="h-4 w-4" />
-                    </Button>
-                  </TableCell>
-                </TableRow>
-              ))
-            )}
-          </TableBody>
-        </Table>
-      </div>
+            <div className="border rounded-md">
+                <Table>
+                    <TableHeader>
+                        <TableRow>
+                            {([
+                                ["name", "Name"],
+                                ["priority", "Priority"],
+                                ["uplink", "Uplink"],
+                                ["telemetry", "Telemetry"],
+                                ["science", "Science"],
+                                ["tle", "TLE"],
+                            ] as [SortableColumn | string, string][]).map(([key, label]) => (
+                                <TableHead key={key} className="px-4 py-3">
+                                    {[
+                                        "name",
+                                        "priority",
+                                        "uplink",
+                                        "telemetry",
+                                        "science",
+                                    ].includes(key) ? (
+                                        <Button
+                                            variant="ghost"
+                                            onClick={() =>
+                                                handleSort(key as SortableColumn)
+                                            }
+                                            className="p-0 hover:bg-transparent"
+                                        >
+                                            {label}
+                                            <ArrowUpDown className="ml-2 h-4 w-4" />
+                                            {sortConfig?.key === key && (
+                                                <span className="ml-1">
+                                                    {sortConfig.direction === "asc" ? "↑" : "↓"}
+                                                </span>
+                                            )}
+                                        </Button>
+                                    ) : (
+                                        label
+                                    )}
+                                </TableHead>
+                            ))}
+                            <TableHead key="actions" className="px-4 py-3">Actions</TableHead>
+                        </TableRow>
+                    </TableHeader>
+                    <TableBody>
+                        {filteredSatellites.length === 0 ? (
+                            <TableRow>
+                                <TableCell colSpan={7} className="text-center py-4">
+                                    No satellites found
+                                </TableCell>
+                            </TableRow>
+                        ) : (
+                            filteredSatellites.map((satellite) => (
+                                <TableRow key={satellite.id}>
+                                    <TableCell className="font-medium px-4 py-3">
+                                        {formatValue(satellite.name)}
+                                    </TableCell>
+                                    <TableCell className="px-4 py-3">{formatValue(satellite.priority)}</TableCell>
+                                    <TableCell className="px-4 py-3">{formatValue(satellite.uplink)}</TableCell>
+                                    <TableCell className="px-4 py-3">{formatValue(satellite.telemetry)}</TableCell>
+                                    <TableCell className="px-4 py-3">{formatValue(satellite.science)}</TableCell>
+                                    <TableCell className="max-w-[200px] truncate px-4 py-3">
+                                        {formatValue(satellite.tle)}
+                                    </TableCell>
+                                    <TableCell className="space-x-2 px-4 py-3">
+                                        <Button
+                                            variant="outline"
+                                            size="sm"
+                                            onClick={() => handleEdit(satellite)}
+                                        >
+                                            <Edit2 className="h-4 w-4" />
+                                        </Button>
+                                    </TableCell>
+                                </TableRow>
+                            ))
+                        )}
+                    </TableBody>
+                </Table>
+            </div>
 
       {/* Edit Dialog */}
       <Dialog open={isEditDialogOpen} onOpenChange={setIsEditDialogOpen}>
@@ -424,22 +407,37 @@ const SatelliteGeneral: React.FC = () => {
             </div>
           )}
 
-          <DialogFooter>
-            <Button
-              variant="outline"
-              onClick={() => {
-                setIsEditDialogOpen(false);
-                setEditingSatellite(null);
-              }}
-            >
-              Cancel
-            </Button>
-            <Button onClick={handleSaveEdit}>Save Changes</Button>
-          </DialogFooter>
-        </DialogContent>
-      </Dialog>
-    </div>
-  );
+                    <DialogFooter>
+                         <Button
+                                  className="mr-[5vw]"
+                                    variant="destructive"
+                                    onClick={() => {
+                                      const confirmDelete = window.confirm(
+                                        "Are you sure you want to delete this satellite cone?"
+                                      );
+                                      if (confirmDelete && editingSatellite) {
+                                        handleDelete(editingSatellite.id);
+                                        setIsEditDialogOpen(false);
+                                      }
+                                    }}
+                                  >
+                                  <Trash className="h-4" />
+                                  </Button>
+                        <Button
+                            variant="outline"
+                            onClick={() => {
+                                setIsEditDialogOpen(false);
+                                setEditingSatellite(null);
+                            }}
+                        >
+                            Cancel
+                        </Button>
+                        <Button onClick={handleSaveEdit}>Save Changes</Button>
+                    </DialogFooter>
+                </DialogContent>
+            </Dialog>
+        </div>
+    );
 };
 
 export default SatelliteGeneral;

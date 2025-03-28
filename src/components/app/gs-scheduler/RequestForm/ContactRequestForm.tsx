@@ -58,7 +58,7 @@ const ContactRequestForm = ({ }) => {
       missionName: "",
       satelliteId: "",
       station_id: "",
-      orbit: "",
+      orbit: 0,
       uplink: false,
       telemetry: false,
       science: false,
