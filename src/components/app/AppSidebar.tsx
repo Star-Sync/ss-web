@@ -5,14 +5,9 @@ import React, { useEffect, useState } from "react";
 import Image from "next/image";
 import { FaQuestionCircle } from "react-icons/fa";
 import { useRouter } from "next/router";
-import {
-    ChevronsUpDown,
-    CogIcon,
-    LayoutDashboard,
-    LogOut,
-    Calendar,
-    Satellite,
-} from "lucide-react";
+
+// Icons
+import { ChevronsUpDown, CogIcon, LayoutDashboard, LogOut, Calendar, Satellite, Globe} from "lucide-react";
 
 // Custom Hooks
 import { useIsMobile } from "@/hooks/use-mobile";
@@ -62,33 +57,52 @@ interface NavItem {
     icon: React.ComponentType<React.SVGProps<SVGSVGElement>>;
 }
 
-// Static navigation data remains the same
-const navMain: NavItem[] = [
-    {
-        title: "Dashboard",
-        url: "/dashboard",
-        isActive: true,
-        icon: LayoutDashboard,
+interface Data {
+    user: User;
+    navMain: NavItem[];
+}
+
+// Data
+const data: Data = {
+    user: {
+        name: "Sathira Williams",
+        email: "sathira.williams@gmail.com",
+        avatar: "/logo/ss-logo-favicon.png",
+        role: "CSA Admin",
     },
-    {
-        title: "Calendar",
-        url: "/calendar",
-        isActive: false,
-        icon: Calendar,
-    },
-    {
-        title: "Satellite",
-        url: "/satellite",
-        isActive: true,
-        icon: Satellite,
-    },
-    {
-        title: "Settings",
-        url: "/settings",
-        isActive: false,
-        icon: CogIcon,
-    },
-];
+    navMain: [
+        {
+            title: "Dashboard",
+            url: "/dashboard",
+            isActive: true,
+            icon: LayoutDashboard,
+        },
+        {
+            title: "Calendar",
+            url: "/calendar",
+            isActive: false,
+            icon: Calendar,
+        },
+        {
+            title: "Satellite",
+            url: "/satellite",
+            isActive: true,
+            icon: Satellite,
+        },
+        {
+            title: "Ground Station",  
+            url: "/ground",  
+            isActive: true,         
+            icon: Globe,         
+        },
+        {
+            title: "Settings",
+            url: "/settings",
+            isActive: false,
+            icon: CogIcon,
+        },
+    ],
+};
 
 // Logo Component
 interface LogoProps {
@@ -296,7 +310,7 @@ export const AppSidebar: React.FC = () => {
         <Sidebar collapsible="icon" className="flex flex-col overflow-hidden">
             <Logo isCollapsed={isCollapsed} isMobile={isMobile} />
             <SidebarContent className="ml-1 flex-1 overflow-y-auto">
-                <NavigationMenu navMain={navMain} />
+                <NavigationMenu navMain={data.navMain} />
             </SidebarContent>
             <SidebarFooter
                 className={`flex items-center justify-center ${
