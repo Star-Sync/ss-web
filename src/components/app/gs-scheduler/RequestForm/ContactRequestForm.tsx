@@ -57,7 +57,7 @@ const ContactRequestForm = ({ }) => {
     defaultValues: {
       missionName: "",
       satelliteId: "",
-      groundStationId: "",
+      station_id: "",
       orbit: "",
       uplink: false,
       telemetry: false,
@@ -125,7 +125,7 @@ const ContactRequestForm = ({ }) => {
                   {/* Ground Station Combobox */}
                   <div className="grid grid-cols-1 md:grid-cols-2 gap-4 max-w-[25vw]">
                     <Controller
-                      name="groundStationId"
+                      name="station_id"
                       control={form.control}
                       render={({ field }) => (
                         <Combobox
