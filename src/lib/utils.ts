@@ -11,27 +11,9 @@ export function cn(...inputs: ClassValue[]) {
  * @returns A CSS color string (hex, hsl, or rgb)
  */
 export function getColorFromId(id: string): string {
-    // Simple hash function to convert string to a number
-    let hash = 0;
-    for (let i = 0; i < id.length; i++) {
-        hash = (hash << 5) - hash + id.charCodeAt(i);
-        hash = hash & hash; // Convert to 32bit integer
-    }
-
-    // Use the hash to pick from a predefined color palette
-    const colors = [
-        "#FF5733",
-        "#33FF57",
-        "#3357FF",
-        "#F033FF",
-        "#FF3333",
-        "#33FFF3",
-        "#F3FF33",
-        "#FF33A1",
-        "#33A1FF",
-        "#A1FF33",
-    ];
-
-    const index = Math.abs(hash) % colors.length;
-    return colors[index];
+    // Convert the id to a number and get a value between 0 and 360 for hue
+    const hue = parseInt(id.slice(-4), 16) % 360;
+    
+    // Use high lightness (80-90%) and medium saturation (60-70%) for pastel colors
+    return `hsl(${hue}, 65%, 85%)`;
 }

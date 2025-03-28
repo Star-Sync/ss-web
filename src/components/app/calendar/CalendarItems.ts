@@ -27,19 +27,23 @@ export const createTimelineItems = (bookings: Booking[]): TimelineItem[] => {
             [start, end] = [end, start];
         }
 
+        const backgroundColor = getColorFromId(booking.request_id);
+
         return {
             id: index + 1,
             group: booking.gs_id,
-            title: `Booking ${booking.id.slice(0, 5)}`,
+            title: `${booking.id.slice(0, 5)}`,
             start_time: start,
             end_time: end,
             itemProps: {
                 className: "custom-item",
                 style: {
-                    background: getColorFromId(booking.request_id),
-                    color: "white",
+                    background: backgroundColor,
+                    color: "#4a5568",
                     borderRadius: "4px",
                     padding: "2px 6px",
+                    border: "1px solid rgba(0,0,0,0.1)",
+                    boxShadow: "0 1px 2px rgba(0,0,0,0.05)",
                 },
             },
             description: `Request ID: ${booking.request_id}\nBooking ID: ${booking.id}`,
