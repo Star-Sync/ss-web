@@ -8,7 +8,7 @@ import Timeline, {
 } from "react-calendar-timeline";
 import MotionWrapper from "@/components/app/MotionWrapper";
 import moment from "moment";
-import { gsFetchMissions } from "@/api/gs-fetch-missions";
+import { gsFetchBookings, Booking } from "@/api/gs-fetch-missions";
 import { createTimelineItems, TimelineItem } from "@/components/app/calendar/CalendarItems";
 import { MissionModal } from "@/components/app/calendar/MissionModal";
 import { toast } from "@/hooks/use-toast";
@@ -21,6 +21,7 @@ const groups = [
 
 const CalendarContainer = () => {
     const [items, setItems] = useState<TimelineItem[]>([]);
+    const [bookings, setBookings] = useState<Booking[]>([]);
     const [isLoading, setIsLoading] = useState(true);
     const [error, setError] = useState<string | null>(null);
     const [selectedMission, setSelectedMission] = useState<TimelineItem | null>(null);
@@ -36,22 +37,22 @@ const CalendarContainer = () => {
     const minTime = moment().add(-6, "months").valueOf();
     const maxTime = moment().add(6, "months").valueOf();
 
-    const fetchAndSetMissions = useCallback(async () => {
+    const fetchBookings = useCallback(async () => {
         setIsLoading(true);
         setError(null);
         try {
-            const missions = await gsFetchMissions();
-            const timelineItems = createTimelineItems(missions);
-            setItems(timelineItems);
+            const fetchedBookings = await gsFetchBookings();
+            setBookings(fetchedBookings);
+            setItems(createTimelineItems(fetchedBookings, visibleTimeStart, visibleTimeEnd));
         } catch (err) {
-            console.error("Error fetching missions:", err);
+            console.error("Error fetching bookings:", err);
             setError(
                 err instanceof Error ? err.message : "An unknown error occurred"
             );
         } finally {
             setIsLoading(false);
         }
-    }, []); // Empty dependency array since it doesn't depend on any props or state
+    }, []);
 
     const handleItemClick = useCallback((itemId: number) => {
         const mission = items.find((item) => item.id === itemId);
@@ -84,18 +85,20 @@ const CalendarContainer = () => {
 
         setVisibleTimeStart(newVisibleTimeStart);
         setVisibleTimeEnd(newVisibleTimeEnd);
-    }, [minTime, maxTime]);
+        
+        setItems(createTimelineItems(bookings, newVisibleTimeStart, newVisibleTimeEnd));
+    }, [minTime, maxTime, bookings]);
 
-    // Initial fetch of missions
+    // Initial fetch of bookings
     useEffect(() => {
-        fetchAndSetMissions();
-    }, [fetchAndSetMissions]);
+        fetchBookings();
+    }, [fetchBookings]);
 
     // Handle sidebar button click
     useEffect(() => {
         const handleSidebarButtonClick = () => {
             setTimeout(() => {
-                fetchAndSetMissions();
+                fetchBookings();
             }, 200);
         };
 
@@ -104,7 +107,7 @@ const CalendarContainer = () => {
         return () => {
             window.removeEventListener("sidebarButtonClick", handleSidebarButtonClick);
         };
-    }, [fetchAndSetMissions]);
+    }, [fetchBookings]);
 
     if (isLoading)
         return (
@@ -138,7 +141,7 @@ const CalendarContainer = () => {
                     </p>
                 </div>
                 <button
-                    onClick={() => fetchAndSetMissions()}
+                    onClick={() => fetchBookings()}
                     className="bg-blue-500 hover:bg-blue-600 text-white font-semibold py-2 px-4 rounded"
                 >
                     Refresh
