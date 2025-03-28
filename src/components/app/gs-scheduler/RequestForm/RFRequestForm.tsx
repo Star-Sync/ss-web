@@ -51,7 +51,7 @@ const RFRequestForm = () => {
     };
 
     try {
-      const response = await apiClient.post("/api/v1/request/rf-time", payload);
+      const response = await apiClient.post("/api/v1/request/rf-time/", payload);
       console.log("Successfully submitted:", response.data);
       toast({
         title: "Submission Success",
