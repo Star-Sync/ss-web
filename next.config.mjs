@@ -8,7 +8,7 @@ const nextConfig = {
         { source: '/settings', destination: '/app/settings' },
         { source: '/calendar', destination: '/app/calendar' },
         { source: '/satellite', destination: '/app/satellite' },
-        
+        { source: '/manage-users', destination: '/app/manage-users'},
 
         // Web pages
         { source: '/', destination: '/web/' },
