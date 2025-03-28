@@ -1,5 +1,4 @@
 import React, { FC, useState, useRef } from "react";
-import { Location } from "@/api/gs-locations";
 import { Tab } from "./TabNav";
 import MotionWrapper from "../MotionWrapper";
 import Scheduler from "@/components/app/gs-scheduler/Scheduler";
