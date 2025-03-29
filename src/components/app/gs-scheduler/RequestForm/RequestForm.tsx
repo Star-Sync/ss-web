@@ -16,7 +16,7 @@ const transition = { duration: 0.4, ease: "easeInOut" };
 const RequestForm = () => {
     return (
         <MotionWrapper>
-            <Tabs defaultValue="contact" className="w-full">
+            <Tabs defaultValue="contact">
                 {/* Tabs List */}
                 <TabsList className="mb-4">
                     <TabsTrigger value="contact">Contact Request</TabsTrigger>

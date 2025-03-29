@@ -12,7 +12,7 @@ const AppLayout: React.FC<LayoutProps> = ({ children }) => {
     return (
         <SidebarProvider>
             <AppSidebar />
-            <main className="mx-auto w-full bg-white">
+            <main className="bg-gray-50 overflow-hidden">
                 <AppHeader />
                 <Toaster />
                 {children}
