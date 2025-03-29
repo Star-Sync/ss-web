@@ -17,8 +17,8 @@ import { toast } from "@/hooks/use-toast";
 const RFRequestForm = () => {
   const [satellites, setSatellites] = useState<Satellite[]>([]);
   const satelliteOptions = satellites.map((sat) => ({
-    value: sat.id.toString(),
-    label: sat.name,
+    value: sat.id,
+    label: `${sat.name} (${sat.id.slice(0, 5) + "..."})`,
   }));
 
    useEffect(() => {
