@@ -7,7 +7,7 @@ const nextConfig = {
         { source: '/dashboard', destination: '/app/dashboard' },
         { source: '/settings', destination: '/app/settings' },
         { source: '/calendar', destination: '/app/calendar' },
-        { source: '/ground', destination: '/app/ground' },
+        { source: '/ground-station', destination: '/app/ground' },
         { source: '/satellite', destination: '/app/satellite' },
         
 

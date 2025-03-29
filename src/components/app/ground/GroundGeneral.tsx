@@ -10,7 +10,6 @@ import {
 } from "@/components/ui/table";
 import { Button } from "@/components/ui/button";
 import { ArrowUpDown, Edit2, Trash } from "lucide-react";
-import axios from "axios";
 import { toast } from "@/hooks/use-toast";
 import {
     Dialog,
@@ -20,6 +19,7 @@ import {
     DialogFooter,
 } from "@/components/ui/dialog";
 import { Label } from "@/components/ui/label";
+import apiClient from "@/lib/api";
 
 
 interface Ground {
@@ -34,7 +34,28 @@ interface Ground {
     science: string;
 }
 
+interface ValidationErrors {
+    lat?: string;
+    lon?: string;
+    height?: string;
+    mask?: string;
+    science?: string;
+    downlink?: string;
+    uplink?: string;
+}
+
 type SortableColumn = 'name' | 'lat' | 'lon' | 'height' | 'mask' | 'uplink' | 'downlink' | 'science';
+
+// Helper function to extract error messages from API responses
+function getApiErrorMessage(err: unknown, defaultMessage: string = "An error occurred."): string {
+    if (err && typeof err === 'object' && 'response' in err && 
+        err.response && typeof err.response === 'object' && 
+        'data' in err.response && err.response.data && 
+        typeof err.response.data === 'object' && 'detail' in err.response.data) {
+        return err.response.data.detail as string;
+    }
+    return defaultMessage;
+}
 
 const GroundGeneral: React.FC = () => {
     const [searchTerm, setSearchTerm] = useState("");
@@ -46,19 +67,21 @@ const GroundGeneral: React.FC = () => {
     const [error, setError] = useState<string | null>(null);
     const [editingGround, setEditingGround] = useState<Ground | null>(null);
     const [isEditDialogOpen, setIsEditDialogOpen] = useState(false);
+    const [validationErrors, setValidationErrors] = useState<ValidationErrors>({});
 
     useEffect(() => {
         const fetchGroundStations = async () => {
             setLoading(true);
             try {
-                const response = await axios.get<Ground[]>("/api/v1/gs/");
+                const response = await apiClient.get<Ground[]>("/api/v1/gs/");
                 setGrounds(response.data);
             } catch (err) {
-                setError("Failed to fetch ground stations.");
+                const errorMessage = getApiErrorMessage(err, "Failed to fetch ground stations.");
+                setError(errorMessage);
                 console.error(err);
                 toast({
-                    title: "Error: " + err,
-                    description: "There was an error fetching from the API. Please try again.",
+                    title: "Error fetching ground stations",
+                    description: errorMessage,
                     variant: "destructive",
                     duration: 5000,
                 });
@@ -81,13 +104,68 @@ const GroundGeneral: React.FC = () => {
     const handleEdit = (ground: Ground) => {
         setEditingGround({ ...ground });
         setIsEditDialogOpen(true);
+        setValidationErrors({});
+    };
+
+    const validateForm = (): boolean => {
+        if (!editingGround) return false;
+        
+        const errors: ValidationErrors = {};
+        
+        // Validate latitude (-90 to 90)
+        const lat = parseFloat(editingGround.lat);
+        if (isNaN(lat) || lat < -90 || lat > 90) {
+            errors.lat = "Latitude must be between -90 and 90";
+        }
+        
+        // Validate longitude (-180 to 180)
+        const lon = parseFloat(editingGround.lon);
+        if (isNaN(lon) || lon < -180 || lon > 180) {
+            errors.lon = "Longitude must be between -180 and 180";
+        }
+        
+        // Validate height (positive)
+        const height = parseFloat(editingGround.height);
+        if (isNaN(height) || height <= 0) {
+            errors.height = "Height must be a positive number";
+        }
+        
+        // Validate mask (non-negative)
+        if (editingGround.mask < 0) {
+            errors.mask = "Mask must be at least 0";
+        }
+        
+        // Validate science (positive)
+        const science = parseFloat(editingGround.science);
+        if (isNaN(science) || science <= 0) {
+            errors.science = "Science data rate must be a positive number";
+        }
+        
+        // Validate downlink and uplink are numbers
+        const downlink = parseFloat(editingGround.downlink);
+        if (isNaN(downlink)) {
+            errors.downlink = "Downlink must be a number";
+        }
+        
+        const uplink = parseFloat(editingGround.uplink);
+        if (isNaN(uplink)) {
+            errors.uplink = "Uplink must be a number";
+        }
+        
+        setValidationErrors(errors);
+        return Object.keys(errors).length === 0;
     };
 
     const handleSaveEdit = async () => {
         if (!editingGround) return;
+        
+        // Validate the form before submitting
+        if (!validateForm()) {
+            return;
+        }
 
         try {
-            await axios.patch(`/api/v1/gs/${editingGround.id}`, editingGround);
+           await apiClient.patch(`/api/v1/gs/${editingGround.id}`, editingGround);
 
             // Update the local state
             setGrounds((prev) =>
@@ -99,6 +177,7 @@ const GroundGeneral: React.FC = () => {
             toast({
                 title: "Ground Station updated successfully.",
                 description: `Ground Station "${editingGround.name}" was updated.`,
+                variant: "success",
             });
 
             // Close the edit dialog
@@ -107,11 +186,8 @@ const GroundGeneral: React.FC = () => {
         } catch (err) {
             console.error(err);
             
-            // Check if it's an axios error with a response
-            const errorMessage = axios.isAxiosError(err) && err.response?.data?.detail 
-                ? err.response.data.detail 
-                : "There was an error updating the ground station.";
-
+            const errorMessage = getApiErrorMessage(err, "There was an error updating the ground station.");
+                
             toast({
                 title: "Error updating ground station.",
                 description: errorMessage,
@@ -127,18 +203,17 @@ const GroundGeneral: React.FC = () => {
         if (!confirmDelete) return;
 
         try {
-            await axios.delete(`/api/v1/gs/${groundId}`);
+            await apiClient.delete(`/api/v1/gs/${groundId}`);
             setGrounds((prev) => prev.filter((ground) => ground.id !== groundId));
             toast({
                 title: "Ground Station deleted successfully.",
+                variant: "success",
             });
         } catch (err) {
             console.error(err);
-            // Check if it's an axios error with a response
-            const errorMessage = axios.isAxiosError(err) && err.response?.data?.detail 
-                ? err.response.data.detail 
-                : "There was an error deleting the ground station.";
-
+            
+            const errorMessage = getApiErrorMessage(err, "There was an error deleting the ground station.");
+        
             toast({
                 title: "Error deleting ground station.",
                 description: errorMessage,
@@ -211,6 +286,23 @@ const GroundGeneral: React.FC = () => {
     const formatValue = (value: any) => {
         if (value === undefined || value === null) return "-";
         return value.toString();
+    };
+
+    const handleFieldChange = (field: keyof Ground, value: string | number) => {
+        if (!editingGround) return;
+        
+        setEditingGround({
+            ...editingGround,
+            [field]: value
+        });
+        
+        // Clear validation error for this field
+        if (validationErrors[field as keyof ValidationErrors]) {
+            setValidationErrors({
+                ...validationErrors,
+                [field]: undefined
+            });
+        }
     };
 
     return (
@@ -327,10 +419,7 @@ const GroundGeneral: React.FC = () => {
                                 <Input
                                     id="name"
                                     value={editingGround.name}
-                                    onChange={(e) => setEditingGround({
-                                        ...editingGround,
-                                        name: e.target.value
-                                    })}
+                                    onChange={(e) => handleFieldChange('name', e.target.value)}
                                     className="col-span-3"
                                 />
                             </div>
@@ -339,106 +428,140 @@ const GroundGeneral: React.FC = () => {
                                 <Label htmlFor="lat" className="text-right">
                                     Latitude
                                 </Label>
-                                <Input
-                                    id="lat"
-                                    value={editingGround.lat}
-                                    onChange={(e) => setEditingGround({
-                                        ...editingGround,
-                                        lat: e.target.value
-                                    })}
-                                    className="col-span-3"
-                                />
+                                <div className="col-span-3">
+                                    <Input
+                                        id="lat"
+                                        type="number"
+                                        step="any"
+                                        min="-90"
+                                        max="90"
+                                        value={editingGround.lat}
+                                        onChange={(e) => handleFieldChange('lat', e.target.value)}
+                                        className={validationErrors.lat ? "border-red-500" : ""}
+                                    />
+                                    {validationErrors.lat && (
+                                        <p className="text-red-500 text-sm mt-1">{validationErrors.lat}</p>
+                                    )}
+                                </div>
                             </div>
 
                             <div className="grid grid-cols-4 items-center gap-4">
                                 <Label htmlFor="lon" className="text-right">
                                     Longitude
                                 </Label>
-                                <Input
-                                    id="lon"
-                                    value={editingGround.lon}
-                                    onChange={(e) => setEditingGround({
-                                        ...editingGround,
-                                        lon: e.target.value
-                                    })}
-                                    className="col-span-3"
-                                />
+                                <div className="col-span-3">
+                                    <Input
+                                        id="lon"
+                                        type="number"
+                                        step="any"
+                                        min="-180"
+                                        max="180"
+                                        value={editingGround.lon}
+                                        onChange={(e) => handleFieldChange('lon', e.target.value)}
+                                        className={validationErrors.lon ? "border-red-500" : ""}
+                                    />
+                                    {validationErrors.lon && (
+                                        <p className="text-red-500 text-sm mt-1">{validationErrors.lon}</p>
+                                    )}
+                                </div>
                             </div>
 
                             <div className="grid grid-cols-4 items-center gap-4">
                                 <Label htmlFor="height" className="text-right">
                                     Height
                                 </Label>
-                                <Input
-                                    id="height"
-                                    value={editingGround.height}
-                                    onChange={(e) => setEditingGround({
-                                        ...editingGround,
-                                        height: e.target.value
-                                    })}
-                                    className="col-span-3"
-                                />
+                                <div className="col-span-3">
+                                    <Input
+                                        id="height"
+                                        type="number"
+                                        step="any"
+                                        min="0.1"
+                                        value={editingGround.height}
+                                        onChange={(e) => handleFieldChange('height', e.target.value)}
+                                        className={validationErrors.height ? "border-red-500" : ""}
+                                    />
+                                    {validationErrors.height && (
+                                        <p className="text-red-500 text-sm mt-1">{validationErrors.height}</p>
+                                    )}
+                                </div>
                             </div>
 
                             <div className="grid grid-cols-4 items-center gap-4">
                                 <Label htmlFor="mask" className="text-right">
                                     Mask
                                 </Label>
-                                <Input
-                                    id="mask"
-                                    type="number"
-                                    value={editingGround.mask}
-                                    onChange={(e) => setEditingGround({
-                                        ...editingGround,
-                                        mask: Number(e.target.value)
-                                    })}
-                                    className="col-span-3"
-                                />
+                                <div className="col-span-3">
+                                    <Input
+                                        id="mask"
+                                        type="number"
+                                        step="any"
+                                        min="0"
+                                        value={editingGround.mask}
+                                        onChange={(e) => handleFieldChange('mask', Number(e.target.value))}
+                                        className={validationErrors.mask ? "border-red-500" : ""}
+                                    />
+                                    {validationErrors.mask && (
+                                        <p className="text-red-500 text-sm mt-1">{validationErrors.mask}</p>
+                                    )}
+                                </div>
                             </div>
 
                             <div className="grid grid-cols-4 items-center gap-4">
                                 <Label htmlFor="uplink" className="text-right">
                                     Uplink
                                 </Label>
-                                <Input
-                                    id="uplink"
-                                    value={editingGround.uplink}
-                                    onChange={(e) => setEditingGround({
-                                        ...editingGround,
-                                        uplink: e.target.value
-                                    })}
-                                    className="col-span-3"
-                                />
+                                <div className="col-span-3">
+                                    <Input
+                                        id="uplink"
+                                        type="number"
+                                        step="any"
+                                        value={editingGround.uplink}
+                                        onChange={(e) => handleFieldChange('uplink', e.target.value)}
+                                        className={validationErrors.uplink ? "border-red-500" : ""}
+                                    />
+                                    {validationErrors.uplink && (
+                                        <p className="text-red-500 text-sm mt-1">{validationErrors.uplink}</p>
+                                    )}
+                                </div>
                             </div>
 
                             <div className="grid grid-cols-4 items-center gap-4">
                                 <Label htmlFor="downlink" className="text-right">
                                     Downlink
                                 </Label>
-                                <Input
-                                    id="downlink"
-                                    value={editingGround.downlink}
-                                    onChange={(e) => setEditingGround({
-                                        ...editingGround,
-                                        downlink: e.target.value
-                                    })}
-                                    className="col-span-3"
-                                />
+                                <div className="col-span-3">
+                                    <Input
+                                        id="downlink"
+                                        type="number"
+                                        step="any"
+                                        value={editingGround.downlink}
+                                        onChange={(e) => handleFieldChange('downlink', e.target.value)}
+                                        className={validationErrors.downlink ? "border-red-500" : ""}
+                                    />
+                                    {validationErrors.downlink && (
+                                        <p className="text-red-500 text-sm mt-1">{validationErrors.downlink}</p>
+                                    )}
+                                </div>
                             </div>
 
                             <div className="grid grid-cols-4 items-center gap-4">
                                 <Label htmlFor="science" className="text-right">
                                     Science
                                 </Label>
-                                <Input
-                                    id="science"
-                                    value={editingGround.science}
-                                    onChange={(e) => setEditingGround({
-                                        ...editingGround,
-                                        science: e.target.value
-                                    })}
-                                    className="col-span-3"
-                                />
+                                <div className="col-span-3">
+                                    <Input
+                                        id="science"
+                                        type="number"
+                                        step="any"
+                                        min="0.1"
+                                        value={editingGround.science}
+                                        onChange={(e) => handleFieldChange('science', e.target.value)}
+                                        className={validationErrors.science ? "border-red-500" : ""}
+                                    />
+                                    {validationErrors.science && (
+                                        <p className="text-red-500 text-sm mt-1">{validationErrors.science}</p>
+                                    )}
+                                </div>
                             </div>
                         </div>
                     )}
@@ -449,6 +572,7 @@ const GroundGeneral: React.FC = () => {
                             onClick={() => {
                                 setIsEditDialogOpen(false);
                                 setEditingGround(null);
+                                setValidationErrors({});
                             }}
                         >
                             Cancel

@@ -91,7 +91,7 @@ const data: Data = {
         },
         {
             title: "Ground Station",  
-            url: "/ground",  
+            url: "/ground-station",  
             isActive: true,         
             icon: Globe,         
         },
