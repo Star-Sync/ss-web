@@ -342,15 +342,15 @@ const GroundGeneral: React.FC = () => {
                                             onClick={() =>
                                                 handleSort(key as SortableColumn)
                                             }
-                                            className="p-0 hover:bg-transparent flex items-center"
+                                            className="p-0 hover:bg-transparent"
                                         >
                                             {label}
                                             <ArrowUpDown className="ml-2 h-4 w-4" />
-                                            {/* {sortConfig?.key === key && (
+                                            {sortConfig?.key === key && (
                                                 <span className="ml-1">
                                                     {sortConfig.direction === "asc" ? "↑" : "↓"}
                                                 </span>
-                                            )} */}
+                                            )}
                                         </Button>
                                     ) : (
                                         label
@@ -388,13 +388,6 @@ const GroundGeneral: React.FC = () => {
                                         >
                                             <Edit2 className="h-4 w-4" />
                                         </Button>
-                                        <Button
-                                            variant="destructive"
-                                            size="sm"
-                                            onClick={() => handleDelete(ground.id)}
-                                        >
-                                            <Trash className="h-4 w-4" />
-                                        </Button>
                                     </TableCell>
                                 </TableRow>
                             ))
@@ -411,7 +404,7 @@ const GroundGeneral: React.FC = () => {
                     </DialogHeader>
 
                     {editingGround && (
-                        <div className="grid gap-4 py-4 ">
+                        <div className="grid gap-4 py-4">
                             <div className="grid grid-cols-4 items-center gap-4">
                                 <Label htmlFor="name" className="text-right">
                                     Name
@@ -567,6 +560,21 @@ const GroundGeneral: React.FC = () => {
                     )}
 
                     <DialogFooter>
+                        <Button
+                            className="mr-[5vw]"
+                            variant="destructive"
+                            onClick={() => {
+                                const confirmDelete = window.confirm(
+                                    "Are you sure you want to delete this ground station?"
+                                );
+                                if (confirmDelete && editingGround) {
+                                    handleDelete(editingGround.id);
+                                    setIsEditDialogOpen(false);
+                                }
+                            }}
+                        >
+                            <Trash className="h-4" />
+                        </Button>
                         <Button
                             variant="outline"
                             onClick={() => {
