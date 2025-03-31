@@ -10,7 +10,6 @@ import {
 } from "@/components/ui/table";
 import { Button } from "@/components/ui/button";
 import { ArrowUpDown, Edit2, Trash } from "lucide-react";
-import axios from "axios";
 import { toast } from "@/hooks/use-toast";
 import {
   Dialog,
@@ -20,6 +19,7 @@ import {
   DialogFooter,
 } from "@/components/ui/dialog";
 import { Label } from "@/components/ui/label";
+import apiClient from "@/lib/api";
 
 interface ExclusionCone {
   id: string;
@@ -30,13 +30,19 @@ interface ExclusionCone {
   gs_id: number;
 }
 
-type SortableColumn = "mission" | "angle_limit" | "interfering_satellite" | "satellite_id" | "gs_id";
+type SortableColumn =
+  | "mission"
+  | "angle_limit"
+  | "interfering_satellite"
+  | "satellite_id"
+  | "gs_id";
 
 const ExclusionGeneral: React.FC = () => {
   const [searchTerm, setSearchTerm] = useState("");
-  const [sortConfig, setSortConfig] = useState<
-    { key: SortableColumn; direction: "asc" | "desc" } | null
-  >(null);
+  const [sortConfig, setSortConfig] = useState<{
+    key: SortableColumn;
+    direction: "asc" | "desc";
+  } | null>(null);
   const [exCones, setExCones] = useState<ExclusionCone[]>([]);
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState<string | null>(null);
@@ -47,7 +53,8 @@ const ExclusionGeneral: React.FC = () => {
     const fetchExclusionCones = async () => {
       setLoading(true);
       try {
-        const response = await axios.get<ExclusionCone[]>("/api/v1/excones/");
+        const response =
+          await apiClient.get<ExclusionCone[]>("/api/v1/excones/");
         const processedData = response.data.map((cone) => ({
           ...cone,
           angle_limit: Number(cone.angle_limit),
@@ -74,7 +81,11 @@ const ExclusionGeneral: React.FC = () => {
 
   const handleSort = (key: SortableColumn) => {
     let direction: "asc" | "desc" = "asc";
-    if (sortConfig && sortConfig.key === key && sortConfig.direction === "asc") {
+    if (
+      sortConfig &&
+      sortConfig.key === key &&
+      sortConfig.direction === "asc"
+    ) {
       direction = "desc";
     }
     setSortConfig({ key, direction });
@@ -89,7 +100,7 @@ const ExclusionGeneral: React.FC = () => {
     if (!editingCone) return;
 
     try {
-      await axios.patch(`/api/v1/excones/${editingCone.id}`, editingCone);
+      await apiClient.patch(`/api/v1/excones/${editingCone.id}`, editingCone);
       setExCones((prev) =>
         prev.map((cone) => (cone.id === editingCone.id ? editingCone : cone))
       );
@@ -118,7 +129,7 @@ const ExclusionGeneral: React.FC = () => {
     if (!confirmDelete) return;
 
     try {
-      await axios.delete(`/api/v1/excones/${coneId}`);
+      await apiClient.delete(`/api/v1/excones/${coneId}`);
       setExCones((prev) => prev.filter((cone) => cone.id !== coneId));
       toast({
         title: "Exclusion cone deleted successfully.",
@@ -127,7 +138,8 @@ const ExclusionGeneral: React.FC = () => {
       console.error(err);
       toast({
         title: "Error deleting exclusion cone.",
-        description: err instanceof Error ? err.message : "An unknown error occurred",
+        description:
+          err instanceof Error ? err.message : "An unknown error occurred",
         variant: "destructive",
       });
     }
@@ -300,10 +312,7 @@ const ExclusionGeneral: React.FC = () => {
               </div>
 
               <div className="grid grid-cols-4 items-center gap-4">
-                <Label
-                  htmlFor="interfering_satellite"
-                  className="text-right"
-                >
+                <Label htmlFor="interfering_satellite" className="text-right">
                   Interfering Satellite
                 </Label>
                 <Input
@@ -357,21 +366,21 @@ const ExclusionGeneral: React.FC = () => {
           )}
 
           <DialogFooter>
-          <Button
-          className="mr-[5vw]"
-            variant="destructive"
-            onClick={() => {
-              const confirmDelete = window.confirm(
-                "Are you sure you want to delete this exclusion cone?"
-              );
-              if (confirmDelete && editingCone) {
-                handleDelete(editingCone.id);
-                setIsEditDialogOpen(false);
-              }
-            }}
-          >
-          <Trash className="h-4" />
-          </Button>
+            <Button
+              className="mr-[5vw]"
+              variant="destructive"
+              onClick={() => {
+                const confirmDelete = window.confirm(
+                  "Are you sure you want to delete this exclusion cone?"
+                );
+                if (confirmDelete && editingCone) {
+                  handleDelete(editingCone.id);
+                  setIsEditDialogOpen(false);
+                }
+              }}
+            >
+              <Trash className="h-4" />
+            </Button>
             <Button
               variant="outline"
               onClick={() => {
