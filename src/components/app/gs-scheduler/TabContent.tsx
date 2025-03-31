@@ -1,15 +1,13 @@
 import React, { FC } from "react";
 import { motion } from "framer-motion";
-import {Location } from "@/api/gs-locations";
 import { Tab } from "./TabNav";
 
 interface TabContentProps {
     tabs: Tab[];
     activeTabId: string;
-    selectedLocation: Location;
 }
 
-const TabContent: FC<TabContentProps> = ({ tabs, activeTabId, selectedLocation }) => {
+const TabContent: FC<TabContentProps> = ({ tabs, activeTabId }) => {
     return (
         <div className="flex-grow relative">
             {tabs.map((tab) => (
@@ -24,7 +22,7 @@ const TabContent: FC<TabContentProps> = ({ tabs, activeTabId, selectedLocation }
                     transition={{ duration: 0.3 }}
                     style={{ width: "100%", height: "100%" }}
                 >
-                    {tab.content(selectedLocation)}
+                    {tab.content()}
                 </motion.div>
             ))}
         </div>

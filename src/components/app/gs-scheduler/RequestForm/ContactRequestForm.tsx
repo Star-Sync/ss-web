@@ -1,11 +1,10 @@
-import React, { useEffect } from "react";
+import React, { useEffect, useState } from "react";
 import { Controller, FormProvider, useForm } from "react-hook-form";
 import { Button } from "@/components/ui/button";
 import { zodResolver } from "@hookform/resolvers/zod";
 import "react-datepicker/dist/react-datepicker.css";
 import { Separator } from "@/components/ui/separator";
 import { TimePickerField } from "@/components/ui/wrapper/timepickerfield";
-import { locations } from "@/api/gs-locations";
 import FormFieldWrapper from "@/components/ui/wrapper/formfieldwrapper";
 import CheckboxFieldWrapper from "@/components/ui/wrapper/checkboxfieldwrapper";
 import {
@@ -13,34 +12,52 @@ import {
   ContactRequestFormData,
 } from "./ContactRequestFormSchema";
 import Combobox from "@/components/ui/combobox";
-import { satellites } from "@/api/gs-satellites";
+import { getSatellites, Satellite } from "@/api/gs-satellites";
+import { getLocations, Location } from "@/api/gs-locations";
 import { formatToISOString } from "@/lib/formatToISOString";
 import apiClient from "@/lib/api";
 import { toast } from "@/hooks/use-toast";
 
-interface ContactRequestFormProps {
-  location: (typeof locations)[0];
-}
 
-const satelliteOptions = satellites
-  .filter((sat) => sat.satellite_id && sat.label)
-  .map((sat) => ({
-    value: sat.satellite_id.toString(),
-    label: sat.label,
-  }));
 
-const ContactRequestForm: React.FC<ContactRequestFormProps> = ({
-  location,
-}) => {
-  useEffect(() => {
-    console.log("ContactRequestForm: Location updated to", location.label);
-  }, [location]);
+const ContactRequestForm = ({ }) => {
+   const [groundStations, setGroundStations] = useState<Location[]>([]);
+   const [satellites, setSatellites] = useState<Satellite[]>([]);
+   
+    // Transform ground stations into combobox format
+    const groundStationOptions = groundStations.map((station) => ({
+      value: station.id.toString(),
+      label: station.name,
+    }));
+
+    const satelliteOptions = satellites.map((sat) => ({
+      value: sat.id.toString(),
+      label: sat.name,
+    }));
+  
+    useEffect(() => {
+      const fetchGroundStations = async () => {
+        const stations = await getLocations();
+        setGroundStations(stations);
+      };
+      fetchGroundStations();
+    }, []);
+
+    useEffect(() => {
+      const fetchSatellites = async () => {
+        const sats = await getSatellites();
+        setSatellites(sats);
+      };
+      fetchSatellites();
+    }
+, []);
 
   const form = useForm<ContactRequestFormData>({
     resolver: zodResolver(ContactRequestFormSchema),
     defaultValues: {
       missionName: "",
-      satelliteId: satelliteOptions[0]?.value || "",
+      satelliteId: "",
+      station_id: "",
       orbit: 0,
       uplink: false,
       telemetry: false,
@@ -59,7 +76,6 @@ const ContactRequestForm: React.FC<ContactRequestFormProps> = ({
       rfOnTime: formatToISOString(values.rfOnTime),
       rfOffTime: formatToISOString(values.rfOffTime),
       losTime: formatToISOString(values.losTime),
-      location: location.label,
     };
     // Send the request to the backend using apiClient
     try {
@@ -82,7 +98,9 @@ const ContactRequestForm: React.FC<ContactRequestFormProps> = ({
           "There was an error submitting the contact request. Please try again.",
         variant: "destructive",
         duration: 5000,
+        
       });
+      console.log(payload);
     }
   };
 
@@ -104,7 +122,24 @@ const ContactRequestForm: React.FC<ContactRequestFormProps> = ({
               />
             )}
           />
+                  {/* Ground Station Combobox */}
+                  <div className="grid grid-cols-1 md:grid-cols-2 gap-4 max-w-[25vw]">
+                    <Controller
+                      name="station_id"
+                      control={form.control}
+                      render={({ field }) => (
+                        <Combobox
+                          items={groundStationOptions}
+                          value={field.value}
+                          onChange={field.onChange}
+                          placeholder="Select a Ground Station"
+                          className="text-black"
+                        />
+                      )}
+                    />
+                  </div>
         </div>
+        
 
         <Separator className="max-w-[50vw]" />
 
@@ -159,8 +194,6 @@ const ContactRequestForm: React.FC<ContactRequestFormProps> = ({
         </div>
 
         <Separator className="max-w-[50vw]" />
-
-        <p className="text-sm text-gray-600">Location: {location.label}</p>
 
         {/* Submit Button */}
         <Button type="submit" className="w-full md:w-auto">
