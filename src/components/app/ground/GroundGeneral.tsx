@@ -56,8 +56,8 @@ const GroundGeneral: React.FC = () => {
                 setError(errorMessage);
                 console.error(err);
                 toast({
-                    title: "Error: " + err,
-                    description: "There was an error fetching from the API. Please try again.",
+                    title: "Error",
+                    description: errorMessage,
                     variant: "destructive",
                     duration: 5000,
                 });
@@ -167,7 +167,7 @@ const GroundGeneral: React.FC = () => {
                 
             toast({
                 title: "Error updating ground station.",
-                description: "There was an error updating the ground station.",
+                description: errorMessage,
                 variant: "destructive",
                 duration: 5000,
             });
@@ -194,7 +194,7 @@ const GroundGeneral: React.FC = () => {
         
             toast({
                 title: "Error deleting ground station.",
-                description: "There was an error deleting the ground station.",
+                description: errorMessage,
                 variant: "destructive",
                 duration: 5000,
             });
