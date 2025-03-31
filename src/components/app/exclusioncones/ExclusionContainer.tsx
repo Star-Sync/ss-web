@@ -12,7 +12,7 @@ const ExclusionContainer: FC = () => {
         {
             id: "overview",
             name: "Overview",
-            content: <ExclusionGeneral/>,
+            content: () => <ExclusionGeneral/>,
             isPinned: true,
         },
     ]);
@@ -25,7 +25,7 @@ const ExclusionContainer: FC = () => {
         const newTab: Tab = {
             id: newTabId,
             name: `Form ${tabCounter.current}`,
-            content: <FormManager key={newTabId}/>,
+            content: () => <FormManager key={newTabId}/>,
         };
         setTabs((prevTabs) => [...prevTabs, newTab]);
         setActiveTabId(newTabId);
@@ -44,8 +44,8 @@ const ExclusionContainer: FC = () => {
     };
 
     return (
-        <MotionWrapper className="w-full h-full flex flex-col bg-gray-50 p-6">
-            <div className="bg-white rounded-xl p-6 shadow-lg flex flex-col h-full overflow-hidden">
+        <MotionWrapper className="flex flex-col p-6">
+            <div className="rounded-xl p-6 shadow-lg bg-white">
                 <HeaderSection />
                 <TabNav
                     tabs={tabs}

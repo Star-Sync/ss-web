@@ -3,8 +3,8 @@ import { Tab } from "./TabNav";
 import MotionWrapper from "../MotionWrapper";
 import Scheduler from "@/components/app/gs-scheduler/Scheduler";
 import RequestForm from "./RequestForm/RequestForm";
-import TabNav from "./TabNav";
-import TabContent from "./TabContent";
+import TabNav from "@/components/ui/tab/TabNav";
+import TabContent from "@/components/ui/tab/TabContent";
 import HeaderSection from "./HeaderSection";
 
 const GSContainer: FC = () => {
@@ -44,8 +44,8 @@ const GSContainer: FC = () => {
     };
 
     return (
-        <MotionWrapper className="w-full h-full flex flex-col bg-gray-50 p-6">
-            <div className="bg-white rounded-xl p-6 shadow-lg flex flex-col h-full overflow-hidden">
+        <MotionWrapper className="flex flex-col p-6">
+            <div className="rounded-xl p-6 shadow-lg bg-white">
                 <HeaderSection />
                 <TabNav
                     tabs={tabs}

@@ -12,8 +12,8 @@ interface TabNavProps {
 export interface Tab {
     id: string;
     name: string;
+    content: () => React.ReactElement;
     isPinned?: boolean;
-    content: React.ReactElement;
 }
 
 const TabNav: FC<TabNavProps> = ({ tabs, activeTabId, setActiveTabId, addNewTab, closeTab }) => {
@@ -47,7 +47,7 @@ const TabNav: FC<TabNavProps> = ({ tabs, activeTabId, setActiveTabId, addNewTab,
                 onClick={addNewTab}
                 className="flex items-center px-4 py-2 text-gray-500 hover:text-blue-500 border-b-2 border-transparent"
             >
-                <Plus className="h-4 w-4 mr-1" /> New Form
+                <Plus className="h-4 w-4 mr-1" /> New Request
             </button>
         </div>
     );
