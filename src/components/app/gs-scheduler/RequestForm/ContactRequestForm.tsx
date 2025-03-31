@@ -12,8 +12,8 @@ import {
   ContactRequestFormData,
 } from "./ContactRequestFormSchema";
 import Combobox from "@/components/ui/combobox";
-import { getSatellites, Satellite } from "@/api/gs-satellites";
-import { getLocations, Location } from "@/api/gs-locations";
+import { getSatellitesSafe, Satellite } from "@/api/satellites";
+import { getGroundStationsSafe, Ground } from "@/api/ground-stations";
 import { formatToISOString } from "@/lib/formatToISOString";
 import apiClient from "@/lib/api";
 import { toast } from "@/hooks/use-toast";
@@ -21,7 +21,7 @@ import { toast } from "@/hooks/use-toast";
 
 
 const ContactRequestForm = ({ }) => {
-   const [groundStations, setGroundStations] = useState<Location[]>([]);
+   const [groundStations, setGroundStations] = useState<Ground[]>([]);
    const [satellites, setSatellites] = useState<Satellite[]>([]);
    
     // Transform ground stations into combobox format
@@ -37,7 +37,7 @@ const ContactRequestForm = ({ }) => {
   
     useEffect(() => {
       const fetchGroundStations = async () => {
-        const stations = await getLocations();
+        const stations = await getGroundStationsSafe();
         setGroundStations(stations);
       };
       fetchGroundStations();
@@ -45,7 +45,7 @@ const ContactRequestForm = ({ }) => {
 
     useEffect(() => {
       const fetchSatellites = async () => {
-        const sats = await getSatellites();
+        const sats = await getSatellitesSafe();
         setSatellites(sats);
       };
       fetchSatellites();

@@ -3,7 +3,6 @@ import { useForm, FormProvider } from "react-hook-form";
 import { zodResolver } from "@hookform/resolvers/zod";
 import { Button } from "@/components/ui/button";
 import { Separator } from "@/components/ui/separator";
-import axios from "axios";
 import { toast } from "@/hooks/use-toast";
 import {
   ExclusionFormSchema,
@@ -11,6 +10,9 @@ import {
 } from "@/components/app/exclusioncones/Form/ExclusionFormSchema";
 import FormFieldWrapper from "@/components/ui/wrapper/formfieldwrapper";
 import FormCombobox, { Option } from "@/components/ui/wrapper/comboboxwrapper";
+import { getSatellitesSafe } from "@/api/satellites";
+import { getGroundStationsSafe } from "@/api/ground-stations";
+import { createExclusionCone } from "@/api/exclusion-cones";
 
 const ExclusionForm: React.FC = () => {
   const form = useForm<ExclusionFormData>({
@@ -31,13 +33,8 @@ const ExclusionForm: React.FC = () => {
   useEffect(() => {
     async function fetchSatellites() {
       try {
-        const response = await axios.get(
-          process.env.NEXT_PUBLIC_API_URL + "/api/v1/satellites"
-        );
-        // Map the API response so that:
-        // - value is set to the satellite's "id"
-        // - label is set to the satellite's "name"
-        const options = response.data.map((sat: any) => ({
+        const satellites = await getSatellitesSafe();
+        const options = satellites.map((sat) => ({
           value: sat.id,
           label: `${sat.name} (${sat.id.slice(0, 5) + "..."})`
         }));
@@ -52,13 +49,8 @@ const ExclusionForm: React.FC = () => {
   useEffect(() => {
     async function fetchGroundStations() {
       try {
-        const response = await axios.get(
-          process.env.NEXT_PUBLIC_API_URL + "/api/v1/gs"
-        );
-        // Map the API response so that:
-        // - value is set to the ground station's "id" (converted to a string)
-        // - label is set to the ground station's "name"
-        const options = response.data.map((gs: any) => ({
+        const groundStations = await getGroundStationsSafe();
+        const options = groundStations.map((gs) => ({
           value: String(gs.id),
           label: gs.name,
         }));
@@ -71,36 +63,20 @@ const ExclusionForm: React.FC = () => {
   }, []);
 
   const onSubmit = async (values: ExclusionFormData) => {
-    // The payload will have the following structure:
-    // {
-    //   mission: "SCISAT",
-    //   angle_limit: 5,
-    //   interfering_satellite: "OTHER SAT",
-    //   satellite_id: "bd9aa11b-4502-4f2c-958d-140ccb750d96",
-    //   gs_id: 1
-    // }
-    const payload = { ...values };
-
-    console.log("Validated values:", values);
-
     try {
-      const response = await axios.post(
-        process.env.NEXT_PUBLIC_API_URL + "/api/v1/excones/",
-        payload
-      );
-      console.log("Successfully submitted:", response.data);
+      await createExclusionCone(values);
       toast({
         title: "Submission Success",
         description: "Exclusion cone successfully created!",
         variant: "success",
         duration: 5000,
       });
-      // Optionally reset the form.
+      // Reset the form
       form.reset();
     } catch (error) {
       console.error("Error submitting exclusion cone:", error);
       toast({
-        title: "Submission Error: " + error,
+        title: "Submission Error",
         description: "Failed to create exclusion cone!",
         variant: "destructive",
         duration: 5000,

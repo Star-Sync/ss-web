@@ -10,7 +10,6 @@ import {
 } from "@/components/ui/table";
 import { Button } from "@/components/ui/button";
 import { ArrowUpDown, Edit2, Trash } from "lucide-react";
-import axios from "axios";
 import { toast } from "@/hooks/use-toast";
 import {
   Dialog,
@@ -20,15 +19,7 @@ import {
   DialogFooter,
 } from "@/components/ui/dialog";
 import { Label } from "@/components/ui/label";
-
-interface ExclusionCone {
-  id: string;
-  mission: string;
-  angle_limit: number;
-  interfering_satellite: string;
-  satellite_id: string;
-  gs_id: number;
-}
+import { ExclusionCone, getExclusionCones, updateExclusionCone, deleteExclusionCone } from "@/api/exclusion-cones";
 
 type SortableColumn = "mission" | "angle_limit" | "interfering_satellite" | "satellite_id" | "gs_id";
 
@@ -47,13 +38,8 @@ const ExclusionGeneral: React.FC = () => {
     const fetchExclusionCones = async () => {
       setLoading(true);
       try {
-        const response = await axios.get<ExclusionCone[]>("/api/v1/excones/");
-        const processedData = response.data.map((cone) => ({
-          ...cone,
-          angle_limit: Number(cone.angle_limit),
-          gs_id: Number(cone.gs_id),
-        }));
-        setExCones(processedData);
+        const data = await getExclusionCones();
+        setExCones(data);
       } catch (err) {
         setError("Failed to fetch exclusion cones.");
         console.error(err);
@@ -89,9 +75,9 @@ const ExclusionGeneral: React.FC = () => {
     if (!editingCone) return;
 
     try {
-      await axios.patch(`/api/v1/excones/${editingCone.id}`, editingCone);
+      const updatedCone = await updateExclusionCone(editingCone.id, editingCone);
       setExCones((prev) =>
-        prev.map((cone) => (cone.id === editingCone.id ? editingCone : cone))
+        prev.map((cone) => (cone.id === editingCone.id ? updatedCone : cone))
       );
       toast({
         title: "Exclusion cone updated successfully.",
@@ -118,7 +104,7 @@ const ExclusionGeneral: React.FC = () => {
     if (!confirmDelete) return;
 
     try {
-      await axios.delete(`/api/v1/excones/${coneId}`);
+      await deleteExclusionCone(coneId);
       setExCones((prev) => prev.filter((cone) => cone.id !== coneId));
       toast({
         title: "Exclusion cone deleted successfully.",

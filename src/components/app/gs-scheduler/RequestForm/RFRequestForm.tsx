@@ -8,7 +8,7 @@ import { TimePickerField } from "@/components/ui/wrapper/timepickerfield";
 import FormFieldWrapper from "@/components/ui/wrapper/formfieldwrapper";
 import { RFRequestFormSchema, RFRequestFormData } from "./RFRequestFormSchema";
 import Combobox from "@/components/ui/combobox";
-import { getSatellites, Satellite } from "@/api/gs-satellites";
+import { getSatellitesSafe, Satellite } from "@/api/satellites";
 import apiClient from "@/lib/api";
 import { formatToISOString } from "@/lib/formatToISOString";
 import { toast } from "@/hooks/use-toast";
@@ -23,7 +23,7 @@ const RFRequestForm = () => {
 
    useEffect(() => {
         const fetchSatellites = async () => {
-          const sats = await getSatellites();
+          const sats = await getSatellitesSafe();
           setSatellites(sats);
         };
         fetchSatellites();

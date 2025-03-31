@@ -19,20 +19,7 @@ import {
     DialogFooter,
 } from "@/components/ui/dialog";
 import { Label } from "@/components/ui/label";
-import apiClient from "@/lib/api";
-
-
-interface Ground {
-    id: string;
-    name: string;
-    lat: string;
-    lon: string;
-    height: string;
-    mask: number;
-    uplink: string;
-    downlink: string;
-    science: string;
-}
+import { Ground, getGroundStations, updateGroundStation, deleteGroundStation, getApiErrorMessage } from "@/api/ground-stations";
 
 interface ValidationErrors {
     lat?: string;
@@ -45,17 +32,6 @@ interface ValidationErrors {
 }
 
 type SortableColumn = 'name' | 'lat' | 'lon' | 'height' | 'mask' | 'uplink' | 'downlink' | 'science';
-
-// Helper function to extract error messages from API responses
-function getApiErrorMessage(err: unknown, defaultMessage: string = "An error occurred."): string {
-    if (err && typeof err === 'object' && 'response' in err && 
-        err.response && typeof err.response === 'object' && 
-        'data' in err.response && err.response.data && 
-        typeof err.response.data === 'object' && 'detail' in err.response.data) {
-        return err.response.data.detail as string;
-    }
-    return defaultMessage;
-}
 
 const GroundGeneral: React.FC = () => {
     const [searchTerm, setSearchTerm] = useState("");
@@ -73,15 +49,15 @@ const GroundGeneral: React.FC = () => {
         const fetchGroundStations = async () => {
             setLoading(true);
             try {
-                const response = await apiClient.get<Ground[]>("/api/v1/gs/");
-                setGrounds(response.data);
+                const data = await getGroundStations();
+                setGrounds(data);
             } catch (err) {
                 const errorMessage = getApiErrorMessage(err, "Failed to fetch ground stations.");
                 setError(errorMessage);
                 console.error(err);
                 toast({
-                    title: "Error fetching ground stations",
-                    description: errorMessage,
+                    title: "Error: " + err,
+                    description: "There was an error fetching from the API. Please try again.",
                     variant: "destructive",
                     duration: 5000,
                 });
@@ -165,12 +141,12 @@ const GroundGeneral: React.FC = () => {
         }
 
         try {
-           await apiClient.patch(`/api/v1/gs/${editingGround.id}`, editingGround);
+            const updatedGround = await updateGroundStation(editingGround.id, editingGround);
 
             // Update the local state
             setGrounds((prev) =>
                 prev.map((ground) =>
-                    ground.id === editingGround.id ? editingGround : ground
+                    ground.id === editingGround.id ? updatedGround : ground
                 )
             );
 
@@ -178,6 +154,7 @@ const GroundGeneral: React.FC = () => {
                 title: "Ground Station updated successfully.",
                 description: `Ground Station "${editingGround.name}" was updated.`,
                 variant: "success",
+                duration: 5000,
             });
 
             // Close the edit dialog
@@ -190,8 +167,9 @@ const GroundGeneral: React.FC = () => {
                 
             toast({
                 title: "Error updating ground station.",
-                description: errorMessage,
+                description: "There was an error updating the ground station.",
                 variant: "destructive",
+                duration: 5000,
             });
         }
     };
@@ -203,11 +181,11 @@ const GroundGeneral: React.FC = () => {
         if (!confirmDelete) return;
 
         try {
-            await apiClient.delete(`/api/v1/gs/${groundId}`);
+            await deleteGroundStation(groundId);
             setGrounds((prev) => prev.filter((ground) => ground.id !== groundId));
             toast({
                 title: "Ground Station deleted successfully.",
-                variant: "success",
+                duration: 5000,
             });
         } catch (err) {
             console.error(err);
@@ -216,8 +194,9 @@ const GroundGeneral: React.FC = () => {
         
             toast({
                 title: "Error deleting ground station.",
-                description: errorMessage,
+                description: "There was an error deleting the ground station.",
                 variant: "destructive",
+                duration: 5000,
             });
         }
     };
