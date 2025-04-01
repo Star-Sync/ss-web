@@ -10,9 +10,9 @@ import {
 } from "@/components/app/exclusioncones/Form/ExclusionFormSchema";
 import FormFieldWrapper from "@/components/ui/wrapper/formfieldwrapper";
 import FormCombobox, { Option } from "@/components/ui/wrapper/comboboxwrapper";
-import { getSatellitesSafe } from "@/api/satellites";
-import { getGroundStationsSafe } from "@/api/ground-stations";
-import { createExclusionCone } from "@/api/exclusion-cones";
+import { getSatellitesSafe, getApiErrorMessage as getSatelliteApiErrorMessage } from "@/api/satellites";
+import { getGroundStationsSafe, getApiErrorMessage as getGroundStationApiErrorMessage } from "@/api/ground-stations";
+import { createExclusionCone, getApiErrorMessage } from "@/api/exclusion-cones";
 
 const ExclusionForm: React.FC = () => {
   const form = useForm<ExclusionFormData>({
@@ -41,6 +41,12 @@ const ExclusionForm: React.FC = () => {
         setSatelliteOptions(options);
       } catch (error) {
         console.error("Failed to fetch satellites", error);
+        toast({
+          title: "Error Loading Satellites",
+          description: getSatelliteApiErrorMessage(error, "Failed to load satellites. Please try again."),
+          variant: "destructive",
+          duration: 5000,
+        });
       }
     }
     fetchSatellites();
@@ -57,6 +63,12 @@ const ExclusionForm: React.FC = () => {
         setGroundStationOptions(options);
       } catch (error) {
         console.error("Failed to fetch ground stations", error);
+        toast({
+          title: "Error Loading Ground Stations",
+          description: getGroundStationApiErrorMessage(error, "Failed to load ground stations. Please try again."),
+          variant: "destructive",
+          duration: 5000,
+        });
       }
     }
     fetchGroundStations();
@@ -66,8 +78,8 @@ const ExclusionForm: React.FC = () => {
     try {
       await createExclusionCone(values);
       toast({
-        title: "Submission Success",
-        description: "Exclusion cone successfully created!",
+        title: "Success",
+        description: `Exclusion cone "${values.mission}" was successfully created`,
         variant: "success",
         duration: 5000,
       });
@@ -77,7 +89,7 @@ const ExclusionForm: React.FC = () => {
       console.error("Error submitting exclusion cone:", error);
       toast({
         title: "Submission Error",
-        description: "Failed to create exclusion cone!",
+        description: getApiErrorMessage(error, "Failed to create exclusion cone!"),
         variant: "destructive",
         duration: 5000,
       });

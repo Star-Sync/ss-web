@@ -7,7 +7,7 @@ import { Separator } from "@/components/ui/separator";
 import FormFieldWrapper from "@/components/ui/wrapper/formfieldwrapper";
 import { SatelliteFormSchema, SatelliteFormData } from "./SatelliteFormSchema";
 import { toast } from "@/hooks/use-toast";
-import { createSatellite } from "@/api/satellites";
+import { createSatellite, getApiErrorMessage } from "@/api/satellites";
 
 const SatelliteForm: React.FC = () => {
   const form = useForm<SatelliteFormData>({
@@ -36,7 +36,7 @@ const SatelliteForm: React.FC = () => {
       console.error("Error submitting satellite:", error);
       toast({
         title: "Submission Error",
-        description: "Failed to create satellite!",
+        description: getApiErrorMessage(error, "Failed to create satellite!"),
         variant: "destructive",
         duration: 5000,
       });

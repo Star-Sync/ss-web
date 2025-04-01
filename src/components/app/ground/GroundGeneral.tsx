@@ -185,6 +185,7 @@ const GroundGeneral: React.FC = () => {
             setGrounds((prev) => prev.filter((ground) => ground.id !== groundId));
             toast({
                 title: "Ground Station deleted successfully.",
+                variant: "success",
                 duration: 5000,
             });
         } catch (err) {

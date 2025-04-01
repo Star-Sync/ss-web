@@ -19,7 +19,7 @@ import {
   DialogFooter,
 } from "@/components/ui/dialog";
 import { Label } from "@/components/ui/label";
-import { ExclusionCone, getExclusionCones, updateExclusionCone, deleteExclusionCone } from "@/api/exclusion-cones";
+import { ExclusionCone, getExclusionCones, updateExclusionCone, deleteExclusionCone, getApiErrorMessage } from "@/api/exclusion-cones";
 
 type SortableColumn = "mission" | "angle_limit" | "interfering_satellite" | "satellite_id" | "gs_id";
 
@@ -41,12 +41,12 @@ const ExclusionGeneral: React.FC = () => {
         const data = await getExclusionCones();
         setExCones(data);
       } catch (err) {
-        setError("Failed to fetch exclusion cones.");
+        const errorMessage = getApiErrorMessage(err, "Failed to fetch exclusion cones.");
+        setError(errorMessage);
         console.error(err);
         toast({
-          title: "Error: " + err,
-          description:
-            "There was an error fetching from the API. Please try again.",
+          title: "Error",
+          description: errorMessage,
           variant: "destructive",
           duration: 5000,
         });
@@ -89,10 +89,12 @@ const ExclusionGeneral: React.FC = () => {
       setEditingCone(null);
     } catch (err) {
       console.error(err);
+      const errorMessage = getApiErrorMessage(err, "There was an error updating the exclusion cone.");
       toast({
-        title: "Error updating exclusion cone.",
-        description: "There was an error updating the exclusion cone.",
+        title: "Error updating exclusion cone",
+        description: errorMessage,
         variant: "destructive",
+        duration: 5000,
       });
     }
   };
@@ -108,13 +110,17 @@ const ExclusionGeneral: React.FC = () => {
       setExCones((prev) => prev.filter((cone) => cone.id !== coneId));
       toast({
         title: "Exclusion cone deleted successfully.",
+        variant: "success",
+        duration: 5000,
       });
     } catch (err) {
       console.error(err);
+      const errorMessage = getApiErrorMessage(err, "There was an error deleting the exclusion cone.");
       toast({
-        title: "Error deleting exclusion cone.",
-        description: err instanceof Error ? err.message : "An unknown error occurred",
+        title: "Error deleting exclusion cone",
+        description: errorMessage,
         variant: "destructive",
+        duration: 5000,
       });
     }
   };

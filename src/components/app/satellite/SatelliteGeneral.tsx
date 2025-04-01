@@ -20,7 +20,7 @@ import {
 } from "@/components/ui/dialog";
 import { Label } from "@/components/ui/label";
 import { Textarea } from "@/components/ui/textarea";
-import { Satellite, getSatellites, updateSatellite, deleteSatellite } from "@/api/satellites";
+import { Satellite, getSatellites, updateSatellite, deleteSatellite, getApiErrorMessage } from "@/api/satellites";
 
 type SortableColumn = "name" | "priority" | "uplink" | "telemetry" | "science";
 
@@ -46,8 +46,8 @@ const SatelliteGeneral: React.FC = () => {
         setError("Failed to fetch satellites.");
         console.error(err);
         toast({
-          title: "Error: " + err,
-          description: "There was an error fetching from the API. Please try again.",
+          title: "Error",
+          description: getApiErrorMessage(err, "Failed to fetch satellites. Please try again."),
           variant: "destructive",
           duration: 5000,
         });
@@ -88,6 +88,7 @@ const SatelliteGeneral: React.FC = () => {
       toast({
         title: "Satellite updated successfully.",
         description: `Satellite "${editingSatellite.name}" was updated.`,
+        variant: "success",
         duration: 5000,
       });
 
@@ -97,8 +98,8 @@ const SatelliteGeneral: React.FC = () => {
     } catch (err) {
       console.error(err);
       toast({
-        title: "Error updating satellite.",
-        description: "There was an error updating the satellite.",
+        title: "Error updating satellite",
+        description: getApiErrorMessage(err, "Failed to update the satellite."),
         variant: "destructive",
         duration: 5000,
       });
@@ -116,13 +117,14 @@ const SatelliteGeneral: React.FC = () => {
       setSatellites((prev) => prev.filter((sat) => sat.id !== satelliteId));
       toast({
         title: "Satellite deleted successfully.",
+        variant: "success",
         duration: 5000,
       });
     } catch (err) {
       console.error(err);
       toast({
-        title: "Error deleting satellite.",
-        description: "There was an error deleting the satellite.",
+        title: "Error deleting satellite",
+        description: getApiErrorMessage(err, "Failed to delete the satellite."),
         variant: "destructive",
         duration: 5000,
       });

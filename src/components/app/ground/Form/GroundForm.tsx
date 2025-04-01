@@ -6,7 +6,7 @@ import { Separator } from "@/components/ui/separator";
 import FormFieldWrapper from "@/components/ui/wrapper/formfieldwrapper";
 import { GroundFormSchema, GroundFormData } from "./GroundFormSchema";
 import { toast } from "@/hooks/use-toast";
-import { createGroundStation } from "@/api/ground-stations";
+import { createGroundStation, getApiErrorMessage } from "@/api/ground-stations";
 
 const GroundForm: React.FC = () => {
     const form = useForm<GroundFormData>({
@@ -49,7 +49,7 @@ const GroundForm: React.FC = () => {
             console.error("Error submitting ground station:", error);
             toast({
                 title: "Submission Error",
-                description: "Failed to create ground station!",
+                description: getApiErrorMessage(error, "Failed to create ground station!"),
                 variant: "destructive",
                 duration: 5000,
             });
