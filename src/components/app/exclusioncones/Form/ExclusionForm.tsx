@@ -57,7 +57,7 @@ const ExclusionForm: React.FC = () => {
       try {
         const groundStations = await getGroundStationsSafe();
         const options = groundStations.map((gs) => ({
-          value: gs.id,
+          value: String(gs.id),
           label: `${gs.name} (${gs.id})`
         }));
         setGroundStationOptions(options);
