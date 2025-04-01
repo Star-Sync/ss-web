@@ -30,7 +30,7 @@ const Dashboard: React.FC = () => {
                 <title>Dashboard | Star-Sync</title>
             </Head>
             <MotionWrapper
-                className="w-full h-full flex flex-col bg-gray-50 p-3"
+                className="flex flex-col bg-gray-50 p-3"
                 initial={{ opacity: 0, y: 10 }}
                 animate={{ opacity: 1, y: 0 }}
             >
@@ -39,7 +39,7 @@ const Dashboard: React.FC = () => {
                     className="bg-white rounded-xl p-6 shadow-md mb-4"
                     animate={{ opacity: isLoaded ? 1 : 0 }}
                 >
-                    <h2 className="text-2xl font-bold text-black">Overview</h2>
+                    <h2 className="text-2xl font-bold text-black w-screen">Overview</h2>
                     <p className="text-md text-gray-500 mb-4">Manage your plan and billing history here.</p>
                     <MotionCardList cards={cards} />
                 </MotionWrapper>
