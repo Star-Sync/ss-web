@@ -17,3 +17,4 @@ export const gsFetchBookings = async (): Promise<Booking[]> => {
   const response = await apiClient.get<Booking[]>("/api/v1/request/bookings/");
   return response.data;
 };
+

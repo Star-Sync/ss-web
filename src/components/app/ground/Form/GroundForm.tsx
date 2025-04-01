@@ -5,16 +5,14 @@ import { zodResolver } from "@hookform/resolvers/zod";
 import { Separator } from "@/components/ui/separator";
 import FormFieldWrapper from "@/components/ui/wrapper/formfieldwrapper";
 import { GroundFormSchema, GroundFormData } from "./GroundFormSchema";
-import axios from "axios";
 import { toast } from "@/hooks/use-toast";
+import { createGroundStation, getApiErrorMessage } from "@/api/ground-stations";
 
 const GroundForm: React.FC = () => {
     const form = useForm<GroundFormData>({
         resolver: zodResolver(GroundFormSchema),
         defaultValues: {
             groundStationName: "",
-            // location: "",
-            // priority: undefined,
             latitude: undefined,
             longitude: undefined,
             height: undefined,
@@ -25,42 +23,33 @@ const GroundForm: React.FC = () => {
             maintenanceWindow: "",
         },
     });
-    console.log("Form Errors:", form.formState.errors);
 
     const onSubmit = async (values: GroundFormData) => {
-        console.log(" Form submitted!"); //  Step 1: Debugging
-
         const payload = {
-            name: values.groundStationName,  //  Ensure correct key
-            lat: values.latitude ? Number(values.latitude) : undefined,   // Match API schema
-            lon: values.longitude ? Number(values.longitude) : undefined,
-            height: values.height ? Number(values.height) : undefined,
-            mask: values.mask ? Number(values.mask) : undefined,
-            uplink: values.uplink ? Number(values.uplink) : undefined,
-            downlink: values.downlink ? Number(values.downlink) : undefined,
-            science: values.science ? Number(values.science) : undefined,
+            name: values.groundStationName,
+            lat: values.latitude ? String(values.latitude) : "0",
+            lon: values.longitude ? String(values.longitude) : "0",
+            height: values.height ? String(values.height) : "0",
+            mask: values.mask ? Number(values.mask) : 0,
+            uplink: values.uplink ? String(values.uplink) : "0",
+            downlink: values.downlink ? String(values.downlink) : "0",
+            science: values.science ? String(values.science) : "0",
         };
 
-        console.log(" Sending request with payload:", payload); //  Step 2: Debug API request
-
         try {
-            const apiUrl = process.env.NEXT_PUBLIC_API_URL + "/api/v1/gs/";
-            console.log("API URL:", apiUrl); // Step 2: Confirm URL is correct
-
-            const response = await axios.post(apiUrl, payload);
-            console.log(" Successfully submitted:", response.data); //  Step 2: Log response
-
+            await createGroundStation(payload);
             toast({
                 title: "Submission Success",
-                description: "Successfully sent!",
+                description: "Ground station successfully created!",
                 variant: "success",
                 duration: 5000,
             });
+            form.reset();
         } catch (error) {
-            console.error("Error submitting GroundRequest:", error);
+            console.error("Error submitting ground station:", error);
             toast({
                 title: "Submission Error",
-                description: "Failed to submit!",
+                description: getApiErrorMessage(error, "Failed to create ground station!"),
                 variant: "destructive",
                 duration: 5000,
             });

@@ -6,8 +6,8 @@ import { zodResolver } from "@hookform/resolvers/zod";
 import { Separator } from "@/components/ui/separator";
 import FormFieldWrapper from "@/components/ui/wrapper/formfieldwrapper";
 import { SatelliteFormSchema, SatelliteFormData } from "./SatelliteFormSchema";
-import apiClient from "@/lib/api";
 import { toast } from "@/hooks/use-toast";
+import { createSatellite, getApiErrorMessage } from "@/api/satellites";
 
 const SatelliteForm: React.FC = () => {
   const form = useForm<SatelliteFormData>({
@@ -23,24 +23,20 @@ const SatelliteForm: React.FC = () => {
   });
 
   const onSubmit = async (values: SatelliteFormData) => {
-    const payload = { ...values };
-
-    console.log("Validated values:", values);
-
     try {
-      const response = await apiClient.post("/api/v1/satellites/", payload);
-      console.log("Successfully submitted:", response.data);
+      await createSatellite(values);
       toast({
         title: "Submission Success",
-        description: "Successfully sent! " + response.data,
+        description: "Satellite successfully created!",
         variant: "success",
         duration: 5000,
       });
+      form.reset();
     } catch (error) {
-      console.error("Error submitting Satellite:", error);
+      console.error("Error submitting satellite:", error);
       toast({
-        title: "Submission Error: " + error,
-        description: "Failed to submit!",
+        title: "Submission Error",
+        description: getApiErrorMessage(error, "Failed to create satellite!"),
         variant: "destructive",
         duration: 5000,
       });
