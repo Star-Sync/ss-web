@@ -28,6 +28,7 @@ const ExclusionForm: React.FC = () => {
 
   // Option states for Satellite and Ground Station selection.
   const [satelliteOptions, setSatelliteOptions] = useState<Option[]>([]);
+  const [interferingSatelliteOptions, setInterferingSatelliteOptions] = useState<Option[]>([]);
   const [groundStationOptions, setGroundStationOptions] = useState<Option[]>([]);
 
   useEffect(() => {
@@ -39,6 +40,13 @@ const ExclusionForm: React.FC = () => {
           label: `${sat.name} (${sat.id.slice(0, 5) + "..."})`
         }));
         setSatelliteOptions(options);
+        
+        // Create separate options for interfering satellite using name as value
+        const interferingOptions = satellites.map((sat) => ({
+          value: sat.name,
+          label: `${sat.name} (${sat.id.slice(0, 5) + "..."})`
+        }));
+        setInterferingSatelliteOptions(interferingOptions);
       } catch (error) {
         console.error("Failed to fetch satellites", error);
         toast({
@@ -106,11 +114,12 @@ const ExclusionForm: React.FC = () => {
             label="Mission"
             placeholder="Enter mission name"
           />
-          <FormFieldWrapper<ExclusionFormData>
-            control={form.control}
+          <FormCombobox
             name="interfering_satellite"
             label="Interfering Satellite"
-            placeholder="Enter interfering satellite"
+            placeholder="Select interfering satellite"
+            items={interferingSatelliteOptions}
+            className="mt-2 w-full border-[0.1vw] border-gray-300 rounded-md text-gray-700"
           />
         </div>
         <Separator className="max-w-[50vw]" />

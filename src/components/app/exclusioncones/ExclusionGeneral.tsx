@@ -20,6 +20,10 @@ import {
 } from "@/components/ui/dialog";
 import { Label } from "@/components/ui/label";
 import { ExclusionCone, getExclusionCones, updateExclusionCone, deleteExclusionCone, getApiErrorMessage } from "@/api/exclusion-cones";
+import { getSatellitesSafe, getApiErrorMessage as getSatelliteApiErrorMessage } from "@/api/satellites";
+import { getGroundStationsSafe, getApiErrorMessage as getGroundStationApiErrorMessage } from "@/api/ground-stations";
+import FormCombobox, { Option } from "@/components/ui/wrapper/comboboxwrapper";
+import { useForm, FormProvider } from "react-hook-form";
 
 type SortableColumn = "mission" | "angle_limit" | "interfering_satellite" | "satellite_id" | "gs_id";
 
@@ -33,6 +37,19 @@ const ExclusionGeneral: React.FC = () => {
   const [error, setError] = useState<string | null>(null);
   const [editingCone, setEditingCone] = useState<ExclusionCone | null>(null);
   const [isEditDialogOpen, setIsEditDialogOpen] = useState(false);
+  const [satelliteOptions, setSatelliteOptions] = useState<Option[]>([]);
+  const [interferingSatelliteOptions, setInterferingSatelliteOptions] = useState<Option[]>([]);
+  const [groundStationOptions, setGroundStationOptions] = useState<Option[]>([]);
+
+  const form = useForm({
+    defaultValues: {
+      mission: "",
+      angle_limit: 0,
+      interfering_satellite: "",
+      satellite_id: "",
+      gs_id: "",
+    },
+  });
 
   useEffect(() => {
     const fetchExclusionCones = async () => {
@@ -58,6 +75,57 @@ const ExclusionGeneral: React.FC = () => {
     fetchExclusionCones();
   }, []);
 
+  useEffect(() => {
+    async function fetchSatellites() {
+      try {
+        const satellites = await getSatellitesSafe();
+        const options = satellites.map((sat) => ({
+          value: sat.id,
+          label: `${sat.name} (${sat.id.slice(0, 5) + "..."})`
+        }));
+        setSatelliteOptions(options);
+        
+        // Create separate options for interfering satellite using name as value
+        const interferingOptions = satellites.map((sat) => ({
+          value: sat.name,
+          label: `${sat.name} (${sat.id.slice(0, 5) + "..."})`
+        }));
+        setInterferingSatelliteOptions(interferingOptions);
+      } catch (error) {
+        console.error("Failed to fetch satellites", error);
+        toast({
+          title: "Error Loading Satellites",
+          description: getSatelliteApiErrorMessage(error, "Failed to load satellites. Please try again."),
+          variant: "destructive",
+          duration: 5000,
+        });
+      }
+    }
+    fetchSatellites();
+  }, []);
+
+  useEffect(() => {
+    async function fetchGroundStations() {
+      try {
+        const groundStations = await getGroundStationsSafe();
+        const options = groundStations.map((gs) => ({
+          value: String(gs.id),
+          label: `${gs.name} (${gs.id})`
+        }));
+        setGroundStationOptions(options);
+      } catch (error) {
+        console.error("Failed to fetch ground stations", error);
+        toast({
+          title: "Error Loading Ground Stations",
+          description: getGroundStationApiErrorMessage(error, "Failed to load ground stations. Please try again."),
+          variant: "destructive",
+          duration: 5000,
+        });
+      }
+    }
+    fetchGroundStations();
+  }, []);
+
   const handleSort = (key: SortableColumn) => {
     let direction: "asc" | "desc" = "asc";
     if (sortConfig && sortConfig.key === key && sortConfig.direction === "asc") {
@@ -68,20 +136,37 @@ const ExclusionGeneral: React.FC = () => {
 
   const handleEdit = (cone: ExclusionCone) => {
     setEditingCone({ ...cone });
+    form.reset({
+      mission: cone.mission,
+      angle_limit: cone.angle_limit,
+      interfering_satellite: cone.interfering_satellite,
+      satellite_id: cone.satellite_id,
+      gs_id: String(cone.gs_id),
+    });
     setIsEditDialogOpen(true);
   };
 
   const handleSaveEdit = async () => {
     if (!editingCone) return;
 
+    const values = form.getValues();
+    const updatedCone = {
+      ...editingCone,
+      mission: values.mission,
+      angle_limit: values.angle_limit,
+      interfering_satellite: values.interfering_satellite,
+      satellite_id: values.satellite_id,
+      gs_id: Number(values.gs_id),
+    };
+
     try {
-      const updatedCone = await updateExclusionCone(editingCone.id, editingCone);
+      const result = await updateExclusionCone(editingCone.id, updatedCone);
       setExCones((prev) =>
-        prev.map((cone) => (cone.id === editingCone.id ? updatedCone : cone))
+        prev.map((cone) => (cone.id === editingCone.id ? result : cone))
       );
       toast({
         title: "Exclusion cone updated successfully.",
-        description: `Exclusion cone for mission "${editingCone.mission}" was updated.`,
+        description: `Exclusion cone for mission "${updatedCone.mission}" was updated.`,
         variant: "success",
         duration: 5000,
       });
@@ -255,115 +340,98 @@ const ExclusionGeneral: React.FC = () => {
           </DialogHeader>
 
           {editingCone && (
-            <div className="grid gap-4 py-4">
-              <div className="grid grid-cols-4 items-center gap-4">
-                <Label htmlFor="mission" className="text-right">
-                  Mission
-                </Label>
-                <Input
-                  id="mission"
-                  value={editingCone.mission}
-                  onChange={(e) =>
-                    setEditingCone({
-                      ...editingCone,
-                      mission: e.target.value,
-                    })
-                  }
-                  className="col-span-3"
-                />
-              </div>
+            <FormProvider {...form}>
+              <div className="grid gap-4 py-4">
+                <div className="grid grid-cols-4 items-center gap-4">
+                  <Label htmlFor="mission" className="text-right">
+                    Mission
+                  </Label>
+                  <Input
+                    id="mission"
+                    {...form.register("mission")}
+                    className="col-span-3"
+                  />
+                </div>
 
-              <div className="grid grid-cols-4 items-center gap-4">
-                <Label htmlFor="angle_limit" className="text-right">
-                  Angle Limit
-                </Label>
-                <Input
-                  id="angle_limit"
-                  type="number"
-                  value={editingCone.angle_limit}
-                  onChange={(e) =>
-                    setEditingCone({
-                      ...editingCone,
-                      angle_limit: Number(e.target.value),
-                    })
-                  }
-                  className="col-span-3"
-                />
-              </div>
+                <div className="grid grid-cols-4 items-center gap-4">
+                  <Label htmlFor="angle_limit" className="text-right">
+                    Angle Limit
+                  </Label>
+                  <Input
+                    id="angle_limit"
+                    type="number"
+                    {...form.register("angle_limit", { valueAsNumber: true })}
+                    className="col-span-3"
+                  />
+                </div>
 
-              <div className="grid grid-cols-4 items-center gap-4">
-                <Label
-                  htmlFor="interfering_satellite"
-                  className="text-right"
-                >
-                  Interfering Satellite
-                </Label>
-                <Input
-                  id="interfering_satellite"
-                  value={editingCone.interfering_satellite}
-                  onChange={(e) =>
-                    setEditingCone({
-                      ...editingCone,
-                      interfering_satellite: e.target.value,
-                    })
-                  }
-                  className="col-span-3"
-                />
-              </div>
+                <div className="grid grid-cols-4 items-center gap-4">
+                  <Label
+                    htmlFor="interfering_satellite"
+                    className="text-right"
+                  >
+                    Interfering Satellite
+                  </Label>
+                  <div className="col-span-3">
+                    <FormCombobox
+                      name="interfering_satellite"
+                      label=""
+                      placeholder="Select interfering satellite"
+                      items={interferingSatelliteOptions}
+                      className="mt-0 w-full border-[0.1vw] border-gray-300 rounded-md text-gray-700"
+                    />
+                  </div>
+                </div>
 
-              <div className="grid grid-cols-4 items-center gap-4">
-                <Label htmlFor="satellite_id" className="text-right">
-                  Satellite ID
-                </Label>
-                <Input
-                  id="satellite_id"
-                  value={editingCone.satellite_id}
-                  onChange={(e) =>
-                    setEditingCone({
-                      ...editingCone,
-                      satellite_id: e.target.value,
-                    })
-                  }
-                  className="col-span-3"
-                />
-              </div>
+                <div className="grid grid-cols-4 items-center gap-4">
+                  <Label htmlFor="satellite_id" className="text-right">
+                    Satellite ID
+                  </Label>
+                  <div className="col-span-3">
+                    <FormCombobox
+                      name="satellite_id"
+                      label=""
+                      placeholder="Select a satellite"
+                      items={satelliteOptions}
+                      className="mt-0 w-full border-[0.1vw] border-gray-300 rounded-md text-gray-700"
+                    />
+                  </div>
+                </div>
 
-              <div className="grid grid-cols-4 items-center gap-4">
-                <Label htmlFor="gs_id" className="text-right">
-                  GS ID
-                </Label>
-                <Input
-                  id="gs_id"
-                  type="number"
-                  value={editingCone.gs_id}
-                  onChange={(e) =>
-                    setEditingCone({
-                      ...editingCone,
-                      gs_id: Number(e.target.value),
-                    })
-                  }
-                  className="col-span-3"
-                />
+                <div className="grid grid-cols-4 items-center gap-4">
+                  <Label htmlFor="gs_id" className="text-right">
+                    GS ID
+                  </Label>
+                  <div className="col-span-3">
+                    <FormCombobox
+                      name="gs_id"
+                      label=""
+                      placeholder="Select a ground station"
+                      items={groundStationOptions}
+                      className="mt-0 w-full border-[0.1vw] border-gray-300 rounded-md text-gray-700"
+                    />
+                  </div>
+                </div>
               </div>
-            </div>
+            </FormProvider>
           )}
 
           <DialogFooter>
-          <Button
-          className="mr-[5vw]"
-            variant="destructive"
-            onClick={() => {
-              const confirmDelete = window.confirm(
-                "Are you sure you want to delete this exclusion cone?"
-              );
-              if (confirmDelete && editingCone) {
-                handleDelete(editingCone.id);
-                setIsEditDialogOpen(false);
-              }
-            }}
-          >
-          <Trash className="h-4" />
-          </Button>
+            <Button
+              className="mr-[5vw]"
+              variant="destructive"
+              onClick={() => {
+                const confirmDelete = window.confirm(
+                  "Are you sure you want to delete this exclusion cone?"
+                );
+                if (confirmDelete && editingCone) {
+                  handleDelete(editingCone.id);
+                  setIsEditDialogOpen(false);
+                }
+              }}
+            >
+              <Trash className="h-4" />
+            </Button>
             <Button
               variant="outline"
               onClick={() => {
