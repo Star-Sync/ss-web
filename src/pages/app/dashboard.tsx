@@ -4,6 +4,7 @@ import MotionWrapper from "@/components/app/MotionWrapper";
 import MotionCardList from "@/components/app/dashboard/MotionCardList";
 import DashboardGS from "@/components/app/dashboard/dashboard-gs";
 import Head from "next/head";
+import { Separator } from "@/components/ui/separator";
 
 type Card = {
     color: string;
@@ -30,35 +31,34 @@ const Dashboard: React.FC = () => {
                 <title>Dashboard | Star-Sync</title>
             </Head>
             <MotionWrapper
-                className="flex flex-col bg-gray-50 p-3"
+                className="flex flex-col gap-4 p-4 bg-gray-50"
                 initial={{ opacity: 0, y: 10 }}
                 animate={{ opacity: 1, y: 0 }}
             >
                 {/* Row 1: Overview */}
                 <MotionWrapper
-                    className="bg-white rounded-xl p-6 shadow-md mb-4"
+                    className="bg-white rounded-xl p-6 shadow-md"
                     animate={{ opacity: isLoaded ? 1 : 0 }}
                 >
-                    <h2 className="text-2xl font-bold text-black w-screen">Overview</h2>
-                    <p className="text-md text-gray-500 mb-4">Manage your plan and billing history here.</p>
+                    <h2 className="text-2xl font-bold w-screen">Overview</h2>
+                    <p className="text-md text-gray-500 mb-4">Current status of the system.</p>
                     <MotionCardList cards={cards} />
                 </MotionWrapper>
 
                 {/* Row 2: DashboardUpcoming and DashboardGS */}
-                <div className="flex flex-grow gap-4 mt-4">
+                <div className="flex gap-4 flex-grow mt-4">
                     {/* DashboardUpcoming */}
-                    <MotionWrapper className="w-1/2 min-h-[58vh] max-h-64 bg-white rounded-xl p-6 shadow-md">
+                    <MotionWrapper className="flex-1 bg-white rounded-xl shadow-md p-4">
                         <DashboardUpcoming />
                     </MotionWrapper>
 
                     {/* DashboardGS */}
-                    <MotionWrapper className="w-1/2 min-h-[58vh] max-h-64 bg-white rounded-xl p-6 shadow-md">
+                    <MotionWrapper className="flex-1 bg-white rounded-xl shadow-md p-4">
                         <DashboardGS />
                     </MotionWrapper>
                 </div>
             </MotionWrapper>
         </>
-
     );
 };
 

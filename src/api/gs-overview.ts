@@ -1,29 +1,23 @@
+import apiClient from '@/lib/api';
+
 export interface GroundStation {
+    id: number;
     name: string;
-    location: string;
-    usageData: Array<{ date: string; usage: string }>;
-    usage: number;
+    lat: number;
+    lon: number;
+    height: number;
+    mask: number;
+    uplink: number;
+    downlink: number;
+    science: number;
 }
 
-// Sample data for ground stations
-export const groundStations: GroundStation[] = [
-    {
-        name: "Gatineau Quebec GS",
-        location: "Gatineau, Quebec, Canada",
-        usage: 50,
-        usageData: [
-            { date: "2023-10-01", usage: "5 hours" },
-            { date: "2023-10-02", usage: "6 hours" }
-        ],
-
-    },
-    {
-        name: "Vancouver BC GS",
-        location: "Vancouver, British Columbia, Canada",
-        usage: 75,
-        usageData: [
-            { date: "2023-10-01", usage: "4 hours" },
-            { date: "2023-10-02", usage: "7 hours" },
-        ],
-    },
-];
+export const getGroundStations = async (): Promise<GroundStation[]> => {
+    try {
+        const response = await apiClient.get<GroundStation[]>('/api/v1/gs');
+        return response.data;
+    } catch (error) {
+        console.error('Error fetching ground stations:', error);
+        return [];
+    }
+};
