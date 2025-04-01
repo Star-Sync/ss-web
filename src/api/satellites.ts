@@ -65,3 +65,13 @@ export const deleteSatellite = async (id: string): Promise<void> => {
         throw error;
     }
 }; 
+
+export const getApiErrorMessage = (error: unknown, defaultMessage: string = "An error occurred."): string => {
+    if (error && typeof error === 'object' && 'response' in error && 
+        error.response && typeof error.response === 'object' && 
+        'data' in error.response && error.response.data && 
+        typeof error.response.data === 'object' && 'detail' in error.response.data) {
+        return error.response.data.detail as string;
+    }
+    return defaultMessage;
+};

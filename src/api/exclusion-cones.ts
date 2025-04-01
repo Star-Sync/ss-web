@@ -50,4 +50,15 @@ export const deleteExclusionCone = async (id: string): Promise<void> => {
         console.error('Error deleting exclusion cone:', error);
         throw error;
     }
-}; 
+};
+
+// Helper function to extract error messages from API responses
+export function getApiErrorMessage(err: unknown, defaultMessage: string = "An error occurred."): string {
+    if (err && typeof err === 'object' && 'response' in err && 
+        err.response && typeof err.response === 'object' && 
+        'data' in err.response && err.response.data && 
+        typeof err.response.data === 'object' && 'detail' in err.response.data) {
+        return err.response.data.detail as string;
+    }
+    return defaultMessage;
+} 
