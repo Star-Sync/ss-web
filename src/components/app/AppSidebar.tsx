@@ -12,7 +12,6 @@ import {
     LogOut,
     Calendar,
     Cone,
-    Globe,
     Satellite,
     Globe,
 } from "lucide-react";
