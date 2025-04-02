@@ -28,7 +28,7 @@ const Settings = () => {
             <MotionWrapper className="w-full h-full bg-gray-50 p-4 space-y-4">
                 {/* Header Section */}
                 <div className="bg-white rounded-xl p-6 shadow-md">
-                    <h1 className="text-2xl font-bold text-black">Settings</h1>
+                    <h1 className="text-2xl font-bold text-black w-screen">Settings</h1>
                     <h2 className="text-md text-gray-500 mb-3">
                         Manage your plan and billing history here.
                     </h2>

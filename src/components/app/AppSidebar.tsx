@@ -310,7 +310,7 @@ export const AppSidebar: React.FC = () => {
         <Sidebar collapsible="icon" className="flex flex-col overflow-hidden">
             <Logo isCollapsed={isCollapsed} isMobile={isMobile} />
             <SidebarContent className="ml-1 flex-1 overflow-y-auto">
-                <NavigationMenu navMain={data.navMain} />
+                <NavigationMenu navMain={navMain} />
             </SidebarContent>
             <SidebarFooter
                 className={`flex items-center justify-center ${

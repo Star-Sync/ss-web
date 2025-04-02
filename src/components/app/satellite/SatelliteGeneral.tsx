@@ -20,18 +20,7 @@ import {
 } from "@/components/ui/dialog";
 import { Label } from "@/components/ui/label";
 import { Textarea } from "@/components/ui/textarea";
-import apiClient from "@/lib/api";
-
-interface Satellite {
-  id: string;
-  name: string;
-  priority: number;
-  uplink: number;
-  telemetry: number;
-  science: number;
-  tle: string;
-  ex_cones?: any[];
-}
+import { Satellite, getSatellites, updateSatellite, deleteSatellite, getApiErrorMessage } from "@/api/satellites";
 
 type SortableColumn = "name" | "priority" | "uplink" | "telemetry" | "science";
 
@@ -44,33 +33,21 @@ const SatelliteGeneral: React.FC = () => {
   const [satellites, setSatellites] = useState<Satellite[]>([]);
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState<string | null>(null);
-  const [editingSatellite, setEditingSatellite] = useState<Satellite | null>(
-    null
-  );
+  const [editingSatellite, setEditingSatellite] = useState<Satellite | null>(null);
   const [isEditDialogOpen, setIsEditDialogOpen] = useState(false);
 
   useEffect(() => {
     const fetchSatellites = async () => {
       setLoading(true);
       try {
-        const response = await apiClient.get<Satellite[]>(
-          "/api/v1/satellites/"
-        );
-
-        const processedData = response.data.map((sat) => ({
-          ...sat,
-          uplink: typeof sat.uplink === "number" ? sat.uplink : 0,
-          telemetry: typeof sat.telemetry === "number" ? sat.telemetry : 0,
-          science: typeof sat.science === "number" ? sat.science : 0,
-        }));
-        setSatellites(processedData);
+        const data = await getSatellites();
+        setSatellites(data);
       } catch (err) {
         setError("Failed to fetch satellites.");
         console.error(err);
         toast({
-          title: "Error: " + err,
-          description:
-            "There was an error fetching from the API. Please try again.",
+          title: "Error",
+          description: getApiErrorMessage(err, "Failed to fetch satellites. Please try again."),
           variant: "destructive",
           duration: 5000,
         });
@@ -84,11 +61,7 @@ const SatelliteGeneral: React.FC = () => {
 
   const handleSort = (key: SortableColumn) => {
     let direction: "asc" | "desc" = "asc";
-    if (
-      sortConfig &&
-      sortConfig.key === key &&
-      sortConfig.direction === "asc"
-    ) {
+    if (sortConfig && sortConfig.key === key && sortConfig.direction === "asc") {
       direction = "desc";
     }
     setSortConfig({ key, direction });
@@ -103,21 +76,20 @@ const SatelliteGeneral: React.FC = () => {
     if (!editingSatellite) return;
 
     try {
-      await apiClient.patch(
-        `/api/v1/satellites/${editingSatellite.id}`,
-        editingSatellite
-      );
+      const updatedSatellite = await updateSatellite(editingSatellite.id, editingSatellite);
 
       // Update the local state
       setSatellites((prev) =>
         prev.map((sat) =>
-          sat.id === editingSatellite.id ? editingSatellite : sat
+          sat.id === editingSatellite.id ? updatedSatellite : sat
         )
       );
 
       toast({
         title: "Satellite updated successfully.",
         description: `Satellite "${editingSatellite.name}" was updated.`,
+        variant: "success",
+        duration: 5000,
       });
 
       // Close the edit dialog
@@ -126,9 +98,10 @@ const SatelliteGeneral: React.FC = () => {
     } catch (err) {
       console.error(err);
       toast({
-        title: "Error updating satellite.",
-        description: "There was an error updating the satellite.",
+        title: "Error updating satellite",
+        description: getApiErrorMessage(err, "Failed to update the satellite."),
         variant: "destructive",
+        duration: 5000,
       });
     }
   };
@@ -140,17 +113,20 @@ const SatelliteGeneral: React.FC = () => {
     if (!confirmDelete) return;
 
     try {
-      await apiClient.delete(`/api/v1/satellites/${satelliteId}`);
+      await deleteSatellite(satelliteId);
       setSatellites((prev) => prev.filter((sat) => sat.id !== satelliteId));
       toast({
         title: "Satellite deleted successfully.",
+        variant: "success",
+        duration: 5000,
       });
     } catch (err) {
       console.error(err);
       toast({
-        title: "Error deleting satellite.",
-        description: "There was an error deleting the satellite.",
+        title: "Error deleting satellite",
+        description: getApiErrorMessage(err, "Failed to delete the satellite."),
         variant: "destructive",
+        duration: 5000,
       });
     }
   };

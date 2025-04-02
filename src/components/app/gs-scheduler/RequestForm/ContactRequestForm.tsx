@@ -1,4 +1,5 @@
 import React, { useEffect, useState } from "react";
+import React, { useEffect, useState } from "react";
 import { Controller, FormProvider, useForm } from "react-hook-form";
 import { Button } from "@/components/ui/button";
 import { zodResolver } from "@hookform/resolvers/zod";
@@ -12,16 +13,14 @@ import {
   ContactRequestFormData,
 } from "./ContactRequestFormSchema";
 import Combobox from "@/components/ui/combobox";
-import { getSatellites, Satellite } from "@/api/gs-satellites";
-import { getLocations, Location } from "@/api/gs-locations";
+import { getSatellitesSafe, Satellite } from "@/api/satellites";
+import { getGroundStationsSafe, Ground } from "@/api/ground-stations";
 import { formatToISOString } from "@/lib/formatToISOString";
-import apiClient from "@/lib/api";
 import { toast } from "@/hooks/use-toast";
-
-
+import { createContactRequest, getApiErrorMessage, ContactRequest } from "@/api/contact-requests";
 
 const ContactRequestForm = ({ }) => {
-   const [groundStations, setGroundStations] = useState<Location[]>([]);
+   const [groundStations, setGroundStations] = useState<Ground[]>([]);
    const [satellites, setSatellites] = useState<Satellite[]>([]);
    
     // Transform ground stations into combobox format
@@ -31,13 +30,13 @@ const ContactRequestForm = ({ }) => {
     }));
 
     const satelliteOptions = satellites.map((sat) => ({
-      value: sat.id.toString(),
-      label: sat.name,
+      value: sat.id,
+      label: `${sat.name} (${sat.id.slice(0, 5) + "..."})`,
     }));
   
     useEffect(() => {
       const fetchGroundStations = async () => {
-        const stations = await getLocations();
+        const stations = await getGroundStationsSafe();
         setGroundStations(stations);
       };
       fetchGroundStations();
@@ -45,7 +44,7 @@ const ContactRequestForm = ({ }) => {
 
     useEffect(() => {
       const fetchSatellites = async () => {
-        const sats = await getSatellites();
+        const sats = await getSatellitesSafe();
         setSatellites(sats);
       };
       fetchSatellites();
@@ -56,6 +55,8 @@ const ContactRequestForm = ({ }) => {
     resolver: zodResolver(ContactRequestFormSchema),
     defaultValues: {
       missionName: "",
+      satelliteId: "",
+      station_id: "",
       satelliteId: "",
       station_id: "",
       orbit: 0,
@@ -70,32 +71,60 @@ const ContactRequestForm = ({ }) => {
   });
 
   const onSubmit = async (values: ContactRequestFormData) => {
-    const payload = {
-      ...values,
-      aosTime: formatToISOString(values.aosTime),
-      rfOnTime: formatToISOString(values.rfOnTime),
-      rfOffTime: formatToISOString(values.rfOffTime),
-      losTime: formatToISOString(values.losTime),
-    };
-    // Send the request to the backend using apiClient
-    try {
-      const response = await apiClient.post("/api/v1/request/contact/", payload);
-      console.log("Successfully submitted:", response.data);
-
-      // Handle success
+    if (!values.aosTime || !values.losTime || !values.rfOnTime || !values.rfOffTime) {
       toast({
-        title: "Submission Success",
-        description: "Successfully sent!",
+        title: "Validation Error",
+        description: "All time fields are required",
+        variant: "destructive",
+        duration: 5000,
+      });
+      return;
+    }
+
+    const aosTime = formatToISOString(values.aosTime);
+    const losTime = formatToISOString(values.losTime);
+    const rfOnTime = formatToISOString(values.rfOnTime);
+    const rfOffTime = formatToISOString(values.rfOffTime);
+
+    if (!aosTime || !losTime || !rfOnTime || !rfOffTime) {
+      toast({
+        title: "Validation Error",
+        description: "Invalid date format",
+        variant: "destructive",
+        duration: 5000,
+      });
+      return;
+    }
+
+    const payload: ContactRequest = {
+      missionName: values.missionName,
+      satelliteId: values.satelliteId,
+      station_id: values.station_id,
+      orbit: values.orbit,
+      uplink: values.uplink,
+      telemetry: values.telemetry,
+      science: values.science,
+      aosTime,
+      losTime,
+      rfOnTime,
+      rfOffTime,
+    };
+
+    try {
+      const response = await createContactRequest(payload);
+      console.log("Successfully submitted:", response);
+      toast({
+        title: "Success",
+        description: `Contact request "${values.missionName}" was successfully created`,
         variant: "success",
         duration: 5000,
       });
+      form.reset();
     } catch (error) {
       console.error("Error submitting ContactRequest:", error);
-      // Handle errors
       toast({
-        title: "Submission Error: " + error,
-        description:
-          "There was an error submitting the contact request. Please try again.",
+        title: "Submission Error",
+        description: getApiErrorMessage(error, "Failed to create contact request!"),
         variant: "destructive",
         duration: 5000,
         
@@ -138,7 +167,24 @@ const ContactRequestForm = ({ }) => {
                       )}
                     />
                   </div>
+                  {/* Ground Station Combobox */}
+                  <div className="grid grid-cols-1 md:grid-cols-2 gap-4 max-w-[25vw]">
+                    <Controller
+                      name="station_id"
+                      control={form.control}
+                      render={({ field }) => (
+                        <Combobox
+                          items={groundStationOptions}
+                          value={field.value}
+                          onChange={field.onChange}
+                          placeholder="Select a Ground Station"
+                          className="text-black"
+                        />
+                      )}
+                    />
+                  </div>
         </div>
+        
         
 
         <Separator className="max-w-[50vw]" />
