@@ -1,5 +1,4 @@
 import React, { FC } from "react";
-import {Location} from "@/api/gs-locations";
 import { Plus } from "lucide-react";
 
 interface TabNavProps {
@@ -13,7 +12,7 @@ interface TabNavProps {
 export interface Tab {
     id: string;
     name: string;
-    content: (location: Location) => React.ReactElement;
+    content: () => React.ReactElement;
     isPinned?: boolean;
 }
 

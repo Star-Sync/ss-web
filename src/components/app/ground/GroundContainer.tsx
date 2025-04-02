@@ -1,18 +1,18 @@
 import React, { FC, useState, useRef } from "react";
-import { Tab } from "@/components/app/ground/TabNav";  // Adjust the path for ground station tabs
+import { Tab } from "@/components/ui/tab/TabNav";
 import MotionWrapper from "../MotionWrapper";
-import TabNav from "@/components/app/ground/TabNav";  // Adjust path for Ground Station TabNav
-import HeaderSection from "@/components/app/ground/HeaderSection";  // Adjust path for Ground Station header
+import TabNav from "@/components/ui/tab/TabNav";
+import HeaderSection from "@/components/app/ground/HeaderSection";
 import FormManager from "./Form/FormManager";
-import TabContent from "./TabContent";
-import GroundGeneral from "@/components/app/ground/GroundGeneral";  // Modify for GroundGeneral component
+import TabContent from "@/components/ui/tab/TabContent";
+import GroundGeneral from "@/components/app/ground/GroundGeneral";
 
 const GroundContainer: FC = () => {
     const [tabs, setTabs] = useState<Tab[]>([
         {
             id: "overview",
             name: "Overview",
-            content: <GroundGeneral />,  // Replace with Ground Station general content
+            content: () => <GroundGeneral />,
             isPinned: true,
         },
     ]);
@@ -25,7 +25,7 @@ const GroundContainer: FC = () => {
         const newTab: Tab = {
             id: newTabId,
             name: `Form ${tabCounter.current}`,
-            content: <FormManager key={newTabId}/>,
+            content: () => <FormManager key={newTabId}/>,
         };
         setTabs((prevTabs) => [...prevTabs, newTab]);
         setActiveTabId(newTabId);
@@ -44,9 +44,9 @@ const GroundContainer: FC = () => {
     };
 
     return (
-        <MotionWrapper className="w-full h-full flex flex-col bg-gray-50 p-6">
-            <div className="bg-white rounded-xl p-6 shadow-lg flex flex-col h-full overflow-hidden">
-                <HeaderSection />  {/* Header for Ground Station */}
+        <MotionWrapper className="flex flex-col p-6">
+            <div className="rounded-xl p-6 shadow-lg bg-white">
+                <HeaderSection />
                 <TabNav
                     tabs={tabs}
                     activeTabId={activeTabId}

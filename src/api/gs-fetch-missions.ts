@@ -1,22 +1,20 @@
 import apiClient from "@/lib/api";
 
-// Define Mission interface
-export interface Mission {
-  requestType: string;
-  mission: string;
-  satellite: string;
-  station: string;
-  startTime: string;
-  endTime: string;
-  duration: number;
-  aos: string;
-  rf_on: string;
-  rf_off: string;
-  los: string;
+export interface Slot {
+  start_time: string;
+  end_time: string;
 }
 
-// API call to fetch missions
-export const gsFetchMissions = async (): Promise<Mission[]> => {
-  const response = await apiClient.get<Mission[]>("/api/v1/request/");
+export interface Booking {
+  slot: Slot;
+  gs_id: number;
+  request_id: string;
+  id: string;
+}
+
+// API call to fetch bookings
+export const gsFetchBookings = async (): Promise<Booking[]> => {
+  const response = await apiClient.get<Booking[]>("/api/v1/request/bookings/");
   return response.data;
 };
+

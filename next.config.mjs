@@ -9,6 +9,7 @@ const nextConfig = {
         { source: '/calendar', destination: '/app/calendar' },
         { source: '/ground-station', destination: '/app/ground' },
         { source: '/satellite', destination: '/app/satellite' },
+        { source: '/exclusion-cones', destination: '/app/exclusioncones' },
         
 
         // Web pages

@@ -1,5 +1,4 @@
-import React, { useEffect } from "react";
-import { locations } from "@/api/gs-locations";
+import React, { useState, useEffect } from "react";
 import { useForm, Controller, FormProvider } from "react-hook-form";
 import { Button } from "@/components/ui/button";
 import { zodResolver } from "@hookform/resolvers/zod";
@@ -9,32 +8,31 @@ import { TimePickerField } from "@/components/ui/wrapper/timepickerfield";
 import FormFieldWrapper from "@/components/ui/wrapper/formfieldwrapper";
 import { RFRequestFormSchema, RFRequestFormData } from "./RFRequestFormSchema";
 import Combobox from "@/components/ui/combobox";
-import { satellites } from "@/api/gs-satellites";
-import apiClient from "@/lib/api";
+import { getSatellitesSafe, Satellite } from "@/api/satellites";
 import { formatToISOString } from "@/lib/formatToISOString";
 import { toast } from "@/hooks/use-toast";
+import { createRFTimeRequest, getApiErrorMessage, RFTimeRequest } from "@/api/rf-time";
 
-interface RFRequestFormProps {
-  location: (typeof locations)[0];
-}
-
-const satelliteOptions = satellites
-  .filter((sat) => sat.satellite_id && sat.label)
-  .map((sat) => ({
-    value: sat.satellite_id.toString(),
-    label: sat.label,
+const RFRequestForm = () => {
+  const [satellites, setSatellites] = useState<Satellite[]>([]);
+  const satelliteOptions = satellites.map((sat) => ({
+    value: sat.id,
+    label: `${sat.name} (${sat.id.slice(0, 5) + "..."})`,
   }));
 
-const RFRequestForm: React.FC<RFRequestFormProps> = ({ location }) => {
-  useEffect(() => {
-    console.log("RFRequestForm: Location updated to", location.label);
-  }, [location]);
-
+   useEffect(() => {
+        const fetchSatellites = async () => {
+          const sats = await getSatellitesSafe();
+          setSatellites(sats);
+        };
+        fetchSatellites();
+      }, []);
+  
   const form = useForm<RFRequestFormData>({
     resolver: zodResolver(RFRequestFormSchema),
     defaultValues: {
       missionName: "",
-      satelliteId: satelliteOptions[0]?.value || "",
+      satelliteId: "",
       startTime: undefined,
       endTime: undefined,
       uplinkTime: 0,
@@ -45,29 +43,55 @@ const RFRequestForm: React.FC<RFRequestFormProps> = ({ location }) => {
   });
 
   const onSubmit = async (values: RFRequestFormData) => {
-    const payload = {
-      ...values,
-      startTime: formatToISOString(values.startTime),
-      endTime: formatToISOString(values.endTime),
+    if (!values.startTime || !values.endTime) {
+      toast({
+        title: "Validation Error",
+        description: "Start time and end time are required",
+        variant: "destructive",
+        duration: 5000,
+      });
+      return;
+    }
+
+    const startTime = formatToISOString(values.startTime);
+    const endTime = formatToISOString(values.endTime);
+
+    if (!startTime || !endTime) {
+      toast({
+        title: "Validation Error",
+        description: "Invalid date format",
+        variant: "destructive",
+        duration: 5000,
+      });
+      return;
+    }
+
+    const payload: RFTimeRequest = {
+      missionName: values.missionName,
+      satelliteId: values.satelliteId,
+      startTime,
+      endTime,
+      uplinkTime: values.uplinkTime,
+      downlinkTime: values.downlinkTime,
+      scienceTime: values.scienceTime,
+      minimumNumberOfPasses: values.minimumNumberOfPasses,
     };
 
-    // Send the request to the backend using apiClient
     try {
-      const response = await apiClient.post("/api/v1/request/rf-time/", payload);
-      console.log("Successfully submitted:", response.data);
-      // Handle success
+      const response = await createRFTimeRequest(payload);
+      console.log("Successfully submitted:", response);
       toast({
-        title: "Submission Success",
-        description: "Successfully sent!" + response.data,
+        title: "Success",
+        description: `RF time request "${values.missionName}" was successfully created`,
         variant: "success",
         duration: 5000,
       });
+      form.reset();
     } catch (error) {
       console.error("Error submitting RFRequest:", error);
-      // Handle errors
       toast({
-        title: "Submission Error: " + error,
-        description: "Failed to submit!",
+        title: "Submission Error",
+        description: getApiErrorMessage(error, "Failed to create RF time request!"),
         variant: "destructive",
         duration: 5000,
       });

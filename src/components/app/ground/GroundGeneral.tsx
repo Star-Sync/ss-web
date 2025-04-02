@@ -19,20 +19,7 @@ import {
     DialogFooter,
 } from "@/components/ui/dialog";
 import { Label } from "@/components/ui/label";
-import apiClient from "@/lib/api";
-
-
-interface Ground {
-    id: string;
-    name: string;
-    lat: string;
-    lon: string;
-    height: string;
-    mask: number;
-    uplink: string;
-    downlink: string;
-    science: string;
-}
+import { Ground, getGroundStations, updateGroundStation, deleteGroundStation, getApiErrorMessage } from "@/api/ground-stations";
 
 interface ValidationErrors {
     lat?: string;
@@ -45,17 +32,6 @@ interface ValidationErrors {
 }
 
 type SortableColumn = 'name' | 'lat' | 'lon' | 'height' | 'mask' | 'uplink' | 'downlink' | 'science';
-
-// Helper function to extract error messages from API responses
-function getApiErrorMessage(err: unknown, defaultMessage: string = "An error occurred."): string {
-    if (err && typeof err === 'object' && 'response' in err && 
-        err.response && typeof err.response === 'object' && 
-        'data' in err.response && err.response.data && 
-        typeof err.response.data === 'object' && 'detail' in err.response.data) {
-        return err.response.data.detail as string;
-    }
-    return defaultMessage;
-}
 
 const GroundGeneral: React.FC = () => {
     const [searchTerm, setSearchTerm] = useState("");
@@ -73,14 +49,14 @@ const GroundGeneral: React.FC = () => {
         const fetchGroundStations = async () => {
             setLoading(true);
             try {
-                const response = await apiClient.get<Ground[]>("/api/v1/gs/");
-                setGrounds(response.data);
+                const data = await getGroundStations();
+                setGrounds(data);
             } catch (err) {
                 const errorMessage = getApiErrorMessage(err, "Failed to fetch ground stations.");
                 setError(errorMessage);
                 console.error(err);
                 toast({
-                    title: "Error fetching ground stations",
+                    title: "Error",
                     description: errorMessage,
                     variant: "destructive",
                     duration: 5000,
@@ -165,12 +141,12 @@ const GroundGeneral: React.FC = () => {
         }
 
         try {
-           await apiClient.patch(`/api/v1/gs/${editingGround.id}`, editingGround);
+            const updatedGround = await updateGroundStation(editingGround.id, editingGround);
 
             // Update the local state
             setGrounds((prev) =>
                 prev.map((ground) =>
-                    ground.id === editingGround.id ? editingGround : ground
+                    ground.id === editingGround.id ? updatedGround : ground
                 )
             );
 
@@ -178,6 +154,7 @@ const GroundGeneral: React.FC = () => {
                 title: "Ground Station updated successfully.",
                 description: `Ground Station "${editingGround.name}" was updated.`,
                 variant: "success",
+                duration: 5000,
             });
 
             // Close the edit dialog
@@ -192,6 +169,7 @@ const GroundGeneral: React.FC = () => {
                 title: "Error updating ground station.",
                 description: errorMessage,
                 variant: "destructive",
+                duration: 5000,
             });
         }
     };
@@ -203,11 +181,12 @@ const GroundGeneral: React.FC = () => {
         if (!confirmDelete) return;
 
         try {
-            await apiClient.delete(`/api/v1/gs/${groundId}`);
+            await deleteGroundStation(groundId);
             setGrounds((prev) => prev.filter((ground) => ground.id !== groundId));
             toast({
                 title: "Ground Station deleted successfully.",
                 variant: "success",
+                duration: 5000,
             });
         } catch (err) {
             console.error(err);
@@ -218,6 +197,7 @@ const GroundGeneral: React.FC = () => {
                 title: "Error deleting ground station.",
                 description: errorMessage,
                 variant: "destructive",
+                duration: 5000,
             });
         }
     };
@@ -342,15 +322,15 @@ const GroundGeneral: React.FC = () => {
                                             onClick={() =>
                                                 handleSort(key as SortableColumn)
                                             }
-                                            className="p-0 hover:bg-transparent flex items-center"
+                                            className="p-0 hover:bg-transparent"
                                         >
                                             {label}
                                             <ArrowUpDown className="ml-2 h-4 w-4" />
-                                            {/* {sortConfig?.key === key && (
+                                            {sortConfig?.key === key && (
                                                 <span className="ml-1">
                                                     {sortConfig.direction === "asc" ? "↑" : "↓"}
                                                 </span>
-                                            )} */}
+                                            )}
                                         </Button>
                                     ) : (
                                         label
@@ -388,13 +368,6 @@ const GroundGeneral: React.FC = () => {
                                         >
                                             <Edit2 className="h-4 w-4" />
                                         </Button>
-                                        <Button
-                                            variant="destructive"
-                                            size="sm"
-                                            onClick={() => handleDelete(ground.id)}
-                                        >
-                                            <Trash className="h-4 w-4" />
-                                        </Button>
                                     </TableCell>
                                 </TableRow>
                             ))
@@ -411,7 +384,7 @@ const GroundGeneral: React.FC = () => {
                     </DialogHeader>
 
                     {editingGround && (
-                        <div className="grid gap-4 py-4 ">
+                        <div className="grid gap-4 py-4">
                             <div className="grid grid-cols-4 items-center gap-4">
                                 <Label htmlFor="name" className="text-right">
                                     Name
@@ -567,6 +540,21 @@ const GroundGeneral: React.FC = () => {
                     )}
 
                     <DialogFooter>
+                        <Button
+                            className="mr-[5vw]"
+                            variant="destructive"
+                            onClick={() => {
+                                const confirmDelete = window.confirm(
+                                    "Are you sure you want to delete this ground station?"
+                                );
+                                if (confirmDelete && editingGround) {
+                                    handleDelete(editingGround.id);
+                                    setIsEditDialogOpen(false);
+                                }
+                            }}
+                        >
+                            <Trash className="h-4" />
+                        </Button>
                         <Button
                             variant="outline"
                             onClick={() => {
