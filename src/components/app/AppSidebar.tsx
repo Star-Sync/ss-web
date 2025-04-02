@@ -12,6 +12,7 @@ import {
     LogOut,
     Calendar,
     Cone,
+    Globe,
     Satellite,
     Globe,
 } from "lucide-react";
@@ -84,9 +85,9 @@ const navMain: NavItem[] = [
         isActive: true,
         icon: Satellite,
     },
-    { 
+    {
         title: "Ground Station",
-        url: "/ground",
+        url: "/ground-station",
         isActive: true,
         icon: Globe,
     },

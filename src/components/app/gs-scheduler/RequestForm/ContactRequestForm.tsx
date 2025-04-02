@@ -1,5 +1,4 @@
 import React, { useEffect, useState } from "react";
-import React, { useEffect, useState } from "react";
 import { Controller, FormProvider, useForm } from "react-hook-form";
 import { Button } from "@/components/ui/button";
 import { zodResolver } from "@hookform/resolvers/zod";
@@ -55,8 +54,6 @@ const ContactRequestForm = ({ }) => {
     resolver: zodResolver(ContactRequestFormSchema),
     defaultValues: {
       missionName: "",
-      satelliteId: "",
-      station_id: "",
       satelliteId: "",
       station_id: "",
       orbit: 0,
@@ -167,24 +164,7 @@ const ContactRequestForm = ({ }) => {
                       )}
                     />
                   </div>
-                  {/* Ground Station Combobox */}
-                  <div className="grid grid-cols-1 md:grid-cols-2 gap-4 max-w-[25vw]">
-                    <Controller
-                      name="station_id"
-                      control={form.control}
-                      render={({ field }) => (
-                        <Combobox
-                          items={groundStationOptions}
-                          value={field.value}
-                          onChange={field.onChange}
-                          placeholder="Select a Ground Station"
-                          className="text-black"
-                        />
-                      )}
-                    />
-                  </div>
         </div>
-        
         
 
         <Separator className="max-w-[50vw]" />

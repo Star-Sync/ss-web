@@ -26,7 +26,6 @@ const GSContainer: FC = () => {
             id: newTabId,
             name: `Request Form. ${tabCounter.current}`,
             content: () => <RequestForm key={newTabId}/>,
-            content: () => <RequestForm key={newTabId}/>,
         };
         setTabs((prevTabs) => [...prevTabs, newTab]);
         setActiveTabId(newTabId);
@@ -55,7 +54,6 @@ const GSContainer: FC = () => {
                     addNewTab={addNewTab}
                     closeTab={closeTab}
                 />
-                <TabContent tabs={tabs} activeTabId={activeTabId} />
                 <TabContent tabs={tabs} activeTabId={activeTabId} />
             </div>
         </MotionWrapper>

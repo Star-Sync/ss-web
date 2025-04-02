@@ -1,5 +1,4 @@
 import React, { useState, useEffect } from "react";
-import React, { useState, useEffect } from "react";
 import { useForm, Controller, FormProvider } from "react-hook-form";
 import { Button } from "@/components/ui/button";
 import { zodResolver } from "@hookform/resolvers/zod";
@@ -33,7 +32,6 @@ const RFRequestForm = () => {
     resolver: zodResolver(RFRequestFormSchema),
     defaultValues: {
       missionName: "",
-      satelliteId: "",
       satelliteId: "",
       startTime: undefined,
       endTime: undefined,
