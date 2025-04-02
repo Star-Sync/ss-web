@@ -4,7 +4,6 @@ import MotionWrapper from "@/components/app/MotionWrapper";
 import MotionCardList from "@/components/app/dashboard/MotionCardList";
 import DashboardGS from "@/components/app/dashboard/dashboard-gs";
 import Head from "next/head";
-import { Separator } from "@/components/ui/separator";
 
 type Card = {
     color: string;
