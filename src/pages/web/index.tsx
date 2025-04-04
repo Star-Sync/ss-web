@@ -1,17 +1,11 @@
 import React from 'react';
 import WebHeader from "@/components/web/WebHeader";
-import { Article, Brand, CTA, Feature } from "@/components/web/WebPageExports";
 
 const Home: React.FC = () => {
     return (
-        <div className="App">
-            <div className="gradient__bg">
+        <div className="bg-gray-100 h-[calc(100vh-110px)]">
                 <WebHeader />
-            </div>
-            <Article />
-            <Brand />
-            <CTA />
-            <Feature />
+                
         </div>
     );
 };

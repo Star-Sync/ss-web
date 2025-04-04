@@ -11,9 +11,11 @@ type LayoutProps = {
 const WebLayout: React.FC<LayoutProps> = ({ children }) => {
     return (
         <>
-            <WebNavbar />
-            <main>{children}</main>
-            <WebFooter />
+            <div>
+                <WebNavbar />
+                <main className="bg-white">{children}</main>
+            </div>
+     
         </>
     );
 };

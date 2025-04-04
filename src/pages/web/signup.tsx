@@ -2,7 +2,7 @@ import React, { useState, useEffect } from 'react';
 import { useRouter } from 'next/router';
 import Image from 'next/image';
 import Link from 'next/link';
-import logo from '../../assets/web/logo.png';
+import logo from '../../assets/web/ss-logo-full.png';
 
 const SignUp: React.FC = () => {
     const [userData, setUserData] = useState({
@@ -58,10 +58,10 @@ const SignUp: React.FC = () => {
     };
 
     return (
-        <div className="flex items-center justify-center min-h-screen bg-gray-100 p-4">
-            <div className="w-full max-w-md bg-white p-8 rounded-lg shadow-md">
+        <div className="flex items-center justify-center bg-gray-100 p-[10vw] h-[calc(100vh-120px)]">
+            <div className="w-full max-w-md bg-white p-8 rounded-xl shadow-lg">
                 <div className="flex justify-center mb-6">
-                    <Image src={logo} alt="Logo" width={120} height={120} />
+                    <Image src={logo} alt="Logo" width={150} height={120} />
                 </div>
                 <h1 className="text-2xl font-semibold text-center mb-4">Sign Up</h1>
                 {error && (
