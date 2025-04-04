@@ -8,22 +8,21 @@ import { TimePickerField } from "@/components/ui/wrapper/timepickerfield";
 import FormFieldWrapper from "@/components/ui/wrapper/formfieldwrapper";
 import { RFRequestFormSchema, RFRequestFormData } from "./RFRequestFormSchema";
 import Combobox from "@/components/ui/combobox";
-import { getSatellites, Satellite } from "@/api/gs-satellites";
-import apiClient from "@/lib/api";
+import { getSatellitesSafe, Satellite } from "@/api/satellites";
 import { formatToISOString } from "@/lib/formatToISOString";
 import { toast } from "@/hooks/use-toast";
-
+import { createRFTimeRequest, getApiErrorMessage, RFTimeRequest } from "@/api/rf-time";
 
 const RFRequestForm = () => {
   const [satellites, setSatellites] = useState<Satellite[]>([]);
   const satelliteOptions = satellites.map((sat) => ({
-    value: sat.id.toString(),
-    label: sat.name,
+    value: sat.id,
+    label: `${sat.name} (${sat.id.slice(0, 5) + "..."})`,
   }));
 
    useEffect(() => {
         const fetchSatellites = async () => {
-          const sats = await getSatellites();
+          const sats = await getSatellitesSafe();
           setSatellites(sats);
         };
         fetchSatellites();
@@ -44,26 +43,55 @@ const RFRequestForm = () => {
   });
 
   const onSubmit = async (values: RFRequestFormData) => {
-    const payload = {
-      ...values,
-      startTime: formatToISOString(values.startTime),
-      endTime: formatToISOString(values.endTime),
+    if (!values.startTime || !values.endTime) {
+      toast({
+        title: "Validation Error",
+        description: "Start time and end time are required",
+        variant: "destructive",
+        duration: 5000,
+      });
+      return;
+    }
+
+    const startTime = formatToISOString(values.startTime);
+    const endTime = formatToISOString(values.endTime);
+
+    if (!startTime || !endTime) {
+      toast({
+        title: "Validation Error",
+        description: "Invalid date format",
+        variant: "destructive",
+        duration: 5000,
+      });
+      return;
+    }
+
+    const payload: RFTimeRequest = {
+      missionName: values.missionName,
+      satelliteId: values.satelliteId,
+      startTime,
+      endTime,
+      uplinkTime: values.uplinkTime,
+      downlinkTime: values.downlinkTime,
+      scienceTime: values.scienceTime,
+      minimumNumberOfPasses: values.minimumNumberOfPasses,
     };
 
     try {
-      const response = await apiClient.post("/api/v1/request/rf-time/", payload);
-      console.log("Successfully submitted:", response.data);
+      const response = await createRFTimeRequest(payload);
+      console.log("Successfully submitted:", response);
       toast({
-        title: "Submission Success",
-        description: "Successfully sent!" + response.data,
+        title: "Success",
+        description: `RF time request "${values.missionName}" was successfully created`,
         variant: "success",
         duration: 5000,
       });
+      form.reset();
     } catch (error) {
       console.error("Error submitting RFRequest:", error);
       toast({
-        title: "Submission Error: " + error,
-        description: "Failed to submit!",
+        title: "Submission Error",
+        description: getApiErrorMessage(error, "Failed to create RF time request!"),
         variant: "destructive",
         duration: 5000,
       });

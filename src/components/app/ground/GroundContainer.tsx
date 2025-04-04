@@ -2,17 +2,17 @@ import React, { FC, useState, useRef } from "react";
 import { Tab } from "@/components/ui/tab/TabNav";
 import MotionWrapper from "../MotionWrapper";
 import TabNav from "@/components/ui/tab/TabNav";
-import HeaderSection from "@/components/app/exclusioncones/HeaderSection";
+import HeaderSection from "@/components/app/ground/HeaderSection";
 import FormManager from "./Form/FormManager";
 import TabContent from "@/components/ui/tab/TabContent";
-import ExclusionGeneral from "@/components/app/exclusioncones/ExclusionGeneral";
+import GroundGeneral from "@/components/app/ground/GroundGeneral";
 
-const ExclusionContainer: FC = () => {
+const GroundContainer: FC = () => {
     const [tabs, setTabs] = useState<Tab[]>([
         {
             id: "overview",
             name: "Overview",
-            content: () => <ExclusionGeneral/>,
+            content: () => <GroundGeneral />,
             isPinned: true,
         },
     ]);
@@ -21,7 +21,7 @@ const ExclusionContainer: FC = () => {
 
     const addNewTab = () => {
         tabCounter.current += 1;
-        const newTabId = `exclusion-form-${tabCounter.current}`;
+        const newTabId = `ground-station-form-${tabCounter.current}`;
         const newTab: Tab = {
             id: newTabId,
             name: `Form ${tabCounter.current}`,
@@ -60,4 +60,4 @@ const ExclusionContainer: FC = () => {
     );
 };
 
-export default ExclusionContainer;
+export default GroundContainer;
