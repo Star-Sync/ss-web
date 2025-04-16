@@ -13,7 +13,7 @@ export interface Satellite {
 
 export const createSatellite = async (data: Omit<Satellite, 'id'>): Promise<Satellite> => {
     try {
-        const response = await apiClient.post<Satellite>('/api/v1/satellites/', data);
+        const response = await apiClient.post<Satellite>("/api/v1/satellites", data);
         return response.data;
     } catch (error) {
         console.error('Error creating satellite:', error);
@@ -64,12 +64,12 @@ export const deleteSatellite = async (id: string): Promise<void> => {
         console.error('Error deleting satellite:', error);
         throw error;
     }
-}; 
+};
 
 export const getApiErrorMessage = (error: unknown, defaultMessage: string = "An error occurred."): string => {
-    if (error && typeof error === 'object' && 'response' in error && 
-        error.response && typeof error.response === 'object' && 
-        'data' in error.response && error.response.data && 
+    if (error && typeof error === 'object' && 'response' in error &&
+        error.response && typeof error.response === 'object' &&
+        'data' in error.response && error.response.data &&
         typeof error.response.data === 'object' && 'detail' in error.response.data) {
         return error.response.data.detail as string;
     }

@@ -16,9 +16,9 @@ export interface ContactRequest {
 
 // Helper function to extract error messages from API responses
 export function getApiErrorMessage(err: unknown, defaultMessage: string = "An error occurred."): string {
-    if (err && typeof err === 'object' && 'response' in err && 
-        err.response && typeof err.response === 'object' && 
-        'data' in err.response && err.response.data && 
+    if (err && typeof err === 'object' && 'response' in err &&
+        err.response && typeof err.response === 'object' &&
+        'data' in err.response && err.response.data &&
         typeof err.response.data === 'object' && 'detail' in err.response.data) {
         return err.response.data.detail as string;
     }
@@ -27,10 +27,10 @@ export function getApiErrorMessage(err: unknown, defaultMessage: string = "An er
 
 export const createContactRequest = async (data: ContactRequest): Promise<ContactRequest> => {
     try {
-        const response = await apiClient.post<ContactRequest>('/api/v1/request/contact/', data);
+        const response = await apiClient.post<ContactRequest>("/api/v1/request/contact", data);
         return response.data;
     } catch (error) {
         console.error('Error creating contact request:', error);
         throw error;
     }
-}; 
+};
