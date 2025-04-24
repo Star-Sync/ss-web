@@ -39,13 +39,13 @@ const WebNavbar = () => {
                 </div>
                 <div className="scheduler_navbar-links_container">
                     <p>
-                        <a href="#home">Home</a>
+                        <a href="/">Home</a>
                     </p>
                     <p>
-                        <a href="#guide">User Guide</a>
+                        <a href="/web/userguide">User Guide</a>
                     </p>
                     <p>
-                        <a href="#faq">FAQ</a>
+                        <a href="/web/faq">FAQ</a>
                     </p>
                 </div>
             </div>
@@ -80,10 +80,10 @@ const WebNavbar = () => {
                                 <a href="#home">Home</a>
                             </p>
                             <p>
-                                <a href="#guide">User Guide</a>
+                                <a href="/web/userguide">User Guide</a>
                             </p>
                             <p>
-                                <a href="#faq">FAQ</a>
+                                <a href="/web/faq">FAQ</a>
                             </p>
                         </div>
                         <div className="scheduler_navbar-menu_container-links-sign">
