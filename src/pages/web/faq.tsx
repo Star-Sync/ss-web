@@ -77,7 +77,7 @@ const FAQ = () => {
             lineHeight: '1.6',
           }}
         >
-          Have questions? We’ve got answers. Whether you're new to the platform or a returning user,
+          Have questions? We have answers. Whether you are new to the platform or a returning user,
           this section helps clarify the most common topics — from login issues to scheduling tips.
           Explore our quick answers to get the most out of your mission management tools.
         </p>
