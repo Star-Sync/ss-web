@@ -1,6 +1,6 @@
 import React, { FC } from "react";
 import { motion } from "framer-motion";
-import { Tab } from "./TabNav";
+import { Tab } from "@/components/ui/tab/TabNav";
 
 interface TabContentProps {
     tabs: Tab[];
