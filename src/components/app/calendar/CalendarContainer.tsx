@@ -9,7 +9,10 @@ import Timeline, {
 import MotionWrapper from "@/components/app/MotionWrapper";
 import moment from "moment";
 import { gsFetchBookings, Booking } from "@/api/gs-fetch-missions";
-import { createTimelineItems, TimelineItem } from "@/components/app/calendar/CalendarItems";
+import {
+    createTimelineItems,
+    TimelineItem,
+} from "@/components/app/calendar/CalendarItems";
 import { MissionModal } from "@/components/app/calendar/MissionModal";
 import { toast } from "@/hooks/use-toast";
 
@@ -24,7 +27,9 @@ const CalendarContainer = () => {
     const [bookings, setBookings] = useState<Booking[]>([]);
     const [isLoading, setIsLoading] = useState(true);
     const [error, setError] = useState<string | null>(null);
-    const [selectedMission, setSelectedMission] = useState<TimelineItem | null>(null);
+    const [selectedMission, setSelectedMission] = useState<TimelineItem | null>(
+        null
+    );
     const [isModalOpen, setIsModalOpen] = useState(false);
     const [visibleTimeStart, setVisibleTimeStart] = useState(
         moment().startOf("day").valueOf()
@@ -43,7 +48,13 @@ const CalendarContainer = () => {
         try {
             const fetchedBookings = await gsFetchBookings();
             setBookings(fetchedBookings);
-            setItems(createTimelineItems(fetchedBookings, visibleTimeStart, visibleTimeEnd));
+            setItems(
+                createTimelineItems(
+                    fetchedBookings,
+                    visibleTimeStart,
+                    visibleTimeEnd
+                )
+            );
         } catch (err) {
             console.error("Error fetching bookings:", err);
             setError(
@@ -54,40 +65,52 @@ const CalendarContainer = () => {
         }
     }, []);
 
-    const handleItemClick = useCallback((itemId: number) => {
-        const mission = items.find((item) => item.id === itemId);
-        if (mission) {
-            setSelectedMission(mission);
-            setIsModalOpen(true);
-        }
-    }, [items]);
+    const handleItemClick = useCallback(
+        (itemId: number) => {
+            const mission = items.find((item) => item.id === itemId);
+            if (mission) {
+                setSelectedMission(mission);
+                setIsModalOpen(true);
+            }
+        },
+        [items]
+    );
 
-    const handleTimeChange = useCallback((
-        newVisibleTimeStart: number,
-        newVisibleTimeEnd: number,
-        updateScrollCanvas: (start: number, end: number) => void
-    ) => {
-        if (newVisibleTimeStart < minTime && newVisibleTimeEnd > maxTime) {
-            updateScrollCanvas(minTime, maxTime);
-        } else if (newVisibleTimeStart < minTime) {
-            updateScrollCanvas(
-                minTime,
-                minTime + (newVisibleTimeEnd - newVisibleTimeStart)
-            );
-        } else if (newVisibleTimeEnd > maxTime) {
-            updateScrollCanvas(
-                maxTime - (newVisibleTimeEnd - newVisibleTimeStart),
-                maxTime
-            );
-        } else {
-            updateScrollCanvas(newVisibleTimeStart, newVisibleTimeEnd);
-        }
+    const handleTimeChange = useCallback(
+        (
+            newVisibleTimeStart: number,
+            newVisibleTimeEnd: number,
+            updateScrollCanvas: (start: number, end: number) => void
+        ) => {
+            if (newVisibleTimeStart < minTime && newVisibleTimeEnd > maxTime) {
+                updateScrollCanvas(minTime, maxTime);
+            } else if (newVisibleTimeStart < minTime) {
+                updateScrollCanvas(
+                    minTime,
+                    minTime + (newVisibleTimeEnd - newVisibleTimeStart)
+                );
+            } else if (newVisibleTimeEnd > maxTime) {
+                updateScrollCanvas(
+                    maxTime - (newVisibleTimeEnd - newVisibleTimeStart),
+                    maxTime
+                );
+            } else {
+                updateScrollCanvas(newVisibleTimeStart, newVisibleTimeEnd);
+            }
 
-        setVisibleTimeStart(newVisibleTimeStart);
-        setVisibleTimeEnd(newVisibleTimeEnd);
-        
-        setItems(createTimelineItems(bookings, newVisibleTimeStart, newVisibleTimeEnd));
-    }, [minTime, maxTime, bookings]);
+            setVisibleTimeStart(newVisibleTimeStart);
+            setVisibleTimeEnd(newVisibleTimeEnd);
+
+            setItems(
+                createTimelineItems(
+                    bookings,
+                    newVisibleTimeStart,
+                    newVisibleTimeEnd
+                )
+            );
+        },
+        [minTime, maxTime, bookings]
+    );
 
     // Initial fetch of bookings
     useEffect(() => {
@@ -105,7 +128,10 @@ const CalendarContainer = () => {
         window.addEventListener("sidebarButtonClick", handleSidebarButtonClick);
 
         return () => {
-            window.removeEventListener("sidebarButtonClick", handleSidebarButtonClick);
+            window.removeEventListener(
+                "sidebarButtonClick",
+                handleSidebarButtonClick
+            );
         };
     }, [fetchBookings]);
 
@@ -119,11 +145,12 @@ const CalendarContainer = () => {
     if (error) {
         toast({
             title: "Error: " + error,
-            description: "There was an error fetching from the API. Please try again.",
+            description:
+                "There was an error fetching from the API. Please try again.",
             variant: "destructive",
             duration: 5000,
         });
-        console.log('Error fetching missions test:', error);
+        console.log("Error fetching missions test:", error);
         return (
             <div className="w-full h-full flex items-center justify-center">
                 <div className="text-red-600">{error}</div>
@@ -135,7 +162,9 @@ const CalendarContainer = () => {
         <MotionWrapper className="bg-white rounded-xl p-6 shadow-md mb-4">
             <div className="flex justify-between items-center mb-4">
                 <div>
-                    <h1 className="text-2xl font-bold text-black">Scheduling Calendar</h1>
+                    <h1 className="text-2xl font-bold text-black">
+                        Scheduling Calendar
+                    </h1>
                     <p className="text-md text-gray-500">
                         View and manage your schedule effortlessly.
                     </p>
@@ -166,7 +195,10 @@ const CalendarContainer = () => {
                     <TimelineHeaders>
                         <SidebarHeader>
                             {({ getRootProps }) => (
-                                <div className="bg-gray-500" {...getRootProps()}>
+                                <div
+                                    className="bg-gray-500"
+                                    {...getRootProps()}
+                                >
                                     <div className="p-6 text-center text-white font-bold">
                                         GroundStations
                                     </div>
