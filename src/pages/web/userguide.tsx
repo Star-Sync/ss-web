@@ -4,7 +4,6 @@ import MotionWrapper from '@/components/app/MotionWrapper';
 
 const UserGuide = () => {
   const [videoError, setVideoError] = useState(false);
-  const [isLoading, setIsLoading] = useState(true);
 
   return (
     <div className="min-h-screen bg-gradient-to-b from-background to-background/80 py-16 px-4 sm:px-6 lg:px-8">
@@ -84,7 +83,6 @@ const UserGuide = () => {
                   loop
                   playsInline
                   onError={() => setVideoError(true)}
-                  onLoadedData={() => setIsLoading(false)}
                 >
                   <source src="/video/videodemo.mp4" type="video/mp4"/>
                   Your browser does not support the video tag.

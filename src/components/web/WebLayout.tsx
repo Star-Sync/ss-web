@@ -1,6 +1,5 @@
 import React from 'react';
 
-import WebFooter from '@/components/web/WebFooter';
 import WebNavbar from "@/components/web/WebNavbar";
 
 
