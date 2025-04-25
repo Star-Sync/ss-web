@@ -13,7 +13,12 @@ const formVariants = {
 
 const transition = { duration: 0.4, ease: "easeInOut" };
 
-const FormManager: React.FC = () => {
+interface FormManagerProps {
+    closeTab: (tabId: string) => void;
+    tabId: string;
+}
+
+const FormManager: React.FC<FormManagerProps> = ({ closeTab, tabId }) => {
     return (
         <MotionWrapper>
             <Tabs defaultValue="satellite" className="w-full">
@@ -26,7 +31,7 @@ const FormManager: React.FC = () => {
                         exit="exit"
                         transition={transition}
                     >
-                        <SatelliteForm />
+                        <SatelliteForm closeTab={closeTab} tabId={tabId} />
                     </motion.div>
                 </TabsContent>
             </Tabs>

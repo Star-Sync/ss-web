@@ -13,7 +13,7 @@ const SatelliteContainer: FC = () => {
         {
             id: "overview",
             name: "Overview",
-            content: () => <SatelliteGeneral/>,
+            content: () => <SatelliteGeneral />,
             isPinned: true,
         },
     ]);
@@ -26,7 +26,7 @@ const SatelliteContainer: FC = () => {
         const newTab: Tab = {
             id: newTabId,
             name: `Form ${tabCounter.current}`,
-            content: () => <FormManager key={newTabId}/>,
+            content: () => <FormManager closeTab={closeTab} tabId={newTabId} />,
         };
         setTabs((prevTabs) => [...prevTabs, newTab]);
         setActiveTabId(newTabId);
@@ -36,12 +36,9 @@ const SatelliteContainer: FC = () => {
         const tabToClose = tabs.find((tab) => tab.id === tabId);
         if (tabToClose?.isPinned) return;
 
+        setActiveTabId(tabs[0].id);
         const updatedTabs = tabs.filter((tab) => tab.id !== tabId);
         setTabs(updatedTabs);
-
-        if (activeTabId === tabId) {
-            setActiveTabId(updatedTabs[0]?.id || "");
-        }
     };
 
     return (

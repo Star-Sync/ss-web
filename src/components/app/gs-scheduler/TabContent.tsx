@@ -8,23 +8,24 @@ interface TabContentProps {
 }
 
 const TabContent: FC<TabContentProps> = ({ tabs, activeTabId }) => {
+    const activeTab = tabs.find((tab) => tab.id === activeTabId);
+
+    if (!activeTab) {
+        return <div>No active tab found</div>;
+    }
+
     return (
         <div className="flex-grow relative">
-            {tabs.map((tab) => (
-                <motion.div
-                    key={tab.id}
-                    initial={false}
-                    animate={tab.id === activeTabId ? "active" : "inactive"}
-                    variants={{
-                        active: { opacity: 1, x: 0, position: "relative" },
-                        inactive: { opacity: 0, x: -20, position: "absolute" },
-                    }}
-                    transition={{ duration: 0.3 }}
-                    style={{ width: "100%", height: "100%" }}
-                >
-                    {tab.content()}
-                </motion.div>
-            ))}
+            <motion.div
+                key={activeTab.id} // Use key to force re-mount on tab change
+                initial={{ opacity: 0, x: -20 }}
+                animate={{ opacity: 1, x: 0 }}
+                exit={{ opacity: 0, x: -20 }}
+                transition={{ duration: 0.3 }}
+                style={{ width: "100%", height: "100%", position: "relative" }}
+            >
+                {activeTab.content()}
+            </motion.div>
         </div>
     );
 };
