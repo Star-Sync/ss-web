@@ -1,101 +1,128 @@
 "use client";
 
 import React, { useState, useEffect } from "react";
-import { RiMenu3Line, RiCloseLine } from "react-icons/ri";
 import Image from "next/image";
-import logo from "../../assets/web/logo.png";
 import { useRouter } from "next/router";
-import Link from 'next/link';
+import { Button } from "@/components/ui/button";
+import {
+  NavigationMenu,
+  NavigationMenuList,
+} from "@/components/ui/navigation-menu";
+import { Menu } from "lucide-react";
+import { Sheet, SheetContent, SheetTrigger } from "@/components/ui/sheet";
+import logo from "../../assets/web/logo.png";
 
 const WebNavbar = () => {
-    const [toggleMenu, setToggleMenu] = useState(false);
     const [isLoggedIn, setIsLoggedIn] = useState(false);
     const router = useRouter();
 
     useEffect(() => {
-        // Check if user is logged in by looking for an access token
         const token = localStorage.getItem("access_token");
         setIsLoggedIn(!!token);
     }, []);
 
-    // Define authentication routes where the auth button should be hidden.
     const authRoutes = ["/signin", "/signup"];
     const shouldHideAuthButton = authRoutes.includes(router.pathname);
 
     const handleAuthButtonClick = () => {
         if (isLoggedIn) {
-            // If logged in, navigate to dashboard
             router.push("/dashboard");
         } else {
-            // If not logged in, navigate to sign in page
             router.push("/signin");
         }
     };
 
+    const handleSignInClick = () => {
+        router.push("/signin");
+    };
+
+    const handleSignUpClick = () => {
+        router.push("/signup");
+    };
+
+    const handleNavigation = (path: string) => {
+        router.push(path);
+    };
+
     return (
-        <div className="scheduler_navbar">
-            <div className="scheduler_navbar-links">
-                <div className="scheduler_navbar-links_logo">
-                    <Image src={logo} alt="logo" width={100} height={100} />
-                </div>
-                <div className="scheduler_navbar-links_container">
-                    <p>
-                        <Link href="/">Home</Link>
-                    </p>
-                    <p>
-                        <Link href="/web/userguide">User Guide</Link>
-                    </p>
-                    <p>
-                        <Link href="/web/faq">FAQ</Link>
-                    </p>
-                </div>
-            </div>
-
-            {/* Show auth button only if the current route is not the login/signup. */}
-            <div className="scheduler_navbar-sign">
-                {!shouldHideAuthButton && (
-                    <button type="button" onClick={handleAuthButtonClick}>
-                        {isLoggedIn ? "Open App" : "Sign in"}
-                    </button>
-                )}
-            </div>
-
-            <div className="scheduler_navbar-menu">
-                {toggleMenu ? (
-                    <RiCloseLine
-                        color="#fff"
-                        size={27}
-                        onClick={() => setToggleMenu(false)}
-                    />
-                ) : (
-                    <RiMenu3Line
-                        color="#fff"
-                        size={27}
-                        onClick={() => setToggleMenu(true)}
-                    />
-                )}
-                {toggleMenu && (
-                    <div className="scheduler_navbar-menu_container scale-up-center">
-                        <div className="scheduler_navbar-menu_container-links">
-                            <p>
-                                <Link href="/">Home</Link>
-                            </p>
-                            <p>
-                                <Link href="/web/userguide">User Guide</Link>
-                            </p>
-                            <p>
-                                <Link href="/web/faq">FAQ</Link>
-                            </p>
-                        </div>
-                        <div className="scheduler_navbar-menu_container-links-sign">
-                            {!shouldHideAuthButton && (
-                                <button type="button" onClick={handleAuthButtonClick}>
-                                    {isLoggedIn ? "Open App" : "Sign in"}
-                                </button>
-                            )}
-                        </div>
+        <div className="mt-4 border-b bg-white min-h-[6vw]">
+            <div className="flex h-16 items-center px-4 container mx-auto">
+                <div className="flex items-center space-x-4">
+                    <div onClick={() => handleNavigation("/")} className="cursor-pointer">
+                        <Image src={logo} alt="logo" width={75} height={75} />
                     </div>
-                )}
+                    <NavigationMenu>
+                        <NavigationMenuList>
+                        </NavigationMenuList>
+                    </NavigationMenu>
+                </div>
+
+                <div className="ml-auto flex items-center space-x-4">
+                    {!shouldHideAuthButton && !isLoggedIn && (
+                        <>
+                            <Button onClick={handleSignInClick} variant="outline">
+                                Sign in
+                            </Button>
+                            <Button onClick={handleSignUpClick} variant="default">
+                                Sign up
+                            </Button>
+                        </>
+                    )}
+                    {isLoggedIn && (
+                        <Button onClick={handleAuthButtonClick} variant="default">
+                            Open App
+                        </Button>
+                    )}
+
+                    {/* Mobile Menu */}
+                    <Sheet >
+                        <SheetTrigger asChild>
+                            <Button variant="ghost" size="icon" className="md:hidden">
+                                <Menu className="h-5 w-5" />
+                            </Button>
+                        </SheetTrigger>
+                        <SheetContent side="right" className="bg-white p-4">
+                            <div className="flex flex-col space-y-4 mt-4">
+                                <Button 
+                                    variant="ghost" 
+                                    className="justify-start" 
+                                    onClick={() => handleNavigation("/")}
+                                >
+                                    Home
+                                </Button>
+                                <Button 
+                                    variant="ghost" 
+                                    className="justify-start" 
+                                    onClick={() => handleNavigation("/guide")}
+                                >
+                                    User Guide
+                                </Button>
+                                <Button 
+                                    variant="ghost" 
+                                    className="justify-start" 
+                                    onClick={() => handleNavigation("/faq")}
+                                >
+                                    FAQ
+                                </Button>
+                                {!shouldHideAuthButton && (
+                                    <>
+                                        <Button onClick={handleSignInClick} variant="outline" className="w-full">
+                                            Sign in
+                                        </Button>
+                                        <Button onClick={handleSignUpClick} variant="default" className="w-full">
+                                            Sign up
+                                        </Button>
+                                    </>
+                                )}
+                                {isLoggedIn && (
+                                    <Button onClick={handleAuthButtonClick} className="w-full">
+                                        Open App
+                                    </Button>
+                                )}
+                            </div>
+                        </SheetContent>
+                    </Sheet>
+                </div>
             </div>
         </div>
     );
