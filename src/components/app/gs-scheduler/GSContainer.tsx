@@ -16,7 +16,7 @@ const GSContainer: FC = () => {
             isPinned: true,
         },
     ]);
-    const [activeTabId, setActiveTabId] = useState("scheduler");
+    const [activeTabId, setActiveTabId] = useState(tabs[0].id);
     const tabCounter = useRef(0);
 
     const addNewTab = () => {
@@ -25,7 +25,7 @@ const GSContainer: FC = () => {
         const newTab: Tab = {
             id: newTabId,
             name: `Request Form. ${tabCounter.current}`,
-            content: () => <RequestForm key={newTabId}/>,
+            content: () => <RequestForm closeTab={closeTab} tabId={newTabId} />,
         };
         setTabs((prevTabs) => [...prevTabs, newTab]);
         setActiveTabId(newTabId);
@@ -35,12 +35,10 @@ const GSContainer: FC = () => {
         const tabToClose = tabs.find((tab) => tab.id === tabId);
         if (tabToClose?.isPinned) return;
 
+        setActiveTabId(tabs[0].id);
+
         const updatedTabs = tabs.filter((tab) => tab.id !== tabId);
         setTabs(updatedTabs);
-
-        if (activeTabId === tabId) {
-            setActiveTabId(updatedTabs[0]?.id || "");
-        }
     };
 
     return (

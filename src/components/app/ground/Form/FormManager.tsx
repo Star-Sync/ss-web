@@ -2,7 +2,7 @@ import React from "react";
 import { Tabs, TabsContent } from "@/components/ui/tabs";
 import { motion } from "framer-motion";
 import MotionWrapper from "@/components/app/MotionWrapper";
-import GroundForm from "./GroundForm";  // Assuming you will create a GroundForm component
+import GroundForm from "./GroundForm"; // Assuming you will create a GroundForm component
 
 const formVariants = {
     initial: { opacity: 0, scale: 0.95 },
@@ -12,7 +12,12 @@ const formVariants = {
 
 const transition = { duration: 0.4, ease: "easeInOut" };
 
-const FormManager: React.FC = () => {
+interface FormManagerProps {
+    closeTab: (tabId: string) => void;
+    tabId: string;
+}
+
+const FormManager: React.FC<FormManagerProps> = ({ closeTab, tabId }) => {
     return (
         <MotionWrapper>
             <Tabs defaultValue="ground" className="w-full">
@@ -25,7 +30,7 @@ const FormManager: React.FC = () => {
                         exit="exit"
                         transition={transition}
                     >
-                        <GroundForm />  {/* Assuming this is the component for Ground Form */}
+                        <GroundForm closeTab={closeTab} tabId={tabId} />
                     </motion.div>
                 </TabsContent>
             </Tabs>

@@ -12,7 +12,12 @@ const formVariants = {
 
 const transition = { duration: 0.4, ease: "easeInOut" };
 
-const FormManager: React.FC = () => {
+interface FormManagerProps {
+    closeTab: (tabId: string) => void;
+    tabId: string;
+}
+
+const FormManager: React.FC<FormManagerProps> = ({ closeTab, tabId }) => {
     return (
         <MotionWrapper>
             <Tabs defaultValue="exclusion" className="w-full">
@@ -25,7 +30,7 @@ const FormManager: React.FC = () => {
                         exit="exit"
                         transition={transition}
                     >
-                        <ExclusionForm />
+                        <ExclusionForm closeTab={closeTab} tabId={tabId} />
                     </motion.div>
                 </TabsContent>
             </Tabs>
