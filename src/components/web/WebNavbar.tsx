@@ -5,6 +5,7 @@ import { RiMenu3Line, RiCloseLine } from "react-icons/ri";
 import Image from "next/image";
 import logo from "../../assets/web/logo.png";
 import { useRouter } from "next/router";
+import Link from 'next/link';
 
 const WebNavbar = () => {
     const [toggleMenu, setToggleMenu] = useState(false);
@@ -39,13 +40,13 @@ const WebNavbar = () => {
                 </div>
                 <div className="scheduler_navbar-links_container">
                     <p>
-                        <a href="#home">Home</a>
+                        <Link href="/">Home</Link>
                     </p>
                     <p>
-                        <a href="#guide">User Guide</a>
+                        <Link href="/web/userguide">User Guide</Link>
                     </p>
                     <p>
-                        <a href="#faq">FAQ</a>
+                        <Link href="/web/faq">FAQ</Link>
                     </p>
                 </div>
             </div>
@@ -77,13 +78,13 @@ const WebNavbar = () => {
                     <div className="scheduler_navbar-menu_container scale-up-center">
                         <div className="scheduler_navbar-menu_container-links">
                             <p>
-                                <a href="#home">Home</a>
+                                <Link href="/">Home</Link>
                             </p>
                             <p>
-                                <a href="#guide">User Guide</a>
+                                <Link href="/web/userguide">User Guide</Link>
                             </p>
                             <p>
-                                <a href="#faq">FAQ</a>
+                                <Link href="/web/faq">FAQ</Link>
                             </p>
                         </div>
                         <div className="scheduler_navbar-menu_container-links-sign">
