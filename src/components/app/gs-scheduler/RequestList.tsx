@@ -13,6 +13,7 @@ import {
     DialogHeader,
     DialogTitle,
     DialogFooter,
+    DialogPortal,
 } from "@/components/ui/dialog";
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
@@ -246,6 +247,9 @@ const RequestList: FC = () => {
 
             {/* Edit Dialog */}
             <Dialog open={isEditDialogOpen} onOpenChange={setIsEditDialogOpen}>
+                <DialogPortal>
+                    <div className="fixed inset-0 bg-black/50 z-[1000]" />
+                </DialogPortal>
                 <DialogContent className="bg-white border shadow-lg max-h-[90vh] flex flex-col z-[1000]">
                     <DialogHeader>
                         <DialogTitle>Request Details</DialogTitle>
