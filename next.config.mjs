@@ -22,6 +22,8 @@ const nextConfig = {
         { source: '/possibility', destination: '/web/possibility' },
         { source: '/signin', destination: '/web/signin' },
         { source: '/signup', destination: '/web/signup' },
+        { source: '/faq', destination: '/web/faq' },
+        { source: '/userguide', destination: '/web/userguide' },
 
         // API Proxy to Backend
         { source: '/api/:path*', destination: process.env.NEXT_PUBLIC_API_URL+'/api/:path*' }

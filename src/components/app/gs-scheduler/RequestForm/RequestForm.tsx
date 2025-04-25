@@ -13,7 +13,12 @@ const formVariants = {
 
 const transition = { duration: 0.4, ease: "easeInOut" };
 
-const RequestForm = () => {
+interface RequestFormProps {
+    closeTab: (tabId: string) => void;
+    tabId: string;
+}
+
+const RequestForm = ({ closeTab, tabId }: RequestFormProps) => {
     return (
         <MotionWrapper>
             <Tabs defaultValue="contact">
@@ -33,7 +38,7 @@ const RequestForm = () => {
                         exit="exit"
                         transition={transition}
                     >
-                        <ContactRequestForm/>
+                        <ContactRequestForm closeTab={closeTab} tabId={tabId} />
                     </motion.div>
                 </TabsContent>
                 <TabsContent value="rf">
@@ -45,7 +50,7 @@ const RequestForm = () => {
                         exit="exit"
                         transition={transition}
                     >
-                        <RFRequestForm/>
+                        <RFRequestForm closeTab={closeTab} tabId={tabId} />
                     </motion.div>
                 </TabsContent>
             </Tabs>

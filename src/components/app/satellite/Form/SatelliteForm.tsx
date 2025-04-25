@@ -9,7 +9,12 @@ import { SatelliteFormSchema, SatelliteFormData } from "./SatelliteFormSchema";
 import { toast } from "@/hooks/use-toast";
 import { createSatellite, getApiErrorMessage } from "@/api/satellites";
 
-const SatelliteForm: React.FC = () => {
+interface SatelliteFormProps {
+  closeTab: (tabId: string) => void;
+  tabId: string;
+}
+
+const SatelliteForm: React.FC<SatelliteFormProps> = ({ closeTab, tabId }) => {
   const form = useForm<SatelliteFormData>({
     resolver: zodResolver(SatelliteFormSchema),
     defaultValues: {
@@ -31,7 +36,7 @@ const SatelliteForm: React.FC = () => {
         variant: "success",
         duration: 5000,
       });
-      form.reset();
+      closeTab(tabId);
     } catch (error) {
       console.error("Error submitting satellite:", error);
       toast({

@@ -8,7 +8,12 @@ import { GroundFormSchema, GroundFormData } from "./GroundFormSchema";
 import { toast } from "@/hooks/use-toast";
 import { createGroundStation, getApiErrorMessage } from "@/api/ground-stations";
 
-const GroundForm: React.FC = () => {
+interface GroundFormProps {
+    closeTab: (tabId: string) => void;
+    tabId: string;
+}
+
+const GroundForm: React.FC<GroundFormProps> = ({ closeTab, tabId }) => {
     const form = useForm<GroundFormData>({
         resolver: zodResolver(GroundFormSchema),
         defaultValues: {
@@ -44,12 +49,15 @@ const GroundForm: React.FC = () => {
                 variant: "success",
                 duration: 5000,
             });
-            form.reset();
+            closeTab(tabId);
         } catch (error) {
             console.error("Error submitting ground station:", error);
             toast({
                 title: "Submission Error",
-                description: getApiErrorMessage(error, "Failed to create ground station!"),
+                description: getApiErrorMessage(
+                    error,
+                    "Failed to create ground station!"
+                ),
                 variant: "destructive",
                 duration: 5000,
             });
@@ -81,7 +89,9 @@ const GroundForm: React.FC = () => {
                                 placeholder="Enter latitude"
                                 type="number"
                                 step="any"
-                                onChange={(e) => field.onChange(Number(e.target.value))}
+                                onChange={(e) =>
+                                    field.onChange(Number(e.target.value))
+                                }
                             />
                         )}
                     />
@@ -96,7 +106,9 @@ const GroundForm: React.FC = () => {
                                 placeholder="Enter longitude"
                                 type="number"
                                 step="any"
-                                onChange={(e) => field.onChange(Number(e.target.value))}
+                                onChange={(e) =>
+                                    field.onChange(Number(e.target.value))
+                                }
                             />
                         )}
                     />
@@ -115,7 +127,9 @@ const GroundForm: React.FC = () => {
                                 placeholder="Enter height"
                                 type="number"
                                 step="any"
-                                onChange={(e) => field.onChange(Number(e.target.value))}
+                                onChange={(e) =>
+                                    field.onChange(Number(e.target.value))
+                                }
                             />
                         )}
                     />
@@ -130,7 +144,9 @@ const GroundForm: React.FC = () => {
                                 placeholder="Enter mask value"
                                 type="number"
                                 step="any"
-                                onChange={(e) => field.onChange(Number(e.target.value))}
+                                onChange={(e) =>
+                                    field.onChange(Number(e.target.value))
+                                }
                             />
                         )}
                     />
@@ -149,7 +165,9 @@ const GroundForm: React.FC = () => {
                                 placeholder="Enter uplink rate"
                                 type="number"
                                 step="any"
-                                onChange={(e) => field.onChange(Number(e.target.value))}
+                                onChange={(e) =>
+                                    field.onChange(Number(e.target.value))
+                                }
                             />
                         )}
                     />
@@ -164,7 +182,9 @@ const GroundForm: React.FC = () => {
                                 placeholder="Enter downlink rate"
                                 type="number"
                                 step="any"
-                                onChange={(e) => field.onChange(Number(e.target.value))}
+                                onChange={(e) =>
+                                    field.onChange(Number(e.target.value))
+                                }
                             />
                         )}
                     />
@@ -183,7 +203,9 @@ const GroundForm: React.FC = () => {
                                 placeholder="Enter science data rate"
                                 type="number"
                                 step="any"
-                                onChange={(e) => field.onChange(Number(e.target.value))}
+                                onChange={(e) =>
+                                    field.onChange(Number(e.target.value))
+                                }
                             />
                         )}
                     />
