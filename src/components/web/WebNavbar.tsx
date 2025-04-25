@@ -80,13 +80,13 @@ const WebNavbar = () => {
                     )}
 
                     {/* Mobile Menu */}
-                    <Sheet>
+                    <Sheet >
                         <SheetTrigger asChild>
                             <Button variant="ghost" size="icon" className="md:hidden">
                                 <Menu className="h-5 w-5" />
                             </Button>
                         </SheetTrigger>
-                        <SheetContent side="right">
+                        <SheetContent side="right" className="bg-white p-4">
                             <div className="flex flex-col space-y-4 mt-4">
                                 <Button 
                                     variant="ghost" 
