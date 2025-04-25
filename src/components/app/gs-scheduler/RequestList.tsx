@@ -17,7 +17,7 @@ import {
 } from "@/components/ui/dialog";
 import { Button } from "@/components/ui/button";
 import { Label } from "@/components/ui/label";
-import { Trash, Pencil, ArrowUpDown, Edit2 } from "lucide-react";
+import { Trash, ArrowUpDown, Edit2 } from "lucide-react";
 import { format } from "date-fns";
 import { Input } from "@/components/ui/input";
 
