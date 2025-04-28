@@ -15,16 +15,12 @@ import {
 } from "@/components/app/calendar/CalendarItems";
 import { MissionModal } from "@/components/app/calendar/MissionModal";
 import { toast } from "@/hooks/use-toast";
-
-const groups = [
-    { id: 1, title: "Prince Albert" },
-    { id: 2, title: "Gatineau" },
-    { id: 3, title: "Inuvik" },
-];
+import { getGroundStationsSafe, Ground } from "@/api/ground-stations";
 
 const CalendarContainer = () => {
     const [items, setItems] = useState<TimelineItem[]>([]);
     const [bookings, setBookings] = useState<Booking[]>([]);
+    const [groundStations, setGroundStations] = useState<Ground[]>([]);
     const [isLoading, setIsLoading] = useState(true);
     const [error, setError] = useState<string | null>(null);
     const [selectedMission, setSelectedMission] = useState<TimelineItem | null>(
@@ -41,6 +37,18 @@ const CalendarContainer = () => {
     // Set scrolling limits (6 months before and after current time)
     const minTime = moment().add(-6, "months").valueOf();
     const maxTime = moment().add(6, "months").valueOf();
+
+    const fetchGroundStations = useCallback(async () => {
+        try {
+            const stations = await getGroundStationsSafe();
+            setGroundStations(stations);
+        } catch (err) {
+            console.error("Error fetching ground stations:", err);
+            setError(
+                err instanceof Error ? err.message : "An unknown error occurred"
+            );
+        }
+    }, []);
 
     const fetchBookings = useCallback(async () => {
         setIsLoading(true);
@@ -112,10 +120,11 @@ const CalendarContainer = () => {
         [minTime, maxTime, bookings]
     );
 
-    // Initial fetch of bookings
+    // Initial fetch of ground stations and bookings
     useEffect(() => {
+        fetchGroundStations();
         fetchBookings();
-    }, [fetchBookings]);
+    }, [fetchGroundStations, fetchBookings]);
 
     // Handle sidebar button click
     useEffect(() => {
@@ -158,6 +167,12 @@ const CalendarContainer = () => {
         );
     }
 
+    // Transform ground stations into the format required by the Timeline component
+    const groups = groundStations.map((station) => ({
+        id: Number(station.id),
+        title: station.name,
+    }));
+
     return (
         <MotionWrapper className="bg-white rounded-xl p-6 shadow-md mb-4">
             <div className="flex justify-between items-center mb-4">
@@ -170,7 +185,10 @@ const CalendarContainer = () => {
                     </p>
                 </div>
                 <button
-                    onClick={() => fetchBookings()}
+                    onClick={() => {
+                        fetchGroundStations();
+                        fetchBookings();
+                    }}
                     className="bg-blue-500 hover:bg-blue-600 text-white font-semibold py-2 px-4 rounded"
                 >
                     Refresh
